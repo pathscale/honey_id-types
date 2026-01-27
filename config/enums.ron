@@ -1,0 +1,206 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+// TODO: We can probably remove most of these from the public library
+
+Config(
+    definition: EnumList (
+        [
+            Enum(
+                name: "UserRole",
+                variants: [
+                    EnumVariant(
+                        name: "Public",
+                        value: 0,
+                        description: "Public can only view some data.",
+                    ),
+                    EnumVariant(
+                        name: "PlatformAdmin",
+                        value: 1,
+                        description: "Platform admin can do literally everything. Very dangerous role.",
+                    ),
+                    EnumVariant(
+                        name: "PlatformSupport",
+                        value: 2,
+                        description: "Platform support can view and manage some staff.",
+                    ),
+                    EnumVariant(
+                        name: "AppNewUser",
+                        value: 3,
+                        description: "New user in application, can only create new app or be invited to an app.",
+                    ),
+                    EnumVariant(
+                        name: "AppAdmin",
+                        value: 4,
+                        description: "App admin can manage the application, but not the platform.",
+                    ),
+                    EnumVariant(
+                        name: "AppSupport",
+                        value: 5,
+                        description: "App support see the application info, but not the platform.",
+                    ),
+                    EnumVariant(
+                        name: "AppApiKey",
+                        value: 6,
+                        description: "The role is used for external users only.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "roleInApp",
+                variants: [
+                    EnumVariant(
+                        name: "admin",
+                        value: 1,
+                        description: "Admin in application.",
+                    ),
+                    EnumVariant(
+                        name: "member",
+                        value: 2,
+                        description: "Member in application.",
+                    ),
+                    EnumVariant(
+                        name: "guest",
+                        value: 3,
+                        description: "Guest in application.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "InternalUserStatus",
+                variants: [
+                    EnumVariant(
+                        name: "enabled",
+                        value: 1,
+                        description: "Active user.",
+                    ),
+                    EnumVariant(
+                        name: "disabled",
+                        value: 2,
+                        description: "Inactive user.",
+                    ),
+                    EnumVariant(
+                        name: "banned",
+                        value: 3,
+                        description: "Banned user.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "ExternalUserStatus",
+                variants: [
+                    EnumVariant(
+                        name: "enabled",
+                        value: 1,
+                        description: "Active user.",
+                    ),
+                    EnumVariant(
+                        name: "disabled",
+                        value: 2,
+                        description: "Inactive user.",
+                    ),
+                    EnumVariant(
+                        name: "banned",
+                        value: 3,
+                        description: "Banned user.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "appStatus",
+                variants: [
+                    EnumVariant(
+                        name: "enabled",
+                        value: 1,
+                        description: "Active application.",
+                    ),
+                    EnumVariant(
+                        name: "disabled",
+                        value: 2,
+                        description: "Inactive user.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "paymentStatus",
+                variants: [
+                    EnumVariant(
+                        name: "pending",
+                        value: 0,
+                        description: "Payment is pending.",
+                    ),
+                    EnumVariant(
+                        name: "expired",
+                        value: 1,
+                        description: "Payment has expired.",
+                    ),
+                    EnumVariant(
+                        name: "cancelled",
+                        value: 2,
+                        description: "Payment has been cancelled.",
+                    ),
+                    EnumVariant(
+                        name: "completed",
+                        value: 3,
+                        description: "Payment has been completed.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "AppBillingStatus",
+                variants: [
+                    EnumVariant(
+                        name: "PayRequired",
+                        value: 0,
+                        description: "Free tier.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "AppSubscriptionStatus",
+                variants: [
+                    EnumVariant(
+                        name: "Active",
+                        value: 0,
+                        description: "WIP",
+                    ),
+                    EnumVariant(
+                        name: "Cancelled",
+                        value: 1,
+                        description: "WIP",
+                    ),
+                    EnumVariant(
+                        name: "ScheduledForCancel",
+                        value: 2,
+                        description: "WIP",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "EventSeverity",
+                variants: [
+                    EnumVariant(
+                        name: "Success",
+                        value: 0,
+                        description: "Represents a message about successful action.",
+                    ),
+                    EnumVariant(
+                        name: "Info",
+                        value: 1,
+                        description: "Represents a message about some progress.",
+                    ),
+                    EnumVariant(
+                        name: "Warn",
+                        value: 2,
+                        description: "Represents a message that requires attention.",
+                    ),
+                    EnumVariant(
+                        name: "Error",
+                        value: 3,
+                        description: "Represents a message that marks a failure.",
+                    ),
+                ],
+            ),
+        ]
+    )
+)

@@ -1,0 +1,28 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+Config(
+    definition: EndpointSchemaList(
+        "apiKeyEndpoints",
+        10,
+        [
+            EndpointSchema(
+                name: "ApiKeyConnect",
+                code: 100,
+                parameters: [
+                    Field(name: "appPublicId", ty: UUID, 
+                    description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."),
+                    Field(name: "appApiKey", ty: String, 
+                    description: "The API Key of the app initiating this API Key connection. Retrieved and only visible after initial creation of the app in Honey App UI or initially after creating a new API key for an existing app."),
+                ],
+                returns: [],
+                stream_response: None,
+                description: "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+                json_schema: (),
+                roles: [
+                    "UserRole::Public",
+                ],
+            ),
+        ]
+    )
+)

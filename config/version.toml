@@ -1,0 +1,5 @@
+[binary]
+version = "0.4.1"
+
+[libs]
+version = "1.0.5" 

@@ -1,0 +1,668 @@
+{
+  "enums": [
+    {
+      "Enum": {
+        "name": "AppBillingStatus",
+        "variants": [
+          {
+            "description": "Free tier.",
+            "name": "PayRequired",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "AppSubscriptionStatus",
+        "variants": [
+          {
+            "description": "WIP",
+            "name": "Active",
+            "value": 0
+          },
+          {
+            "description": "WIP",
+            "name": "Cancelled",
+            "value": 1
+          },
+          {
+            "description": "WIP",
+            "name": "ScheduledForCancel",
+            "value": 2
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "EventSeverity",
+        "variants": [
+          {
+            "description": "Represents a message about successful action.",
+            "name": "Success",
+            "value": 0
+          },
+          {
+            "description": "Represents a message about some progress.",
+            "name": "Info",
+            "value": 1
+          },
+          {
+            "description": "Represents a message that requires attention.",
+            "name": "Warn",
+            "value": 2
+          },
+          {
+            "description": "Represents a message that marks a failure.",
+            "name": "Error",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "ExternalUserStatus",
+        "variants": [
+          {
+            "description": "Active user.",
+            "name": "enabled",
+            "value": 1
+          },
+          {
+            "description": "Inactive user.",
+            "name": "disabled",
+            "value": 2
+          },
+          {
+            "description": "Banned user.",
+            "name": "banned",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "InternalUserStatus",
+        "variants": [
+          {
+            "description": "Active user.",
+            "name": "enabled",
+            "value": 1
+          },
+          {
+            "description": "Inactive user.",
+            "name": "disabled",
+            "value": 2
+          },
+          {
+            "description": "Banned user.",
+            "name": "banned",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "UserRole",
+        "variants": [
+          {
+            "description": "Public can only view some data.",
+            "name": "Public",
+            "value": 0
+          },
+          {
+            "description": "Platform admin can do literally everything. Very dangerous role.",
+            "name": "PlatformAdmin",
+            "value": 1
+          },
+          {
+            "description": "Platform support can view and manage some staff.",
+            "name": "PlatformSupport",
+            "value": 2
+          },
+          {
+            "description": "New user in application, can only create new app or be invited to an app.",
+            "name": "AppNewUser",
+            "value": 3
+          },
+          {
+            "description": "App admin can manage the application, but not the platform.",
+            "name": "AppAdmin",
+            "value": 4
+          },
+          {
+            "description": "App support see the application info, but not the platform.",
+            "name": "AppSupport",
+            "value": 5
+          },
+          {
+            "description": "The role is used for external users only.",
+            "name": "AppApiKey",
+            "value": 6
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "appStatus",
+        "variants": [
+          {
+            "description": "Active application.",
+            "name": "enabled",
+            "value": 1
+          },
+          {
+            "description": "Inactive user.",
+            "name": "disabled",
+            "value": 2
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "paymentStatus",
+        "variants": [
+          {
+            "description": "Payment is pending.",
+            "name": "pending",
+            "value": 0
+          },
+          {
+            "description": "Payment has expired.",
+            "name": "expired",
+            "value": 1
+          },
+          {
+            "description": "Payment has been cancelled.",
+            "name": "cancelled",
+            "value": 2
+          },
+          {
+            "description": "Payment has been completed.",
+            "name": "completed",
+            "value": 3
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "name": "roleInApp",
+        "variants": [
+          {
+            "description": "Admin in application.",
+            "name": "admin",
+            "value": 1
+          },
+          {
+            "description": "Member in application.",
+            "name": "member",
+            "value": 2
+          },
+          {
+            "description": "Guest in application.",
+            "name": "guest",
+            "value": 3
+          }
+        ]
+      }
+    }
+  ],
+  "services": [
+    {
+      "endpoints": [
+        {
+          "code": 0,
+          "description": "Initiates a websocket connection session with that permits access to endpoints with the UserRole::Public role",
+          "json_schema": null,
+          "name": "PublicConnect",
+          "parameters": [],
+          "returns": [],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 0,
+      "name": "publicApiConnection"
+    },
+    {
+      "endpoints": [
+        {
+          "code": 10,
+          "description": "Frontend initiates HoneyAuth authorization flow. Session is stored per connection.",
+          "json_schema": null,
+          "name": "StartAuth",
+          "parameters": [
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            }
+          ],
+          "returns": [
+            {
+              "name": "loginConfig",
+              "ty": "String"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 11,
+          "description": "Frontend creates new user account during HoneyAuth signup. Session is per connection. Returns authorization code and profile callback endpoint.",
+          "json_schema": null,
+          "name": "Signup",
+          "parameters": [
+            {
+              "name": "username",
+              "ty": "String"
+            },
+            {
+              "name": "password",
+              "ty": "String"
+            },
+            {
+              "name": "agreedTos",
+              "ty": "String"
+            },
+            {
+              "name": "agreedPrivacy",
+              "ty": "String"
+            }
+          ],
+          "returns": [
+            {
+              "name": "accessToken",
+              "ty": "String"
+            },
+            {
+              "name": "refreshToken",
+              "ty": "String"
+            },
+            {
+              "name": "idToken",
+              "ty": "String"
+            },
+            {
+              "name": "tokenType",
+              "ty": "String"
+            },
+            {
+              "name": "expiresIn",
+              "ty": "Int"
+            },
+            {
+              "name": "profileCallbackUrl",
+              "ty": "String"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 12,
+          "description": "Step 1: Frontend submits username during HoneyAuth flow. Session is per connection.",
+          "json_schema": null,
+          "name": "SubmitUsername",
+          "parameters": [
+            {
+              "name": "username",
+              "ty": "String"
+            }
+          ],
+          "returns": [
+            {
+              "name": "expiresAt",
+              "ty": "BigInt"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 13,
+          "description": "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
+          "json_schema": null,
+          "name": "SubmitPassword",
+          "parameters": [
+            {
+              "name": "password",
+              "ty": "String"
+            }
+          ],
+          "returns": [
+            {
+              "name": "accessToken",
+              "ty": "String"
+            },
+            {
+              "name": "refreshToken",
+              "ty": "String"
+            },
+            {
+              "name": "idToken",
+              "ty": "String"
+            },
+            {
+              "name": "tokenType",
+              "ty": "String"
+            },
+            {
+              "name": "expiresIn",
+              "ty": "Int"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 14,
+          "description": "Exchange refresh token for access tokens. Redirect URI handling is client-side; use WebSocket connection context for navigation.",
+          "json_schema": null,
+          "name": "RefreshTokenExchange",
+          "parameters": [
+            {
+              "name": "refreshToken",
+              "ty": "String"
+            },
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            }
+          ],
+          "returns": [
+            {
+              "name": "accessToken",
+              "ty": "String"
+            },
+            {
+              "name": "refreshToken",
+              "ty": "String"
+            },
+            {
+              "name": "idToken",
+              "ty": "String"
+            },
+            {
+              "name": "tokenType",
+              "ty": "String"
+            },
+            {
+              "name": "expiresIn",
+              "ty": "Int"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 15,
+          "description": "Revoke access or refresh tokens.",
+          "json_schema": null,
+          "name": "TokenRevoke",
+          "parameters": [
+            {
+              "name": "token",
+              "ty": "String"
+            },
+            {
+              "name": "tokenTypeHint",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            },
+            {
+              "name": "clientSecret",
+              "ty": {
+                "Optional": "String"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "name": "success",
+              "ty": "Boolean"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 1,
+      "name": "publicAuthApi"
+    },
+    {
+      "endpoints": [
+        {
+          "code": 20,
+          "description": "Adds a lead to the waitlist.",
+          "json_schema": null,
+          "name": "AddWaitlistLead",
+          "parameters": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "telegram",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "whatsApp",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "description",
+              "ty": "String"
+            }
+          ],
+          "returns": [],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 2,
+      "name": "publicWaitlistApi"
+    },
+    {
+      "endpoints": [
+        {
+          "code": 30,
+          "description": "Adds a lead to the waitlist.",
+          "json_schema": null,
+          "name": "KardAddWaitlistLead",
+          "parameters": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "telegram",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "whatsApp",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "description",
+              "ty": "String"
+            }
+          ],
+          "returns": [],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 3,
+      "name": "publicKardVipApi"
+    },
+    {
+      "endpoints": [
+        {
+          "code": 100,
+          "description": "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+          "json_schema": null,
+          "name": "ApiKeyConnect",
+          "parameters": [
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            },
+            {
+              "name": "appApiKey",
+              "ty": "String"
+            }
+          ],
+          "returns": [],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 10,
+      "name": "apiKeyEndpoints"
+    },
+    {
+      "endpoints": [
+        {
+          "code": 110,
+          "description": "Backend validates HoneyAuth tokens (requires app API key).",
+          "json_schema": null,
+          "name": "TokenIntrospect",
+          "parameters": [
+            {
+              "name": "token",
+              "ty": "String"
+            },
+            {
+              "name": "tokenTypeHint",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            },
+            {
+              "name": "appApiKey",
+              "ty": "String"
+            }
+          ],
+          "returns": [
+            {
+              "name": "active",
+              "ty": "Boolean"
+            },
+            {
+              "name": "scope",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "appPublicId",
+              "ty": {
+                "Optional": "UUID"
+              }
+            },
+            {
+              "name": "username",
+              "ty": {
+                "Optional": "String"
+              }
+            },
+            {
+              "name": "userPublicId",
+              "ty": {
+                "Optional": "BigInt"
+              }
+            },
+            {
+              "name": "exp",
+              "ty": {
+                "Optional": "BigInt"
+              }
+            },
+            {
+              "name": "iat",
+              "ty": {
+                "Optional": "BigInt"
+              }
+            }
+          ],
+          "roles": [
+            "UserRole::AppApiKey"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 111,
+          "description": "Backend subscribes to user token revocation events. TODO. This is not implemented",
+          "json_schema": null,
+          "name": "SubscribeTokenRevocations",
+          "parameters": [
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            },
+            {
+              "name": "appApiKey",
+              "ty": "String"
+            }
+          ],
+          "returns": [
+            {
+              "name": "subscriptionId",
+              "ty": "String"
+            }
+          ],
+          "roles": [
+            "UserRole::AppApiKey"
+          ],
+          "stream_response": null
+        }
+      ],
+      "id": 11,
+      "name": "honeyAuthAppApi"
+    }
+  ]
+}

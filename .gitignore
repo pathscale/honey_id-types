@@ -1,1 +1,12 @@
 /target
+/generated
+
+# We will not be tracking any AI tool related metadata, as these will not be formalized or used in pathscale projects
+/.claude
+/.gemini
+/.qwen
+/.opencode
+/.serena
+/.kiro
+CLAUDE.md
+AGENTS.md

@@ -17,10 +17,3 @@ pub mod auth_flow {
     pub use crate::types::generated::TokenRevokeRequest;
     pub use crate::types::generated::TokenRevokeResponse;
 }
-
-pub mod waitlist {
-    pub use crate::types::generated::AddWaitlistLeadRequest;
-    pub use crate::types::generated::AddWaitlistLeadResponse;
-    pub use crate::types::generated::KardAddWaitlistLeadRequest;
-    pub use crate::types::generated::KardAddWaitlistLeadResponse;
-}

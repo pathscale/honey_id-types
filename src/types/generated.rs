@@ -1,5 +1,3 @@
-#![allow(unused_imports, dead_code)]
-
 use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
@@ -250,10 +248,6 @@ pub enum EnumEndpoint {
     ///
     TokenRevoke = 15,
     ///
-    AddWaitlistLead = 20,
-    ///
-    KardAddWaitlistLead = 30,
-    ///
     ApiKeyConnect = 100,
     ///
     TokenIntrospect = 110,
@@ -271,8 +265,6 @@ impl EnumEndpoint {
             Self::SubmitPassword => SubmitPasswordRequest::SCHEMA,
             Self::RefreshTokenExchange => RefreshTokenExchangeRequest::SCHEMA,
             Self::TokenRevoke => TokenRevokeRequest::SCHEMA,
-            Self::AddWaitlistLead => AddWaitlistLeadRequest::SCHEMA,
-            Self::KardAddWaitlistLead => KardAddWaitlistLeadRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::TokenIntrospect => TokenIntrospectRequest::SCHEMA,
             Self::SubscribeTokenRevocations => SubscribeTokenRevocationsRequest::SCHEMA,
@@ -312,19 +304,6 @@ impl From<EnumErrorCode> for ErrorCode {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct AddWaitlistLeadRequest {
-    pub name: String,
-    #[serde(default)]
-    pub telegram: Option<String>,
-    #[serde(default)]
-    pub whatsApp: Option<String>,
-    pub description: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct AddWaitlistLeadResponse {}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectRequest {
     pub appPublicId: uuid::Uuid,
     pub appApiKey: String,
@@ -332,19 +311,6 @@ pub struct ApiKeyConnectRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectResponse {}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct KardAddWaitlistLeadRequest {
-    pub name: String,
-    #[serde(default)]
-    pub telegram: Option<String>,
-    #[serde(default)]
-    pub whatsApp: Option<String>,
-    pub description: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct KardAddWaitlistLeadResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicConnectRequest {}
@@ -759,90 +725,6 @@ impl WsRequest for TokenRevokeRequest {
 }
 impl WsResponse for TokenRevokeResponse {
     type Request = TokenRevokeRequest;
-}
-
-impl WsRequest for AddWaitlistLeadRequest {
-    type Response = AddWaitlistLeadResponse;
-    const METHOD_ID: u32 = 20;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "AddWaitlistLead",
-  "code": 20,
-  "parameters": [
-    {
-      "name": "name",
-      "ty": "String"
-    },
-    {
-      "name": "telegram",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "whatsApp",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "description",
-      "ty": "String"
-    }
-  ],
-  "returns": [],
-  "stream_response": null,
-  "description": "Adds a lead to the waitlist.",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for AddWaitlistLeadResponse {
-    type Request = AddWaitlistLeadRequest;
-}
-
-impl WsRequest for KardAddWaitlistLeadRequest {
-    type Response = KardAddWaitlistLeadResponse;
-    const METHOD_ID: u32 = 30;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "KardAddWaitlistLead",
-  "code": 30,
-  "parameters": [
-    {
-      "name": "name",
-      "ty": "String"
-    },
-    {
-      "name": "telegram",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "whatsApp",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "description",
-      "ty": "String"
-    }
-  ],
-  "returns": [],
-  "stream_response": null,
-  "description": "Adds a lead to the waitlist.",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for KardAddWaitlistLeadResponse {
-    type Request = KardAddWaitlistLeadRequest;
 }
 
 impl WsRequest for ApiKeyConnectRequest {

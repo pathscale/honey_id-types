@@ -18,20 +18,6 @@ ID: 1
 |14|RefreshTokenExchange|refreshToken, appPublicId|accessToken, refreshToken, idToken, tokenType, expiresIn|Exchange refresh token for access tokens. Redirect URI handling is client-side; use WebSocket connection context for navigation.|
 |15|TokenRevoke|token, tokenTypeHint, appPublicId, clientSecret|success|Revoke access or refresh tokens.|
 
-# publicWaitlistApi Server
-ID: 2
-## Endpoints
-|Method Code|Method Name|Parameters|Response|Description|
-|-----------|-----------|----------|--------|-----------|
-|20|AddWaitlistLead|name, telegram, whatsApp, description||Adds a lead to the waitlist.|
-
-# publicKardVipApi Server
-ID: 3
-## Endpoints
-|Method Code|Method Name|Parameters|Response|Description|
-|-----------|-----------|----------|--------|-----------|
-|30|KardAddWaitlistLead|name, telegram, whatsApp, description||Adds a lead to the waitlist.|
-
 # apiKeyEndpoints Server
 ID: 10
 ## Endpoints

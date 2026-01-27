@@ -1,4 +1,5 @@
 // This contains raw unedited generated code from endpointgen
+#![allow(unused_imports, dead_code)]
 mod generated;
 
 // These modules re-export the generated code to improve the public API of this library

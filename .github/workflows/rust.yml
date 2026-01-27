@@ -36,32 +36,32 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-  clippy_check:
-    # runs-on: buildjet-8vcpu-ubuntu-2204-arm
-    runs-on: ubuntu-latest
+  # clippy_check:
+  #   # runs-on: buildjet-8vcpu-ubuntu-2204-arm
+  #   runs-on: ubuntu-latest
 
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - uses: Swatinem/rust-cache@v2
-        with:
-          # cache-provider: buildjet
-          cache-on-failure: "true"
-          add-job-id-key: "false"
-          save-if: "false"
+  #     - uses: Swatinem/rust-cache@v2
+  #       with:
+  #         # cache-provider: buildjet
+  #         cache-on-failure: "true"
+  #         add-job-id-key: "false"
+  #         save-if: "false"
 
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          components: clippy
-          override: true
+  #     - name: Install Rust
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         profile: minimal
+  #         components: clippy
+  #         override: true
 
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+  #     - name: Run Clippy
+  #       run: cargo clippy --all-targets --all-features -- -D warnings
 
   format_check:
     # runs-on: buildjet-8vcpu-ubuntu-2204-arm

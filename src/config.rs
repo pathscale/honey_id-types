@@ -1,12 +1,12 @@
+use secrecy::SecretString;
 use serde::Deserialize;
 use smart_default::SmartDefault;
 use url::Url;
-use secrecy::SecretString;
 use uuid::Uuid;
 
-/// Configuration for `honey.id` client. 
-/// 
-/// Implements [`Deserialize`] so could be easily used as entry for other 
+/// Configuration for `honey.id` client.
+///
+/// Implements [`Deserialize`] so could be easily used as entry for other
 /// config.
 #[derive(Clone, Debug, Deserialize, SmartDefault)]
 pub struct HoneyIdConfig {

@@ -46,7 +46,6 @@ Config(
                     "UserRole::Public",
                 ],
             ),
-            
             EndpointSchema(
                 name: "SubmitUsername",
                 code: 12,

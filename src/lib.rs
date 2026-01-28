@@ -1,6 +1,8 @@
 mod config;
 mod types;
 mod client;
+mod ws;
+mod error;
 
 pub use config::HoneyIdConfig;
 pub use types::api_key_endpoints;

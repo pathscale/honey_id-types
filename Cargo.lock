@@ -1258,7 +1258,10 @@ dependencies = [
 name = "honey_id-types"
 version = "0.1.0"
 dependencies = [
+ "derive_more",
  "endpoint-libs",
+ "eyre",
+ "futures",
  "num-derive",
  "num-traits",
  "secrecy",
@@ -1267,6 +1270,8 @@ dependencies = [
  "smart-default",
  "strum",
  "strum_macros",
+ "tokio",
+ "tokio-tungstenite",
  "url",
  "uuid",
 ]

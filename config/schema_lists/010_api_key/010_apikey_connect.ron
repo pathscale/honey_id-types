@@ -10,14 +10,38 @@ Config(
                 name: "ApiKeyConnect",
                 code: 100,
                 parameters: [
-                    Field(name: "appPublicId", ty: UUID, 
-                    description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."),
-                    Field(name: "appApiKey", ty: String, 
-                    description: "The API Key of the app initiating this API Key connection. Retrieved and only visible after initial creation of the app in Honey App UI or initially after creating a new API key for an existing app."),
+                    Field(
+                        name: "appPublicId",
+                        ty: UUID,
+                        description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."
+                    ),
+                    Field(
+                        name: "appApiKey",
+                        ty: String,
+                        description: "The API Key of the app initiating this API Key connection. Retrieved and only visible after initial creation of the app in Honey App UI or initially after creating a new API key for an existing app."
+                    ),
                 ],
                 returns: [],
                 stream_response: None,
                 description: "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+                json_schema: (),
+                roles: [
+                    "UserRole::Public",
+                ],
+            ),
+            EndpointSchema(
+                name: "GetAppPublicId",
+                code: 101,
+                parameters: [],
+                returns: [
+                    Field(
+                        name: "appPublicId",
+                        ty: UUID,
+                        description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."
+                    ),
+                ],
+                stream_response: None,
+                description: "Returns `appPublicId` which will be used for auth flows",
                 json_schema: (),
                 roles: [
                     "UserRole::Public",

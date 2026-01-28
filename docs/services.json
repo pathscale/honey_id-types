@@ -477,6 +477,23 @@
             "UserRole::Public"
           ],
           "stream_response": null
+        },
+        {
+          "code": 101,
+          "description": "Returns `appPublicId` which will be used for auth flows",
+          "json_schema": null,
+          "name": "GetAppPublicId",
+          "parameters": [],
+          "returns": [
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            }
+          ],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
         }
       ],
       "id": 10,

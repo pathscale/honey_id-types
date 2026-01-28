@@ -24,6 +24,7 @@ ID: 10
 |Method Code|Method Name|Parameters|Response|Description|
 |-----------|-----------|----------|--------|-----------|
 |100|ApiKeyConnect|appPublicId, appApiKey||Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server|
+|101|GetAppPublicId||appPublicId|Returns `appPublicId` which will be used for auth flows|
 
 # honeyAuthAppApi Server
 ID: 11

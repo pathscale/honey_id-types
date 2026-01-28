@@ -250,6 +250,8 @@ pub enum EnumEndpoint {
     ///
     ApiKeyConnect = 100,
     ///
+    GetAppPublicId = 101,
+    ///
     TokenIntrospect = 110,
     ///
     SubscribeTokenRevocations = 111,
@@ -266,6 +268,7 @@ impl EnumEndpoint {
             Self::RefreshTokenExchange => RefreshTokenExchangeRequest::SCHEMA,
             Self::TokenRevoke => TokenRevokeRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
+            Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
             Self::TokenIntrospect => TokenIntrospectRequest::SCHEMA,
             Self::SubscribeTokenRevocations => SubscribeTokenRevocationsRequest::SCHEMA,
         };
@@ -311,6 +314,14 @@ pub struct ApiKeyConnectRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAppPublicIdRequest {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAppPublicIdResponse {
+    pub appPublicId: uuid::Uuid,
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicConnectRequest {}
@@ -755,6 +766,32 @@ impl WsRequest for ApiKeyConnectRequest {
 }
 impl WsResponse for ApiKeyConnectResponse {
     type Request = ApiKeyConnectRequest;
+}
+
+impl WsRequest for GetAppPublicIdRequest {
+    type Response = GetAppPublicIdResponse;
+    const METHOD_ID: u32 = 101;
+    const ROLES: &[u32] = &[0];
+    const SCHEMA: &'static str = r#"{
+  "name": "GetAppPublicId",
+  "code": 101,
+  "parameters": [],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    }
+  ],
+  "stream_response": null,
+  "description": "Returns `appPublicId` which will be used for auth flows",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Public"
+  ]
+}"#;
+}
+impl WsResponse for GetAppPublicIdResponse {
+    type Request = GetAppPublicIdRequest;
 }
 
 impl WsRequest for TokenIntrospectRequest {

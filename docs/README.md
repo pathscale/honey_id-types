@@ -29,3 +29,4 @@ ID: 11
 |Method Code|Method Name|Parameters|Response|Description|
 |-----------|-----------|----------|--------|-----------|
 |110|ReceiveToken|token, userPubId||Backend receives HoneyAuth tokens.|
+|111|ReceiveUserInfo|userPubId, username||Backend receives user info.|

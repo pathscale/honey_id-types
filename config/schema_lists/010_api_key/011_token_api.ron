@@ -21,6 +21,21 @@ Config(
                     "UserRole::AppApiKey",
                 ],
             ),
+            EndpointSchema(
+                name: "ReceiveUserInfo",
+                code: 111,
+                parameters: [
+                    Field(name: "userPubId", ty: UUID),
+                    Field(name: "username", ty: String),
+                ],
+                returns: [],
+                stream_response: None,
+                description: "Backend receives user info.",
+                json_schema: (),
+                roles: [
+                    "UserRole::AppApiKey",
+                ],
+            ),
         ]
     )
 )

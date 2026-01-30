@@ -65,6 +65,8 @@ pub enum EnumEndpoint {
     GetAppPublicId = 101,
     ///
     ReceiveToken = 110,
+    ///
+    ReceiveUserInfo = 111,
 }
 
 impl EnumEndpoint {
@@ -77,6 +79,7 @@ impl EnumEndpoint {
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
+            Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
         };
         serde_json::from_str(schema).unwrap()
     }
@@ -257,6 +260,15 @@ pub struct ReceiveTokenRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveTokenResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserInfoRequest {
+    pub userPubId: uuid::Uuid,
+    pub username: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserInfoResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SignupRequest {
@@ -496,4 +508,34 @@ impl WsRequest for ReceiveTokenRequest {
 }
 impl WsResponse for ReceiveTokenResponse {
     type Request = ReceiveTokenRequest;
+}
+
+impl WsRequest for ReceiveUserInfoRequest {
+    type Response = ReceiveUserInfoResponse;
+    const METHOD_ID: u32 = 111;
+    const ROLES: &[u32] = &[6];
+    const SCHEMA: &'static str = r#"{
+  "name": "ReceiveUserInfo",
+  "code": 111,
+  "parameters": [
+    {
+      "name": "userPubId",
+      "ty": "UUID"
+    },
+    {
+      "name": "username",
+      "ty": "String"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Backend receives user info.",
+  "json_schema": null,
+  "roles": [
+    "UserRole::AppApiKey"
+  ]
+}"#;
+}
+impl WsResponse for ReceiveUserInfoResponse {
+    type Request = ReceiveUserInfoRequest;
 }

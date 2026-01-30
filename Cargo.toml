@@ -1,6 +1,6 @@
 [package]
-name = "honey_id-types"
-version = "0.1.0"
+name = "honey-id-types"
+version = "0.1.0-alpha"
 edition = "2024"
 
 [dependencies]

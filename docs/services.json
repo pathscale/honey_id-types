@@ -208,6 +208,27 @@
             "UserRole::AppApiKey"
           ],
           "stream_response": null
+        },
+        {
+          "code": 111,
+          "description": "Backend receives user info.",
+          "json_schema": null,
+          "name": "ReceiveUserInfo",
+          "parameters": [
+            {
+              "name": "userPubId",
+              "ty": "UUID"
+            },
+            {
+              "name": "username",
+              "ty": "String"
+            }
+          ],
+          "returns": [],
+          "roles": [
+            "UserRole::AppApiKey"
+          ],
+          "stream_response": null
         }
       ],
       "id": 11,

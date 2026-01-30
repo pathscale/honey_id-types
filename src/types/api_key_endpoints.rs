@@ -6,6 +6,5 @@ pub mod connect {
 }
 
 pub mod token {
-    pub use crate::types::generated::SubscribeTokenRevocationsRequest;
-    pub use crate::types::generated::TokenIntrospectRequest;
+    pub use crate::types::generated::{ReceiveTokenRequest, ReceiveTokenResponse};
 }

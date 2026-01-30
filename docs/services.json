@@ -66,32 +66,14 @@
       "endpoints": [
         {
           "code": 10,
-          "description": "Frontend initiates HoneyAuth authorization flow. Session is stored per connection.",
+          "description": "Frontend creates new user account.",
           "json_schema": null,
-          "name": "StartAuth",
+          "name": "Signup",
           "parameters": [
             {
               "name": "appPublicId",
               "ty": "UUID"
-            }
-          ],
-          "returns": [
-            {
-              "name": "loginConfig",
-              "ty": "String"
-            }
-          ],
-          "roles": [
-            "UserRole::Public"
-          ],
-          "stream_response": null
-        },
-        {
-          "code": 11,
-          "description": "Frontend creates new user account during HoneyAuth signup. Session is per connection. Returns authorization code and profile callback endpoint.",
-          "json_schema": null,
-          "name": "Signup",
-          "parameters": [
+            },
             {
               "name": "username",
               "ty": "String"
@@ -99,39 +81,11 @@
             {
               "name": "password",
               "ty": "String"
-            },
-            {
-              "name": "agreedTos",
-              "ty": "String"
-            },
-            {
-              "name": "agreedPrivacy",
-              "ty": "String"
             }
           ],
           "returns": [
             {
               "name": "accessToken",
-              "ty": "String"
-            },
-            {
-              "name": "refreshToken",
-              "ty": "String"
-            },
-            {
-              "name": "idToken",
-              "ty": "String"
-            },
-            {
-              "name": "tokenType",
-              "ty": "String"
-            },
-            {
-              "name": "expiresIn",
-              "ty": "Int"
-            },
-            {
-              "name": "profileCallbackUrl",
               "ty": "String"
             }
           ],
@@ -142,10 +96,14 @@
         },
         {
           "code": 12,
-          "description": "Step 1: Frontend submits username during HoneyAuth flow. Session is per connection.",
+          "description": "Step 1: Frontend submits username during auth flow.",
           "json_schema": null,
           "name": "SubmitUsername",
           "parameters": [
+            {
+              "name": "appPublicId",
+              "ty": "UUID"
+            },
             {
               "name": "username",
               "ty": "String"
@@ -177,102 +135,6 @@
             {
               "name": "accessToken",
               "ty": "String"
-            },
-            {
-              "name": "refreshToken",
-              "ty": "String"
-            },
-            {
-              "name": "idToken",
-              "ty": "String"
-            },
-            {
-              "name": "tokenType",
-              "ty": "String"
-            },
-            {
-              "name": "expiresIn",
-              "ty": "Int"
-            }
-          ],
-          "roles": [
-            "UserRole::Public"
-          ],
-          "stream_response": null
-        },
-        {
-          "code": 14,
-          "description": "Exchange refresh token for access tokens. Redirect URI handling is client-side; use WebSocket connection context for navigation.",
-          "json_schema": null,
-          "name": "RefreshTokenExchange",
-          "parameters": [
-            {
-              "name": "refreshToken",
-              "ty": "String"
-            },
-            {
-              "name": "appPublicId",
-              "ty": "UUID"
-            }
-          ],
-          "returns": [
-            {
-              "name": "accessToken",
-              "ty": "String"
-            },
-            {
-              "name": "refreshToken",
-              "ty": "String"
-            },
-            {
-              "name": "idToken",
-              "ty": "String"
-            },
-            {
-              "name": "tokenType",
-              "ty": "String"
-            },
-            {
-              "name": "expiresIn",
-              "ty": "Int"
-            }
-          ],
-          "roles": [
-            "UserRole::Public"
-          ],
-          "stream_response": null
-        },
-        {
-          "code": 15,
-          "description": "Revoke access or refresh tokens.",
-          "json_schema": null,
-          "name": "TokenRevoke",
-          "parameters": [
-            {
-              "name": "token",
-              "ty": "String"
-            },
-            {
-              "name": "tokenTypeHint",
-              "ty": {
-                "Optional": "String"
-              }
-            },
-            {
-              "name": "appPublicId",
-              "ty": "UUID"
-            },
-            {
-              "name": "clientSecret",
-              "ty": {
-                "Optional": "String"
-              }
-            }
-          ],
-          "returns": [
-            {
-              "name": "success",
-              "ty": "Boolean"
             }
           ],
           "roles": [
@@ -292,10 +154,6 @@
           "json_schema": null,
           "name": "ApiKeyConnect",
           "parameters": [
-            {
-              "name": "appPublicId",
-              "ty": "UUID"
-            },
             {
               "name": "appApiKey",
               "ty": "String"
@@ -332,97 +190,20 @@
       "endpoints": [
         {
           "code": 110,
-          "description": "Backend validates HoneyAuth tokens (requires app API key).",
+          "description": "Backend receives HoneyAuth tokens.",
           "json_schema": null,
-          "name": "TokenIntrospect",
+          "name": "ReceiveToken",
           "parameters": [
             {
               "name": "token",
               "ty": "String"
             },
             {
-              "name": "tokenTypeHint",
-              "ty": {
-                "Optional": "String"
-              }
-            },
-            {
-              "name": "appPublicId",
+              "name": "userPubId",
               "ty": "UUID"
-            },
-            {
-              "name": "appApiKey",
-              "ty": "String"
             }
           ],
-          "returns": [
-            {
-              "name": "active",
-              "ty": "Boolean"
-            },
-            {
-              "name": "scope",
-              "ty": {
-                "Optional": "String"
-              }
-            },
-            {
-              "name": "appPublicId",
-              "ty": {
-                "Optional": "UUID"
-              }
-            },
-            {
-              "name": "username",
-              "ty": {
-                "Optional": "String"
-              }
-            },
-            {
-              "name": "userPublicId",
-              "ty": {
-                "Optional": "BigInt"
-              }
-            },
-            {
-              "name": "exp",
-              "ty": {
-                "Optional": "BigInt"
-              }
-            },
-            {
-              "name": "iat",
-              "ty": {
-                "Optional": "BigInt"
-              }
-            }
-          ],
-          "roles": [
-            "UserRole::AppApiKey"
-          ],
-          "stream_response": null
-        },
-        {
-          "code": 111,
-          "description": "Backend subscribes to user token revocation events. TODO. This is not implemented",
-          "json_schema": null,
-          "name": "SubscribeTokenRevocations",
-          "parameters": [
-            {
-              "name": "appPublicId",
-              "ty": "UUID"
-            },
-            {
-              "name": "appApiKey",
-              "ty": "String"
-            }
-          ],
-          "returns": [
-            {
-              "name": "subscriptionId",
-              "ty": "String"
-            }
-          ],
+          "returns": [],
           "roles": [
             "UserRole::AppApiKey"
           ],
@@ -430,7 +211,7 @@
         }
       ],
       "id": 11,
-      "name": "honeyAuthAppApi"
+      "name": "tokenApi"
     }
   ]
 }

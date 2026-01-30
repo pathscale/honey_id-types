@@ -1,0 +1,26 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+Config(
+    definition: EndpointSchemaList(
+        "tokenApi",
+        11,
+        [
+            EndpointSchema(
+                name: "ReceiveToken",
+                code: 110,
+                parameters: [
+                    Field(name: "token", ty: String),
+                    Field(name: "userPubId", ty: UUID),
+                ],
+                returns: [],
+                stream_response: None,
+                description: "Backend receives HoneyAuth tokens.",
+                json_schema: (),
+                roles: [
+                    "UserRole::AppApiKey",
+                ],
+            ),
+        ]
+    )
+)

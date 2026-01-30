@@ -11,11 +11,6 @@ Config(
                 code: 100,
                 parameters: [
                     Field(
-                        name: "appPublicId",
-                        ty: UUID,
-                        description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."
-                    ),
-                    Field(
                         name: "appApiKey",
                         ty: String,
                         description: "The API Key of the app initiating this API Key connection. Retrieved and only visible after initial creation of the app in Honey App UI or initially after creating a new API key for an existing app."

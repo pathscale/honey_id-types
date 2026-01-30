@@ -1,6 +1,6 @@
-use std::fmt::Display;
 use derive_more::Display;
 use endpoint_libs::libs::error_code::ErrorCode;
+use std::fmt::Display;
 
 pub type HoneyIdResult<T> = Result<T, HoneyIdError>;
 

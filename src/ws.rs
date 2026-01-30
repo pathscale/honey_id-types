@@ -4,9 +4,9 @@ use eyre::bail;
 use futures::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
-use tokio_tungstenite::tungstenite::handshake::client::Request;
 use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::handshake::client::Request;
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use url::Url;
 
 use crate::enums::EndpointMethodCode;
@@ -33,7 +33,11 @@ impl HoneyIdConnection {
         Ok(HoneyIdConnection { stream })
     }
 
-    pub async fn send_request<T: Serialize>(&mut self, method: EndpointMethodCode, params: T) -> eyre::Result<()> {
+    pub async fn send_request<T: Serialize>(
+        &mut self,
+        method: EndpointMethodCode,
+        params: T,
+    ) -> eyre::Result<()> {
         #[derive(Serialize, Deserialize, Debug)]
         #[serde(tag = "seq", rename = "1")]
         struct ApiMessage<T> {
@@ -64,12 +68,18 @@ impl HoneyIdConnection {
             None => bail!("WebSocket stream closed unexpectedly"),
         };
 
-        if let Some(value) = response.get("params").cloned()
-            .and_then(|p| serde_json::from_value::<T>(p).ok()) {
+        if let Some(value) = response
+            .get("params")
+            .cloned()
+            .and_then(|p| serde_json::from_value::<T>(p).ok())
+        {
             Ok(value)
         } else if let Ok(err) = serde_json::from_value::<WsResponseError>(response.clone()) {
             bail!(HoneyIdError::new(
-                err.code.try_into().map(ErrorCode::new).unwrap_or(ErrorCode::INTERNAL_ERROR),
+                err.code
+                    .try_into()
+                    .map(ErrorCode::new)
+                    .unwrap_or(ErrorCode::INTERNAL_ERROR),
                 err.params.to_string()
             ));
         } else {

@@ -25,6 +25,13 @@ pub struct HoneyIdConfig {
     /// UI.
     #[serde(deserialize_with = "util::deserialize_secret_string")]
     pub app_api_key: SecretString,
+
+    /// `Auth` API key, which you can retrieve after `App` creation in
+    /// `honey.id` UI.
+    ///
+    /// Will be used by `Auth` for callback endpoints authorization.
+    #[serde(deserialize_with = "util::deserialize_secret_string")]
+    pub auth_api_key: SecretString,
 }
 
 mod util {

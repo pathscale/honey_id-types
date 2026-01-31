@@ -1,0 +1,149 @@
+{
+    "language": "en",
+    "codes": [
+      {
+        "code": 100400,
+        "symbol": "BadRequest",
+        "message": "Bad Request",
+        "source": "Custom"
+      },
+      {
+        "code": 100500,
+        "symbol": "InternalServerError",
+        "message": "Internal Server Error",
+        "source": "Custom"
+      },
+      {
+        "code": 100501,
+        "symbol": "NotImplemented",
+        "message": "Method not implemented",
+        "source": "Custom"
+      },
+      {
+        "code": 100404,
+        "symbol": "NotFound",
+        "message": "NotFoundResource",
+        "source": "Custom"
+      },
+      {
+        "code": 100601,
+        "symbol": "DatabaseError",
+        "message": "Database error",
+        "source": "Custom"
+      },
+      {
+        "code": 100602,
+        "symbol": "InvalidService",
+        "message": "Invalid Service",
+        "source": "Custom"
+      },
+      {
+        "code": 101403,
+        "symbol": "UserForbidden",
+        "message": "Forbidden user",
+        "source": "Custom"
+      },
+      {
+        "code": 102403,
+        "symbol": "UserRoleForbidden",
+        "message": "Insufficient role for user",
+        "source": "Custom"
+      },
+      {
+        "code": 101404,
+        "symbol": "UserNotFound",
+        "message": "User not found",
+        "source": "Custom"
+      },
+      {
+        "code": 101601,
+        "symbol": "UserMustAgreeTOS",
+        "message": "Must agree to the terms of service",
+        "source": "Custom"
+      },
+      {
+        "code": 101602,
+        "symbol": "UserMustAgreePrivacyPolicy",
+        "message": "Must agree to the privacy policy",
+        "source": "Custom"
+      },
+      {
+        "code": 101604,
+        "symbol": "UserNoAuthToken",
+        "message": "No auth token",
+        "source": "Custom"
+      },
+      {
+        "code": 101605,
+        "symbol": "UserInvalidAuthToken",
+        "message": "token invalid",
+        "source": "Custom"
+      },
+      {
+        "code": 101606,
+        "symbol": "UserInvalidPassword",
+        "message": "password invalid",
+        "source": "Custom"
+      },
+      {
+        "code": 103001,
+        "symbol": "DuplicateRequest",
+        "message": "Duplicate request",
+        "source": "Custom"
+      },
+      {
+        "code": 104000,
+        "symbol": "InvalidExpression",
+        "message": "Invalid expression",
+        "source": "Custom"
+      },
+      {
+        "code": 45349633,
+        "symbol": "InvalidArgument",
+        "message": "InvalidArgument",
+        "source": "SQL R0001"
+      },
+      {
+        "code": 45349634,
+        "symbol": "InvalidState",
+        "message": "InvalidState",
+        "source": "SQL R0002"
+      },
+      {
+        "code": 45349635,
+        "symbol": "InvalidSeq",
+        "message": "InvalidSeq",
+        "source": "SQL R0003"
+      },
+      {
+        "code": 45349636,
+        "symbol": "InvalidMethod",
+        "message": "InvalidMethod",
+        "source": "SQL R0004"
+      },
+      {
+        "code": 45349637,
+        "symbol": "ProtocolViolation",
+        "message": "ProtocolViolation",
+        "source": "SQL R0005"
+      },
+      {
+        "code": 45349655,
+        "symbol": "RestrictedUserPrivileges",
+        "message": "RestrictedUserPrivileges",
+        "source": "SQL R000N"
+      },
+      {
+        "code": 45349660,
+        "symbol": "InvalidRole",
+        "message": "InvalidRole",
+        "source": "SQL R000S"
+      },
+      {
+        "code": 45349684,
+        "symbol": "InternalError",
+        "message": "InternalError",
+        "source": "SQL R001G"
+      }
+    ]
+  }

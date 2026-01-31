@@ -5,6 +5,7 @@ pub mod connect {
     pub use crate::types::generated::ApiKeyConnectResponse;
 }
 
-pub mod token {
+pub mod callback {
     pub use crate::types::generated::{ReceiveTokenRequest, ReceiveTokenResponse};
+    pub use crate::types::generated::{ReceiveUserInfoRequest, ReceiveUserInfoResponse};
 }

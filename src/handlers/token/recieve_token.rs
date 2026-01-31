@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use endpoint_libs::libs::handler::{RequestHandler, Response};
 use endpoint_libs::libs::toolbox::RequestContext;
 
-use crate::api_key_endpoints::token::{ReceiveTokenRequest, ReceiveTokenResponse};
+use crate::api_key_endpoints::callback::{ReceiveTokenRequest, ReceiveTokenResponse};
 use crate::client::HoneyIdClient;
 
 pub struct MethodReceiveToken {

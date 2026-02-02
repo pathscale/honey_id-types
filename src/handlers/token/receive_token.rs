@@ -4,11 +4,11 @@ use async_trait::async_trait;
 use endpoint_libs::libs::handler::{RequestHandler, Response};
 use endpoint_libs::libs::toolbox::RequestContext;
 
-use crate::api_key_endpoints::callback::{ReceiveTokenRequest, ReceiveTokenResponse};
-use crate::client::HoneyIdClient;
+use crate::endpoints::callback::{ReceiveTokenRequest, ReceiveTokenResponse};
+use crate::types::traits::TokenStorage;
 
 pub struct MethodReceiveToken {
-    pub honey_id_client: Arc<HoneyIdClient>,
+    pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
 }
 
 #[async_trait(?Send)]
@@ -19,7 +19,7 @@ impl RequestHandler for MethodReceiveToken {
         let token = uuid::Uuid::parse_str(&req.token)?;
         let user_pub_id = crate::types::entity::UserPublicId::from(req.userPubId);
 
-        self.honey_id_client.store_token(token, user_pub_id)?;
+        self.token_storage.store_token(user_pub_id, token)?;
 
         Ok(ReceiveTokenResponse {})
     }

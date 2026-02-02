@@ -8,7 +8,7 @@ use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
-use crate::api_key_endpoints::connect::{ApiKeyConnectRequest, ApiKeyConnectResponse};
+use crate::endpoints::connect::{ApiKeyConnectRequest, ApiKeyConnectResponse};
 use crate::client::HoneyIdClient;
 use crate::enums::ErrorCode;
 

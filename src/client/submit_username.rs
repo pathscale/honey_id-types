@@ -1,7 +1,7 @@
 use crate::client::HoneyIdClient;
+use crate::endpoints::auth_flow::SubmitUsernameRequest;
 use crate::enums::EndpointMethodCode;
 use crate::error::HoneyIdResult;
-use crate::public_endpoints::auth_flow::SubmitUsernameRequest;
 use crate::ws::HoneyIdConnection;
 
 impl HoneyIdClient {

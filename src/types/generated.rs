@@ -62,7 +62,9 @@ pub enum EnumEndpoint {
     ///
     ApiKeyConnect = 100,
     ///
-    GetAppPublicId = 101,
+    AccessTokenConnect = 101,
+    ///
+    GetAppPublicId = 102,
     ///
     ReceiveToken = 110,
     ///
@@ -77,6 +79,7 @@ impl EnumEndpoint {
             Self::SubmitUsername => SubmitUsernameRequest::SCHEMA,
             Self::SubmitPassword => SubmitPasswordRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
+            Self::AccessTokenConnect => AccessTokenConnectRequest::SCHEMA,
             Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
             Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
@@ -229,6 +232,14 @@ impl From<EnumErrorCode> for ErrorCode {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AccessTokenConnectRequest {
+    pub accessToken: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AccessTokenConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectRequest {
@@ -443,7 +454,7 @@ impl WsRequest for ApiKeyConnectRequest {
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+  "description": "",
   "json_schema": null,
   "roles": [
     "UserRole::Public"
@@ -454,13 +465,39 @@ impl WsResponse for ApiKeyConnectResponse {
     type Request = ApiKeyConnectRequest;
 }
 
-impl WsRequest for GetAppPublicIdRequest {
-    type Response = GetAppPublicIdResponse;
+impl WsRequest for AccessTokenConnectRequest {
+    type Response = AccessTokenConnectResponse;
     const METHOD_ID: u32 = 101;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
-  "name": "GetAppPublicId",
+  "name": "AccessTokenConnect",
   "code": 101,
+  "parameters": [
+    {
+      "name": "accessToken",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Public"
+  ]
+}"#;
+}
+impl WsResponse for AccessTokenConnectResponse {
+    type Request = AccessTokenConnectRequest;
+}
+
+impl WsRequest for GetAppPublicIdRequest {
+    type Response = GetAppPublicIdResponse;
+    const METHOD_ID: u32 = 102;
+    const ROLES: &[u32] = &[0];
+    const SCHEMA: &'static str = r#"{
+  "name": "GetAppPublicId",
+  "code": 102,
   "parameters": [],
   "returns": [
     {

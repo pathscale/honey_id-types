@@ -15,13 +15,14 @@ ID: 1
 |12|SubmitUsername|appPublicId, username|expiresAt|Step 1: Frontend submits username during auth flow.|
 |13|SubmitPassword|password|accessToken|Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.|
 
-# apiKeyEndpoints Server
+# authEndpoints Server
 ID: 10
 ## Endpoints
 |Method Code|Method Name|Parameters|Response|Description|
 |-----------|-----------|----------|--------|-----------|
-|100|ApiKeyConnect|appApiKey||Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server|
-|101|GetAppPublicId||appPublicId|Returns `appPublicId` which will be used for auth flows|
+|100|ApiKeyConnect|appApiKey|||
+|101|AccessTokenConnect|accessToken|||
+|102|GetAppPublicId||appPublicId|Returns `appPublicId` which will be used for auth flows|
 
 # tokenApi Server
 ID: 11

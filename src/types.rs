@@ -3,8 +3,7 @@
 mod generated;
 
 // These modules re-export the generated code to improve the public API of this library
-pub mod api_key_endpoints;
-pub mod app;
+pub mod endpoints;
 pub mod entity;
 pub mod enums;
-pub mod public_endpoints;
+pub mod traits;

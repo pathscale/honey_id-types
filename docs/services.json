@@ -150,7 +150,7 @@
       "endpoints": [
         {
           "code": 100,
-          "description": "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+          "description": "",
           "json_schema": null,
           "name": "ApiKeyConnect",
           "parameters": [
@@ -167,6 +167,23 @@
         },
         {
           "code": 101,
+          "description": "",
+          "json_schema": null,
+          "name": "AccessTokenConnect",
+          "parameters": [
+            {
+              "name": "accessToken",
+              "ty": "UUID"
+            }
+          ],
+          "returns": [],
+          "roles": [
+            "UserRole::Public"
+          ],
+          "stream_response": null
+        },
+        {
+          "code": 102,
           "description": "Returns `appPublicId` which will be used for auth flows",
           "json_schema": null,
           "name": "GetAppPublicId",
@@ -184,7 +201,7 @@
         }
       ],
       "id": 10,
-      "name": "apiKeyEndpoints"
+      "name": "authEndpoints"
     },
     {
       "endpoints": [

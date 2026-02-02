@@ -1,4 +1,4 @@
 mod auth;
-mod recieve_token;
+mod receive_token;
 
 pub use auth::MethodApiKeyConnect;

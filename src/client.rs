@@ -1,21 +1,14 @@
-use std::sync::Arc;
-
 use secrecy::ExposeSecret;
 use uuid::Uuid;
 
 use crate::HoneyIdConfig;
-use crate::tables::token::TokenWorkTable;
-use crate::types::entity::UserPublicId;
 
 mod connect;
 mod submit_username;
-mod token;
 
 #[derive(Debug)]
 pub struct HoneyIdClient {
     config: HoneyIdConfig,
-
-    token_table: Arc<TokenWorkTable>,
 }
 
 impl HoneyIdClient {
@@ -24,7 +17,6 @@ impl HoneyIdClient {
     pub fn new(config: HoneyIdConfig) -> Self {
         Self {
             config,
-            token_table: Arc::new(Default::default()),
         }
     }
 

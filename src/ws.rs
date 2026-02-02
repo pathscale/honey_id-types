@@ -12,6 +12,7 @@ use url::Url;
 use crate::enums::EndpointMethodCode;
 use crate::error::{HoneyIdError, HoneyIdResult};
 
+#[derive(Debug)]
 pub struct HoneyIdConnection {
     stream: WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>,
 }
@@ -35,7 +36,7 @@ impl HoneyIdConnection {
 
     pub async fn send_request<T: Serialize>(
         &mut self,
-        method: EndpointMethodCode,
+        method: u32,
         params: T,
     ) -> eyre::Result<()> {
         #[derive(Serialize, Deserialize, Debug)]
@@ -46,7 +47,7 @@ impl HoneyIdConnection {
         }
 
         let json = serde_json::to_string(&ApiMessage {
-            method: method as u32,
+            method: method,
             params,
         })?;
 

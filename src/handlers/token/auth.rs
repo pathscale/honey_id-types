@@ -8,12 +8,14 @@ use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
-use crate::endpoints::connect::{ApiKeyConnectRequest, ApiKeyConnectResponse};
 use crate::client::HoneyIdClient;
+use crate::endpoints::connect::{ApiKeyConnectRequest, ApiKeyConnectResponse};
 use crate::enums::ErrorCode;
+use crate::types::traits::UserStorage;
 
 pub struct MethodApiKeyConnect {
     pub honey_id_client: Arc<HoneyIdClient>,
+    pub user_storage: Arc<dyn UserStorage + Send + Sync>,
 }
 
 #[async_trait(?Send)]
@@ -41,7 +43,8 @@ impl SubAuthController for MethodApiKeyConnect {
                 ))
             }
 
-            conn.set_roles(Arc::new(vec![u32::MAX]));
+            let auth_role = self.user_storage.get_honey_auth_role();
+            conn.set_roles(Arc::new(vec![auth_role]));
 
             Ok(serde_json::to_value(ApiKeyConnectResponse {})?)
         }

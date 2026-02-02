@@ -15,9 +15,7 @@ impl HoneyIdClient {
     /// Created new [`HoneyIdClient`] with provided [`HoneyIdConfig`].
     #[must_use]
     pub fn new(config: HoneyIdConfig) -> Self {
-        Self {
-            config,
-        }
+        Self { config }
     }
 
     pub fn get_app_pub_id(&self) -> Uuid {

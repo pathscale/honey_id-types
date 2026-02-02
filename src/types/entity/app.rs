@@ -1,7 +1,7 @@
-use worktable::prelude::SizeMeasurable;
-use worktable::prelude::align;
 use derive_more::{From, Into};
 use uuid::Uuid;
+use worktable::prelude::SizeMeasurable;
+use worktable::prelude::align;
 use worktable::prelude::{MemStat, SizeMeasure};
 
 /// Public identifier for an [`App`] in the `honey.id`.

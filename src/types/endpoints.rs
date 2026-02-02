@@ -1,10 +1,10 @@
 #![allow(unused_imports)]
 
 pub mod connect {
-    pub use crate::types::generated::ApiKeyConnectRequest;
-    pub use crate::types::generated::ApiKeyConnectResponse;
     pub use crate::types::generated::AccessTokenConnectRequest;
     pub use crate::types::generated::AccessTokenConnectResponse;
+    pub use crate::types::generated::ApiKeyConnectRequest;
+    pub use crate::types::generated::ApiKeyConnectResponse;
     pub use crate::types::generated::PublicConnectRequest;
     pub use crate::types::generated::PublicConnectResponse;
 }

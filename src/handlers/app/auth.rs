@@ -48,6 +48,6 @@ impl SubAuthController for MethodAccessTokenConnect {
 
             Ok(serde_json::to_value(AccessTokenConnectResponse {})?)
         }
-            .boxed_local()
+        .boxed_local()
     }
 }

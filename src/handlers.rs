@@ -1,2 +1,3 @@
-mod token;
 mod app;
+mod public;
+mod token;

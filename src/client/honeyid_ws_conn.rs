@@ -9,8 +9,8 @@ use tokio_tungstenite::tungstenite::handshake::client::Request;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use url::Url;
 
-use crate::enums::EndpointMethodCode;
-use crate::error::{HoneyIdError, HoneyIdResult};
+use crate::enums::HoneyEndpointMethodCode;
+use crate::types::error::{HoneyIdError, HoneyIdResult};
 
 #[derive(Debug)]
 pub struct HoneyIdConnection {
@@ -18,7 +18,7 @@ pub struct HoneyIdConnection {
 }
 
 impl HoneyIdConnection {
-    pub async fn connect(addr: Url, auth: Option<String>) -> HoneyIdResult<HoneyIdConnection> {
+    pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
         let mut request = Request::builder()
             .uri(addr.to_string())
             .method("GET")
@@ -34,7 +34,19 @@ impl HoneyIdConnection {
         Ok(HoneyIdConnection { stream })
     }
 
+    /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
     pub async fn send_request<T: Serialize>(
+        &mut self,
+        method: HoneyEndpointMethodCode,
+        params: T,
+    ) -> eyre::Result<()> {
+        let _ = self.send_request_raw(method as u32, params).await?;
+
+        Ok(())
+    }
+
+    /// Used for compatibility with code that doesn't call HoneyEndpointMethodCode endpoints
+    pub async fn send_request_raw<T: Serialize>(
         &mut self,
         method: u32,
         params: T,
@@ -46,10 +58,7 @@ impl HoneyIdConnection {
             params: T,
         }
 
-        let json = serde_json::to_string(&ApiMessage {
-            method: method,
-            params,
-        })?;
+        let json = serde_json::to_string(&ApiMessage { method, params })?;
 
         self.stream.send(Message::Text(json.into())).await?;
 

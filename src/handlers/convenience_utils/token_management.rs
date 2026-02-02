@@ -11,8 +11,18 @@ use uuid::Uuid;
 use worktable::prelude::*;
 use worktable::worktable;
 
-use crate::types::entity::UserPublicId;
-use crate::types::traits::TokenStorage;
+use crate::types::id_entities::UserPublicId;
+
+/// Describes the API of [`TokenStorage`], which simplifies and abstracts the storage and validation
+/// of tokens sent from Auth to App BEs.
+pub trait TokenStorage {
+    /// Stores received `token` which belongs to `User` with provided
+    /// [`UserPublicId`].
+    fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()>;
+    /// Validates provided `token` and returns [`UserPublicId`] if `token` is
+    /// valid. Errors otherwise.
+    fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
+}
 
 worktable!(
     name: Token,

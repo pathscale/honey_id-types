@@ -207,12 +207,16 @@
       "endpoints": [
         {
           "code": 110,
-          "description": "Backend receives HoneyAuth tokens.",
+          "description": "Backend receives auth tokens, happens after login or signup",
           "json_schema": null,
           "name": "ReceiveToken",
           "parameters": [
             {
               "name": "token",
+              "ty": "String"
+            },
+            {
+              "name": "username",
               "ty": "String"
             },
             {
@@ -228,7 +232,7 @@
         },
         {
           "code": 111,
-          "description": "Backend receives user info.",
+          "description": "Backend receives user info with token, happens after new user signs up.",
           "json_schema": null,
           "name": "ReceiveUserInfo",
           "parameters": [
@@ -238,6 +242,10 @@
             },
             {
               "name": "username",
+              "ty": "String"
+            },
+            {
+              "name": "token",
               "ty": "String"
             }
           ],

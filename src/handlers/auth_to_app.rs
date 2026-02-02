@@ -11,7 +11,10 @@ use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
 use crate::client::HoneyIdClient;
-use crate::endpoints::callback::{HoneyReceiveTokenRequest, HoneyReceiveTokenResponse};
+use crate::endpoints::callback::{
+    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
+    HoneyReceiveUserInfoResponse,
+};
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
@@ -59,6 +62,7 @@ impl SubAuthController for MethodApiKeyConnect {
 
 pub struct MethodReceiveToken {
     pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
+    pub user_storage: Arc<dyn UserStorage + Send + Sync>,
 }
 
 #[async_trait(?Send)]
@@ -71,6 +75,6 @@ impl RequestHandler for MethodReceiveToken {
 
         self.token_storage.store_token(user_pub_id, token)?;
 
-        Ok(HoneyReceiveTokenResponse {})
+        Ok(self.user_storage.create_or_update_user(req).await?)
     }
 }

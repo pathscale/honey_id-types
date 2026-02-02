@@ -266,6 +266,7 @@ pub struct PublicConnectResponse {}
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveTokenRequest {
     pub token: String,
+    pub username: String,
     pub userPubId: uuid::Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -276,6 +277,7 @@ pub struct ReceiveTokenResponse {}
 pub struct ReceiveUserInfoRequest {
     pub userPubId: uuid::Uuid,
     pub username: String,
+    pub token: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -530,13 +532,17 @@ impl WsRequest for ReceiveTokenRequest {
       "ty": "String"
     },
     {
+      "name": "username",
+      "ty": "String"
+    },
+    {
       "name": "userPubId",
       "ty": "UUID"
     }
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Backend receives HoneyAuth tokens.",
+  "description": "Backend receives auth tokens, happens after login or signup",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
@@ -562,11 +568,15 @@ impl WsRequest for ReceiveUserInfoRequest {
     {
       "name": "username",
       "ty": "String"
+    },
+    {
+      "name": "token",
+      "ty": "String"
     }
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Backend receives user info.",
+  "description": "Backend receives user info with token, happens after new user signs up.",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"

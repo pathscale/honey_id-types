@@ -48,7 +48,7 @@ impl SubAuthController for MethodAccessTokenConnect {
                 ))
             };
 
-            let role = self.user_storage.get_role_by_pub_id(user_pub_id)?;
+            let role = self.user_storage.get_api_role_by_pub_id(user_pub_id)?;
 
             conn.set_roles(Arc::new(vec![role]));
 

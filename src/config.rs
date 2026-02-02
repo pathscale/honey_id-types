@@ -17,8 +17,7 @@ pub struct HoneyIdConfig {
     #[serde(deserialize_with = "util::deserialize_base_url")]
     pub addr: Url,
 
-    /// Public ID of your `App`, which you can retrieve after `App` creation in
-    /// `honey.id` UI.
+    /// Public ID of the API app that is defined in the Auth server's config. This must match that value
     pub app_public_id: Uuid,
 
     /// `App` API key, which you can retrieve after `App` creation in `honey.id`

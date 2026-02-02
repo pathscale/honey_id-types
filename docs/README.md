@@ -29,5 +29,5 @@ ID: 11
 ## Endpoints
 |Method Code|Method Name|Parameters|Response|Description|
 |-----------|-----------|----------|--------|-----------|
-|110|ReceiveToken|token, userPubId||Backend receives HoneyAuth tokens.|
-|111|ReceiveUserInfo|userPubId, username||Backend receives user info.|
+|110|ReceiveToken|token, username, userPubId||Backend receives auth tokens, happens after login or signup|
+|111|ReceiveUserInfo|userPubId, username, token||Backend receives user info with token, happens after new user signs up.|

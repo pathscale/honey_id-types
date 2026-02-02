@@ -34,9 +34,21 @@ impl HoneyIdConnection {
         Ok(HoneyIdConnection { stream })
     }
 
+    /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
     pub async fn send_request<T: Serialize>(
         &mut self,
         method: HoneyEndpointMethodCode,
+        params: T,
+    ) -> eyre::Result<()> {
+        let _ = self.send_request_raw(method as u32, params).await?;
+
+        Ok(())
+    }
+
+    /// Used for compatibility with code that doesn't call HoneyEndpointMethodCode endpoints
+    pub async fn send_request_raw<T: Serialize>(
+        &mut self,
+        method: u32,
         params: T,
     ) -> eyre::Result<()> {
         #[derive(Serialize, Deserialize, Debug)]
@@ -46,10 +58,7 @@ impl HoneyIdConnection {
             params: T,
         }
 
-        let json = serde_json::to_string(&ApiMessage {
-            method: method as u32,
-            params,
-        })?;
+        let json = serde_json::to_string(&ApiMessage { method, params })?;
 
         self.stream.send(Message::Text(json.into())).await?;
 

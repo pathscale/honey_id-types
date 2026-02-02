@@ -8,5 +8,7 @@ mod ws;
 pub use client::HoneyIdClient;
 pub use config::HoneyIdConfig;
 pub use types::endpoints;
+pub use types::entity;
 pub use types::enums;
+pub use types::traits;
 pub use ws::HoneyIdConnection;

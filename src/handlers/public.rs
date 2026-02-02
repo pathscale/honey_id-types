@@ -3,17 +3,14 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
 use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
-use eyre::{Result, bail};
+use eyre::Result;
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
-use crate::endpoints::connect::{
-    AccessTokenConnectRequest, AccessTokenConnectResponse, PublicConnectRequest,
-    PublicConnectResponse,
-};
+use crate::endpoints::connect::{PublicConnectRequest, PublicConnectResponse};
 use crate::enums::ErrorCode;
-use crate::types::traits::{TokenStorage, UserStorage};
+use crate::types::traits::UserStorage;
 
 pub struct MethodPublicConnect {
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,

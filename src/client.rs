@@ -37,6 +37,8 @@ impl HoneyIdClient {
         self.config.auth_api_key.expose_secret() == key
     }
 
+    // TODOVEON: signup call for use in API
+
     pub async fn sign_in(&self, username: &str, password: &str) -> HoneyIdResult<String> {
         let (_username_response, mut session_conn) = self.submit_username(username).await?;
 
@@ -98,11 +100,11 @@ impl HoneyIdClient {
         HoneyIdResult::Ok(response)
     }
 
-    async fn raw_connect(addr: &Url, header: &str) -> HoneyIdResult<HoneyIdConnection> {
+    pub async fn raw_connect(addr: &Url, header: &str) -> HoneyIdResult<HoneyIdConnection> {
         HoneyIdConnection::connect(addr, Some(header)).await
     }
 
-    async fn connect_public(&self) -> HoneyIdResult<HoneyIdConnection> {
+    pub async fn connect_public(&self) -> HoneyIdResult<HoneyIdConnection> {
         let auth_endpoint_name = HoneyEndpointMethodCode::PublicConnect
             .schema()
             .name

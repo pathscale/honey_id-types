@@ -44,6 +44,31 @@ Config(
                         value: 6,
                         description: "The role is used for external users only.",
                     ),
+                    EnumVariant(
+                        name: "Platform",
+                        value: 7,
+                        description: "The role is used for platform only.",
+                    ),
+                ],
+            ),
+            Enum(
+                name: "UserStatus",
+                variants: [
+                    EnumVariant(
+                        name: "enabled",
+                        value: 1,
+                        description: "Active user.",
+                    ),
+                    EnumVariant(
+                        name: "disabled",
+                        value: 2,
+                        description: "Inactive user.",
+                    ),
+                    EnumVariant(
+                        name: "banned",
+                        value: 3,
+                        description: "Banned user.",
+                    ),
                 ],
             ),
         ]

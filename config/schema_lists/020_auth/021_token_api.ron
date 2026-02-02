@@ -4,11 +4,11 @@
 Config(
     definition: EndpointSchemaList(
         "tokenApi",
-        11,
+        21,
         [
             EndpointSchema(
                 name: "ReceiveToken",
-                code: 110,
+                code: 210,
                 parameters: [
                     Field(name: "token", ty: String),
                     Field(name: "username", ty: String),
@@ -24,7 +24,7 @@ Config(
             ),
             EndpointSchema(
                 name: "ReceiveUserInfo",
-                code: 111,
+                code: 211,
                 parameters: [
                     Field(name: "userPubId", ty: UUID),
                     Field(name: "username", ty: String),

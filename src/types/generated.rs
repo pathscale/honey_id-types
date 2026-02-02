@@ -34,6 +34,31 @@ pub enum EnumUserRole {
     AppSupport = 5,
     /// The role is used for external users only.
     AppApiKey = 6,
+    /// The role is used for platform only.
+    Platform = 7,
+}
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+    FromPrimitive,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    EnumString,
+    Display,
+    Hash,
+)]
+pub enum EnumUserStatus {
+    /// Active user.
+    Enabled = 1,
+    /// Inactive user.
+    Disabled = 2,
+    /// Banned user.
+    Banned = 3,
 }
 #[derive(
     Debug,
@@ -60,15 +85,31 @@ pub enum EnumEndpoint {
     ///
     SubmitPassword = 13,
     ///
-    ApiKeyConnect = 100,
+    PlatformConnect = 100,
     ///
-    AccessTokenConnect = 101,
+    CreateAppConfig = 111,
     ///
-    GetAppPublicId = 102,
+    BanUser = 112,
     ///
-    ReceiveToken = 110,
+    EditUser = 113,
     ///
-    ReceiveUserInfo = 111,
+    DeleteUser = 114,
+    ///
+    DeleteAppConfig = 115,
+    ///
+    EditAppConfig = 116,
+    ///
+    GetAppSecurityRules = 117,
+    ///
+    ApiKeyConnect = 200,
+    ///
+    AccessTokenConnect = 201,
+    ///
+    GetAppPublicId = 202,
+    ///
+    ReceiveToken = 210,
+    ///
+    ReceiveUserInfo = 211,
 }
 
 impl EnumEndpoint {
@@ -78,6 +119,14 @@ impl EnumEndpoint {
             Self::Signup => SignupRequest::SCHEMA,
             Self::SubmitUsername => SubmitUsernameRequest::SCHEMA,
             Self::SubmitPassword => SubmitPasswordRequest::SCHEMA,
+            Self::PlatformConnect => PlatformConnectRequest::SCHEMA,
+            Self::CreateAppConfig => CreateAppConfigRequest::SCHEMA,
+            Self::BanUser => BanUserRequest::SCHEMA,
+            Self::EditUser => EditUserRequest::SCHEMA,
+            Self::DeleteUser => DeleteUserRequest::SCHEMA,
+            Self::DeleteAppConfig => DeleteAppConfigRequest::SCHEMA,
+            Self::EditAppConfig => EditAppConfigRequest::SCHEMA,
+            Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AccessTokenConnect => AccessTokenConnectRequest::SCHEMA,
             Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
@@ -250,12 +299,100 @@ pub struct ApiKeyConnectRequest {
 pub struct ApiKeyConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct BanUserRequest {
+    pub userPublicId: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BanUserResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppConfigRequest {
+    pub appPublicId: uuid::Uuid,
+    pub callBackUrl: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppConfigResponse {
+    pub appPublicId: uuid::Uuid,
+    pub createdAt: i64,
+    pub appApiKey: String,
+    pub minPasswordLength: i32,
+    pub requiredPasswordChars: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteAppConfigRequest {
+    pub appPublicId: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteAppConfigResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteUserRequest {
+    pub appPublicId: uuid::Uuid,
+    pub userPublicId: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteUserResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EditAppConfigRequest {
+    pub appPublicId: uuid::Uuid,
+    #[serde(default)]
+    pub minPasswordLength: Option<i32>,
+    #[serde(default)]
+    pub requiredPasswordChars: Option<String>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EditAppConfigResponse {
+    pub appPublicId: uuid::Uuid,
+    pub minPasswordLength: i32,
+    pub requiredPasswordChars: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EditUserRequest {
+    pub userPublicId: uuid::Uuid,
+    pub newStatus: EnumUserStatus,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EditUserResponse {
+    pub userPublicId: uuid::Uuid,
+    pub newStatus: EnumUserStatus,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct GetAppPublicIdRequest {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAppPublicIdResponse {
     pub appPublicId: uuid::Uuid,
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAppSecurityRulesRequest {
+    pub appPublicId: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetAppSecurityRulesResponse {
+    pub appPublicId: uuid::Uuid,
+    pub minPasswordLength: i32,
+    pub requiredPasswordChars: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformConnectRequest {
+    pub platformApiKey: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PlatformConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicConnectRequest {}
@@ -441,13 +578,305 @@ impl WsResponse for SubmitPasswordResponse {
     type Request = SubmitPasswordRequest;
 }
 
-impl WsRequest for ApiKeyConnectRequest {
-    type Response = ApiKeyConnectResponse;
+impl WsRequest for PlatformConnectRequest {
+    type Response = PlatformConnectResponse;
     const METHOD_ID: u32 = 100;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
-  "name": "ApiKeyConnect",
+  "name": "PlatformConnect",
   "code": 100,
+  "parameters": [
+    {
+      "name": "platformApiKey",
+      "ty": "String"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Handles platform API Key login to initiate the connection session between Honey API Backend and this server",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Public"
+  ]
+}"#;
+}
+impl WsResponse for PlatformConnectResponse {
+    type Request = PlatformConnectRequest;
+}
+
+impl WsRequest for CreateAppConfigRequest {
+    type Response = CreateAppConfigResponse;
+    const METHOD_ID: u32 = 111;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "CreateAppConfig",
+  "code": 111,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "callBackUrl",
+      "ty": "String"
+    }
+  ],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "createdAt",
+      "ty": "BigInt"
+    },
+    {
+      "name": "appApiKey",
+      "ty": "String"
+    },
+    {
+      "name": "minPasswordLength",
+      "ty": "Int"
+    },
+    {
+      "name": "requiredPasswordChars",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Platform can create new apps",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for CreateAppConfigResponse {
+    type Request = CreateAppConfigRequest;
+}
+
+impl WsRequest for BanUserRequest {
+    type Response = BanUserResponse;
+    const METHOD_ID: u32 = 112;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "BanUser",
+  "code": 112,
+  "parameters": [
+    {
+      "name": "userPublicId",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Ban a user",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for BanUserResponse {
+    type Request = BanUserRequest;
+}
+
+impl WsRequest for EditUserRequest {
+    type Response = EditUserResponse;
+    const METHOD_ID: u32 = 113;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "EditUser",
+  "code": 113,
+  "parameters": [
+    {
+      "name": "userPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "newStatus",
+      "ty": {
+        "EnumRef": "UserStatus"
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "userPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "newStatus",
+      "ty": {
+        "EnumRef": "UserStatus"
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "Edit user status",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for EditUserResponse {
+    type Request = EditUserRequest;
+}
+
+impl WsRequest for DeleteUserRequest {
+    type Response = DeleteUserResponse;
+    const METHOD_ID: u32 = 114;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "DeleteUser",
+  "code": 114,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "userPublicId",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Delete a user",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for DeleteUserResponse {
+    type Request = DeleteUserRequest;
+}
+
+impl WsRequest for DeleteAppConfigRequest {
+    type Response = DeleteAppConfigResponse;
+    const METHOD_ID: u32 = 115;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "DeleteAppConfig",
+  "code": 115,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Delete app configuration",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for DeleteAppConfigResponse {
+    type Request = DeleteAppConfigRequest;
+}
+
+impl WsRequest for EditAppConfigRequest {
+    type Response = EditAppConfigResponse;
+    const METHOD_ID: u32 = 116;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "EditAppConfig",
+  "code": 116,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "minPasswordLength",
+      "ty": {
+        "Optional": "Int"
+      }
+    },
+    {
+      "name": "requiredPasswordChars",
+      "ty": {
+        "Optional": "String"
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "minPasswordLength",
+      "ty": "Int"
+    },
+    {
+      "name": "requiredPasswordChars",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Edit app configuration",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for EditAppConfigResponse {
+    type Request = EditAppConfigRequest;
+}
+
+impl WsRequest for GetAppSecurityRulesRequest {
+    type Response = GetAppSecurityRulesResponse;
+    const METHOD_ID: u32 = 117;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "GetAppSecurityRules",
+  "code": 117,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
+      "name": "minPasswordLength",
+      "ty": "Int"
+    },
+    {
+      "name": "requiredPasswordChars",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Get security rules contained within current app's configuration",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for GetAppSecurityRulesResponse {
+    type Request = GetAppSecurityRulesRequest;
+}
+
+impl WsRequest for ApiKeyConnectRequest {
+    type Response = ApiKeyConnectResponse;
+    const METHOD_ID: u32 = 200;
+    const ROLES: &[u32] = &[0];
+    const SCHEMA: &'static str = r#"{
+  "name": "ApiKeyConnect",
+  "code": 200,
   "parameters": [
     {
       "name": "appApiKey",
@@ -469,11 +898,11 @@ impl WsResponse for ApiKeyConnectResponse {
 
 impl WsRequest for AccessTokenConnectRequest {
     type Response = AccessTokenConnectResponse;
-    const METHOD_ID: u32 = 101;
+    const METHOD_ID: u32 = 201;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
   "name": "AccessTokenConnect",
-  "code": 101,
+  "code": 201,
   "parameters": [
     {
       "name": "accessToken",
@@ -495,11 +924,11 @@ impl WsResponse for AccessTokenConnectResponse {
 
 impl WsRequest for GetAppPublicIdRequest {
     type Response = GetAppPublicIdResponse;
-    const METHOD_ID: u32 = 102;
+    const METHOD_ID: u32 = 202;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
   "name": "GetAppPublicId",
-  "code": 102,
+  "code": 202,
   "parameters": [],
   "returns": [
     {
@@ -521,11 +950,11 @@ impl WsResponse for GetAppPublicIdResponse {
 
 impl WsRequest for ReceiveTokenRequest {
     type Response = ReceiveTokenResponse;
-    const METHOD_ID: u32 = 110;
+    const METHOD_ID: u32 = 210;
     const ROLES: &[u32] = &[6];
     const SCHEMA: &'static str = r#"{
   "name": "ReceiveToken",
-  "code": 110,
+  "code": 210,
   "parameters": [
     {
       "name": "token",
@@ -555,11 +984,11 @@ impl WsResponse for ReceiveTokenResponse {
 
 impl WsRequest for ReceiveUserInfoRequest {
     type Response = ReceiveUserInfoResponse;
-    const METHOD_ID: u32 = 111;
+    const METHOD_ID: u32 = 211;
     const ROLES: &[u32] = &[6];
     const SCHEMA: &'static str = r#"{
   "name": "ReceiveUserInfo",
-  "code": 111,
+  "code": 211,
   "parameters": [
     {
       "name": "userPubId",

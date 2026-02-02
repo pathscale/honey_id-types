@@ -1,0 +1,28 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+Config(
+    definition: EndpointSchemaList(
+        "platformApiKeyConnection",
+        10,
+        [
+            EndpointSchema(
+                name: "PlatformConnect",
+                code: 100,
+                parameters: [
+                    Field(
+                        name: "platformApiKey",
+                        ty: String,
+                    ),
+                ],
+                returns: [],
+                stream_response: None,
+                description: "Handles platform API Key login to initiate the connection session between Honey API Backend and this server",
+                json_schema: (),
+                roles: [
+                    "UserRole::Public",
+                ],
+            ),
+        ]
+    )
+)

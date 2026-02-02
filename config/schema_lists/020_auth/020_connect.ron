@@ -4,11 +4,11 @@
 Config(
     definition: EndpointSchemaList(
         "authEndpoints",
-        10,
+        20,
         [
             EndpointSchema(
                 name: "ApiKeyConnect",
-                code: 100,
+                code: 200,
                 parameters: [
                     Field(
                         name: "appApiKey",
@@ -25,7 +25,7 @@ Config(
             ),
             EndpointSchema(
                 name: "AccessTokenConnect",
-                code: 101,
+                code: 201,
                 parameters: [
                     Field(
                         name: "accessToken",
@@ -42,7 +42,7 @@ Config(
             ),
             EndpointSchema(
                 name: "GetAppPublicId",
-                code: 102,
+                code: 202,
                 parameters: [],
                 returns: [
                     Field(

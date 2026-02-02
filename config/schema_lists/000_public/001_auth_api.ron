@@ -7,57 +7,35 @@ Config(
         1,
         [
             EndpointSchema(
-                name: "StartAuth",
+                name: "Signup",
                 code: 10,
                 parameters: [
                     Field(name: "appPublicId", ty: UUID),
-                ],
-                returns: [
-                    Field(name: "loginConfig", ty: String), // TODO: This won't be used currently, but will be used for things like "signup enabled", "enabled signin methods", stuff like that for the FE to know
-                ],
-                stream_response: None,
-                description: "Frontend initiates HoneyAuth authorization flow. Session is stored per connection.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
-            ),
-            EndpointSchema(
-                name: "Signup",
-                code: 11,
-                parameters: [
                     Field(name: "username", ty: String),
                     Field(name: "password", ty: String),
-                    Field(name: "agreedTos", ty: String),
-                    Field(name: "agreedPrivacy", ty: String),
                 ],
                 returns: [
                     Field(name: "accessToken", ty: String),
-                    Field(name: "refreshToken", ty: String),
-                    Field(name: "idToken", ty: String),
-                    Field(name: "tokenType", ty: String),
-                    Field(name: "expiresIn", ty: Int),
-                    Field(name: "profileCallbackUrl", ty: String),
                 ],
                 stream_response: None,
-                description: "Frontend creates new user account during HoneyAuth signup. Session is per connection. Returns authorization code and profile callback endpoint.",
+                description: "Frontend creates new user account.",
                 json_schema: (),
                 roles: [
                     "UserRole::Public",
                 ],
             ),
-            
             EndpointSchema(
                 name: "SubmitUsername",
                 code: 12,
                 parameters: [
+                    Field(name: "appPublicId", ty: UUID),
                     Field(name: "username", ty: String),
                 ],
                 returns: [
                     Field(name: "expiresAt", ty: BigInt),
                 ],
                 stream_response: None,
-                description: "Step 1: Frontend submits username during HoneyAuth flow. Session is per connection.",
+                description: "Step 1: Frontend submits username during auth flow.",
                 json_schema: (),
                 roles: [
                     "UserRole::Public",
@@ -71,53 +49,9 @@ Config(
                 ],
                 returns: [
                     Field(name: "accessToken", ty: String),
-                    Field(name: "refreshToken", ty: String),
-                    Field(name: "idToken", ty: String),
-                    Field(name: "tokenType", ty: String),
-                    Field(name: "expiresIn", ty: Int),
                 ],
                 stream_response: None,
                 description: "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
-            ),
-            EndpointSchema(
-                name: "RefreshTokenExchange",
-                code: 14,
-                parameters: [
-                    Field(name: "refreshToken", ty: String),
-                    Field(name: "appPublicId", ty: UUID),
-                ],
-                returns: [
-                    Field(name: "accessToken", ty: String),
-                    Field(name: "refreshToken", ty: String),
-                    Field(name: "idToken", ty: String),
-                    Field(name: "tokenType", ty: String),
-                    Field(name: "expiresIn", ty: Int),
-                ],
-                stream_response: None,
-                description: "Exchange refresh token for access tokens. Redirect URI handling is client-side; use WebSocket connection context for navigation.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
-            ),
-            EndpointSchema(
-                name: "TokenRevoke",
-                code: 15,
-                parameters: [
-                    Field(name: "token", ty: String),
-                    Field(name: "tokenTypeHint", ty: Optional(String)),
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "clientSecret", ty: Optional(String)),
-                ],
-                returns: [
-                    Field(name: "success", ty: Boolean),
-                ],
-                stream_response: None,
-                description: "Revoke access or refresh tokens.",
                 json_schema: (),
                 roles: [
                     "UserRole::Public",

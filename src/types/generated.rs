@@ -19,119 +19,6 @@ use strum_macros::{Display, EnumString};
     Display,
     Hash,
 )]
-pub enum EnumAppBillingStatus {
-    /// Free tier.
-    PayRequired = 0,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumAppSubscriptionStatus {
-    /// WIP
-    Active = 0,
-    /// WIP
-    Cancelled = 1,
-    /// WIP
-    ScheduledForCancel = 2,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumEventSeverity {
-    /// Represents a message about successful action.
-    Success = 0,
-    /// Represents a message about some progress.
-    Info = 1,
-    /// Represents a message that requires attention.
-    Warn = 2,
-    /// Represents a message that marks a failure.
-    Error = 3,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumExternalUserStatus {
-    /// Active user.
-    Enabled = 1,
-    /// Inactive user.
-    Disabled = 2,
-    /// Banned user.
-    Banned = 3,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumInternalUserStatus {
-    /// Active user.
-    Enabled = 1,
-    /// Inactive user.
-    Disabled = 2,
-    /// Banned user.
-    Banned = 3,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
 pub enum EnumUserRole {
     /// Public can only view some data.
     Public = 0,
@@ -163,114 +50,39 @@ pub enum EnumUserRole {
     Display,
     Hash,
 )]
-pub enum EnumAppStatus {
-    /// Active application.
-    Enabled = 1,
-    /// Inactive user.
-    Disabled = 2,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumPaymentStatus {
-    /// Payment is pending.
-    Pending = 0,
-    /// Payment has expired.
-    Expired = 1,
-    /// Payment has been cancelled.
-    Cancelled = 2,
-    /// Payment has been completed.
-    Completed = 3,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
-pub enum EnumRoleInApp {
-    /// Admin in application.
-    Admin = 1,
-    /// Member in application.
-    Member = 2,
-    /// Guest in application.
-    Guest = 3,
-}
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
-)]
 pub enum EnumEndpoint {
     ///
     PublicConnect = 0,
     ///
-    StartAuth = 10,
-    ///
-    Signup = 11,
+    Signup = 10,
     ///
     SubmitUsername = 12,
     ///
     SubmitPassword = 13,
     ///
-    RefreshTokenExchange = 14,
-    ///
-    TokenRevoke = 15,
-    ///
     ApiKeyConnect = 100,
     ///
-    GetAppPublicId = 101,
+    AccessTokenConnect = 101,
     ///
-    TokenIntrospect = 110,
+    GetAppPublicId = 102,
     ///
-    SubscribeTokenRevocations = 111,
+    ReceiveToken = 110,
+    ///
+    ReceiveUserInfo = 111,
 }
 
 impl EnumEndpoint {
     pub fn schema(&self) -> endpoint_libs::model::EndpointSchema {
         let schema = match self {
             Self::PublicConnect => PublicConnectRequest::SCHEMA,
-            Self::StartAuth => StartAuthRequest::SCHEMA,
             Self::Signup => SignupRequest::SCHEMA,
             Self::SubmitUsername => SubmitUsernameRequest::SCHEMA,
             Self::SubmitPassword => SubmitPasswordRequest::SCHEMA,
-            Self::RefreshTokenExchange => RefreshTokenExchangeRequest::SCHEMA,
-            Self::TokenRevoke => TokenRevokeRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
+            Self::AccessTokenConnect => AccessTokenConnectRequest::SCHEMA,
             Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
-            Self::TokenIntrospect => TokenIntrospectRequest::SCHEMA,
-            Self::SubscribeTokenRevocations => SubscribeTokenRevocationsRequest::SCHEMA,
+            Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
+            Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
         };
         serde_json::from_str(schema).unwrap()
     }
@@ -278,7 +90,76 @@ impl EnumEndpoint {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct ErrorXxx {}
+pub struct ErrorBadRequest {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInternalServerError {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorNotImplemented {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorNotFound {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorDatabaseError {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidService {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserForbidden {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserRoleForbidden {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserNotFound {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserMustAgreeTos {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserMustAgreePrivacyPolicy {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserNoAuthToken {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserInvalidAuthToken {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorUserInvalidPassword {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorDuplicateRequest {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidExpression {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidArgument {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidState {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidSeq {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidMethod {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorProtocolViolation {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorRestrictedUserPrivileges {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInvalidRole {}
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorInternalError {}
 #[derive(
     Debug,
     Clone,
@@ -295,8 +176,54 @@ pub struct ErrorXxx {}
     Hash,
 )]
 pub enum EnumErrorCode {
-    /// None Please populate error_codes.json
-    Xxx = 0,
+    /// Custom Bad Request
+    BadRequest = 100400,
+    /// Custom NotFoundResource
+    NotFound = 100404,
+    /// Custom Internal Server Error
+    InternalServerError = 100500,
+    /// Custom Method not implemented
+    NotImplemented = 100501,
+    /// Custom Database error
+    DatabaseError = 100601,
+    /// Custom Invalid Service
+    InvalidService = 100602,
+    /// Custom Forbidden user
+    UserForbidden = 101403,
+    /// Custom User not found
+    UserNotFound = 101404,
+    /// Custom Must agree to the terms of service
+    UserMustAgreeTos = 101601,
+    /// Custom Must agree to the privacy policy
+    UserMustAgreePrivacyPolicy = 101602,
+    /// Custom No auth token
+    UserNoAuthToken = 101604,
+    /// Custom token invalid
+    UserInvalidAuthToken = 101605,
+    /// Custom password invalid
+    UserInvalidPassword = 101606,
+    /// Custom Insufficient role for user
+    UserRoleForbidden = 102403,
+    /// Custom Duplicate request
+    DuplicateRequest = 103001,
+    /// Custom Invalid expression
+    InvalidExpression = 104000,
+    /// SQL R0001 InvalidArgument
+    InvalidArgument = 45349633,
+    /// SQL R0002 InvalidState
+    InvalidState = 45349634,
+    /// SQL R0003 InvalidSeq
+    InvalidSeq = 45349635,
+    /// SQL R0004 InvalidMethod
+    InvalidMethod = 45349636,
+    /// SQL R0005 ProtocolViolation
+    ProtocolViolation = 45349637,
+    /// SQL R000N RestrictedUserPrivileges
+    RestrictedUserPrivileges = 45349655,
+    /// SQL R000S InvalidRole
+    InvalidRole = 45349660,
+    /// SQL R001G InternalError
+    InternalError = 45349684,
 }
 
 impl From<EnumErrorCode> for ErrorCode {
@@ -307,8 +234,15 @@ impl From<EnumErrorCode> for ErrorCode {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct AccessTokenConnectRequest {
+    pub accessToken: uuid::Uuid,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AccessTokenConnectResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectRequest {
-    pub appPublicId: uuid::Uuid,
     pub appApiKey: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -330,46 +264,35 @@ pub struct PublicConnectRequest {}
 pub struct PublicConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct RefreshTokenExchangeRequest {
-    pub refreshToken: String,
-    pub appPublicId: uuid::Uuid,
+pub struct ReceiveTokenRequest {
+    pub token: String,
+    pub username: String,
+    pub userPubId: uuid::Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct RefreshTokenExchangeResponse {
-    pub accessToken: String,
-    pub refreshToken: String,
-    pub idToken: String,
-    pub tokenType: String,
-    pub expiresIn: i32,
+pub struct ReceiveTokenResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserInfoRequest {
+    pub userPubId: uuid::Uuid,
+    pub username: String,
+    pub token: String,
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserInfoResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SignupRequest {
+    pub appPublicId: uuid::Uuid,
     pub username: String,
     pub password: String,
-    pub agreedTos: String,
-    pub agreedPrivacy: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SignupResponse {
     pub accessToken: String,
-    pub refreshToken: String,
-    pub idToken: String,
-    pub tokenType: String,
-    pub expiresIn: i32,
-    pub profileCallbackUrl: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct StartAuthRequest {
-    pub appPublicId: uuid::Uuid,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct StartAuthResponse {
-    pub loginConfig: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -380,72 +303,17 @@ pub struct SubmitPasswordRequest {
 #[serde(rename_all = "camelCase")]
 pub struct SubmitPasswordResponse {
     pub accessToken: String,
-    pub refreshToken: String,
-    pub idToken: String,
-    pub tokenType: String,
-    pub expiresIn: i32,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmitUsernameRequest {
+    pub appPublicId: uuid::Uuid,
     pub username: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmitUsernameResponse {
     pub expiresAt: i64,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeTokenRevocationsRequest {
-    pub appPublicId: uuid::Uuid,
-    pub appApiKey: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeTokenRevocationsResponse {
-    pub subscriptionId: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenIntrospectRequest {
-    pub token: String,
-    #[serde(default)]
-    pub tokenTypeHint: Option<String>,
-    pub appPublicId: uuid::Uuid,
-    pub appApiKey: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenIntrospectResponse {
-    pub active: bool,
-    #[serde(default)]
-    pub scope: Option<String>,
-    #[serde(default)]
-    pub appPublicId: Option<uuid::Uuid>,
-    #[serde(default)]
-    pub username: Option<String>,
-    #[serde(default)]
-    pub userPublicId: Option<i64>,
-    #[serde(default)]
-    pub exp: Option<i64>,
-    #[serde(default)]
-    pub iat: Option<i64>,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenRevokeRequest {
-    pub token: String,
-    #[serde(default)]
-    pub tokenTypeHint: Option<String>,
-    pub appPublicId: uuid::Uuid,
-    #[serde(default)]
-    pub clientSecret: Option<String>,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenRevokeResponse {
-    pub success: bool,
 }
 impl WsRequest for PublicConnectRequest {
     type Response = PublicConnectResponse;
@@ -468,45 +336,18 @@ impl WsResponse for PublicConnectResponse {
     type Request = PublicConnectRequest;
 }
 
-impl WsRequest for StartAuthRequest {
-    type Response = StartAuthResponse;
+impl WsRequest for SignupRequest {
+    type Response = SignupResponse;
     const METHOD_ID: u32 = 10;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
-  "name": "StartAuth",
+  "name": "Signup",
   "code": 10,
   "parameters": [
     {
       "name": "appPublicId",
       "ty": "UUID"
-    }
-  ],
-  "returns": [
-    {
-      "name": "loginConfig",
-      "ty": "String"
-    }
-  ],
-  "stream_response": null,
-  "description": "Frontend initiates HoneyAuth authorization flow. Session is stored per connection.",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for StartAuthResponse {
-    type Request = StartAuthRequest;
-}
-
-impl WsRequest for SignupRequest {
-    type Response = SignupResponse;
-    const METHOD_ID: u32 = 11;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "Signup",
-  "code": 11,
-  "parameters": [
+    },
     {
       "name": "username",
       "ty": "String"
@@ -514,44 +355,16 @@ impl WsRequest for SignupRequest {
     {
       "name": "password",
       "ty": "String"
-    },
-    {
-      "name": "agreedTos",
-      "ty": "String"
-    },
-    {
-      "name": "agreedPrivacy",
-      "ty": "String"
     }
   ],
   "returns": [
     {
       "name": "accessToken",
       "ty": "String"
-    },
-    {
-      "name": "refreshToken",
-      "ty": "String"
-    },
-    {
-      "name": "idToken",
-      "ty": "String"
-    },
-    {
-      "name": "tokenType",
-      "ty": "String"
-    },
-    {
-      "name": "expiresIn",
-      "ty": "Int"
-    },
-    {
-      "name": "profileCallbackUrl",
-      "ty": "String"
     }
   ],
   "stream_response": null,
-  "description": "Frontend creates new user account during HoneyAuth signup. Session is per connection. Returns authorization code and profile callback endpoint.",
+  "description": "Frontend creates new user account.",
   "json_schema": null,
   "roles": [
     "UserRole::Public"
@@ -571,6 +384,10 @@ impl WsRequest for SubmitUsernameRequest {
   "code": 12,
   "parameters": [
     {
+      "name": "appPublicId",
+      "ty": "UUID"
+    },
+    {
       "name": "username",
       "ty": "String"
     }
@@ -582,7 +399,7 @@ impl WsRequest for SubmitUsernameRequest {
     }
   ],
   "stream_response": null,
-  "description": "Step 1: Frontend submits username during HoneyAuth flow. Session is per connection.",
+  "description": "Step 1: Frontend submits username during auth flow.",
   "json_schema": null,
   "roles": [
     "UserRole::Public"
@@ -610,22 +427,6 @@ impl WsRequest for SubmitPasswordRequest {
     {
       "name": "accessToken",
       "ty": "String"
-    },
-    {
-      "name": "refreshToken",
-      "ty": "String"
-    },
-    {
-      "name": "idToken",
-      "ty": "String"
-    },
-    {
-      "name": "tokenType",
-      "ty": "String"
-    },
-    {
-      "name": "expiresIn",
-      "ty": "Int"
     }
   ],
   "stream_response": null,
@@ -640,104 +441,6 @@ impl WsResponse for SubmitPasswordResponse {
     type Request = SubmitPasswordRequest;
 }
 
-impl WsRequest for RefreshTokenExchangeRequest {
-    type Response = RefreshTokenExchangeResponse;
-    const METHOD_ID: u32 = 14;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "RefreshTokenExchange",
-  "code": 14,
-  "parameters": [
-    {
-      "name": "refreshToken",
-      "ty": "String"
-    },
-    {
-      "name": "appPublicId",
-      "ty": "UUID"
-    }
-  ],
-  "returns": [
-    {
-      "name": "accessToken",
-      "ty": "String"
-    },
-    {
-      "name": "refreshToken",
-      "ty": "String"
-    },
-    {
-      "name": "idToken",
-      "ty": "String"
-    },
-    {
-      "name": "tokenType",
-      "ty": "String"
-    },
-    {
-      "name": "expiresIn",
-      "ty": "Int"
-    }
-  ],
-  "stream_response": null,
-  "description": "Exchange refresh token for access tokens. Redirect URI handling is client-side; use WebSocket connection context for navigation.",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for RefreshTokenExchangeResponse {
-    type Request = RefreshTokenExchangeRequest;
-}
-
-impl WsRequest for TokenRevokeRequest {
-    type Response = TokenRevokeResponse;
-    const METHOD_ID: u32 = 15;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "TokenRevoke",
-  "code": 15,
-  "parameters": [
-    {
-      "name": "token",
-      "ty": "String"
-    },
-    {
-      "name": "tokenTypeHint",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "appPublicId",
-      "ty": "UUID"
-    },
-    {
-      "name": "clientSecret",
-      "ty": {
-        "Optional": "String"
-      }
-    }
-  ],
-  "returns": [
-    {
-      "name": "success",
-      "ty": "Boolean"
-    }
-  ],
-  "stream_response": null,
-  "description": "Revoke access or refresh tokens.",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for TokenRevokeResponse {
-    type Request = TokenRevokeRequest;
-}
-
 impl WsRequest for ApiKeyConnectRequest {
     type Response = ApiKeyConnectResponse;
     const METHOD_ID: u32 = 100;
@@ -747,17 +450,13 @@ impl WsRequest for ApiKeyConnectRequest {
   "code": 100,
   "parameters": [
     {
-      "name": "appPublicId",
-      "ty": "UUID"
-    },
-    {
       "name": "appApiKey",
       "ty": "String"
     }
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+  "description": "",
   "json_schema": null,
   "roles": [
     "UserRole::Public"
@@ -768,13 +467,39 @@ impl WsResponse for ApiKeyConnectResponse {
     type Request = ApiKeyConnectRequest;
 }
 
-impl WsRequest for GetAppPublicIdRequest {
-    type Response = GetAppPublicIdResponse;
+impl WsRequest for AccessTokenConnectRequest {
+    type Response = AccessTokenConnectResponse;
     const METHOD_ID: u32 = 101;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
-  "name": "GetAppPublicId",
+  "name": "AccessTokenConnect",
   "code": 101,
+  "parameters": [
+    {
+      "name": "accessToken",
+      "ty": "UUID"
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Public"
+  ]
+}"#;
+}
+impl WsResponse for AccessTokenConnectResponse {
+    type Request = AccessTokenConnectRequest;
+}
+
+impl WsRequest for GetAppPublicIdRequest {
+    type Response = GetAppPublicIdResponse;
+    const METHOD_ID: u32 = 102;
+    const ROLES: &[u32] = &[0];
+    const SCHEMA: &'static str = r#"{
+  "name": "GetAppPublicId",
+  "code": 102,
   "parameters": [],
   "returns": [
     {
@@ -794,12 +519,12 @@ impl WsResponse for GetAppPublicIdResponse {
     type Request = GetAppPublicIdRequest;
 }
 
-impl WsRequest for TokenIntrospectRequest {
-    type Response = TokenIntrospectResponse;
+impl WsRequest for ReceiveTokenRequest {
+    type Response = ReceiveTokenResponse;
     const METHOD_ID: u32 = 110;
     const ROLES: &[u32] = &[6];
     const SCHEMA: &'static str = r#"{
-  "name": "TokenIntrospect",
+  "name": "ReceiveToken",
   "code": 110,
   "parameters": [
     {
@@ -807,105 +532,57 @@ impl WsRequest for TokenIntrospectRequest {
       "ty": "String"
     },
     {
-      "name": "tokenTypeHint",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "appPublicId",
-      "ty": "UUID"
-    },
-    {
-      "name": "appApiKey",
-      "ty": "String"
-    }
-  ],
-  "returns": [
-    {
-      "name": "active",
-      "ty": "Boolean"
-    },
-    {
-      "name": "scope",
-      "ty": {
-        "Optional": "String"
-      }
-    },
-    {
-      "name": "appPublicId",
-      "ty": {
-        "Optional": "UUID"
-      }
-    },
-    {
       "name": "username",
-      "ty": {
-        "Optional": "String"
-      }
+      "ty": "String"
     },
     {
-      "name": "userPublicId",
-      "ty": {
-        "Optional": "BigInt"
-      }
-    },
-    {
-      "name": "exp",
-      "ty": {
-        "Optional": "BigInt"
-      }
-    },
-    {
-      "name": "iat",
-      "ty": {
-        "Optional": "BigInt"
-      }
+      "name": "userPubId",
+      "ty": "UUID"
     }
   ],
+  "returns": [],
   "stream_response": null,
-  "description": "Backend validates HoneyAuth tokens (requires app API key).",
+  "description": "Backend receives auth tokens, happens after login or signup",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
   ]
 }"#;
 }
-impl WsResponse for TokenIntrospectResponse {
-    type Request = TokenIntrospectRequest;
+impl WsResponse for ReceiveTokenResponse {
+    type Request = ReceiveTokenRequest;
 }
 
-impl WsRequest for SubscribeTokenRevocationsRequest {
-    type Response = SubscribeTokenRevocationsResponse;
+impl WsRequest for ReceiveUserInfoRequest {
+    type Response = ReceiveUserInfoResponse;
     const METHOD_ID: u32 = 111;
     const ROLES: &[u32] = &[6];
     const SCHEMA: &'static str = r#"{
-  "name": "SubscribeTokenRevocations",
+  "name": "ReceiveUserInfo",
   "code": 111,
   "parameters": [
     {
-      "name": "appPublicId",
+      "name": "userPubId",
       "ty": "UUID"
     },
     {
-      "name": "appApiKey",
+      "name": "username",
       "ty": "String"
-    }
-  ],
-  "returns": [
+    },
     {
-      "name": "subscriptionId",
+      "name": "token",
       "ty": "String"
     }
   ],
+  "returns": [],
   "stream_response": null,
-  "description": "Backend subscribes to user token revocation events. TODO. This is not implemented",
+  "description": "Backend receives user info with token, happens after new user signs up.",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
   ]
 }"#;
 }
-impl WsResponse for SubscribeTokenRevocationsResponse {
-    type Request = SubscribeTokenRevocationsRequest;
+impl WsResponse for ReceiveUserInfoResponse {
+    type Request = ReceiveUserInfoRequest;
 }

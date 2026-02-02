@@ -3,7 +3,7 @@
 
 Config(
     definition: EndpointSchemaList(
-        "apiKeyEndpoints",
+        "authEndpoints",
         10,
         [
             EndpointSchema(
@@ -11,19 +11,30 @@ Config(
                 code: 100,
                 parameters: [
                     Field(
-                        name: "appPublicId",
-                        ty: UUID,
-                        description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."
-                    ),
-                    Field(
                         name: "appApiKey",
                         ty: String,
-                        description: "The API Key of the app initiating this API Key connection. Retrieved and only visible after initial creation of the app in Honey App UI or initially after creating a new API key for an existing app."
                     ),
                 ],
                 returns: [],
                 stream_response: None,
-                description: "Handles API Key login to initiate the AppApiKey connection session between App Backend and Honey Auth Server",
+                description: "",
+                json_schema: (),
+                roles: [
+                    "UserRole::Public",
+                ],
+            ),
+            EndpointSchema(
+                name: "AccessTokenConnect",
+                code: 101,
+                parameters: [
+                    Field(
+                        name: "accessToken",
+                        ty: UUID,
+                    ),
+                ],
+                returns: [],
+                stream_response: None,
+                description: "",
                 json_schema: (),
                 roles: [
                     "UserRole::Public",
@@ -31,7 +42,7 @@ Config(
             ),
             EndpointSchema(
                 name: "GetAppPublicId",
-                code: 101,
+                code: 102,
                 parameters: [],
                 returns: [
                     Field(

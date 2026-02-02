@@ -9,8 +9,8 @@ use tokio_tungstenite::tungstenite::handshake::client::Request;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use url::Url;
 
-use crate::enums::EndpointMethodCode;
-use crate::error::{HoneyIdError, HoneyIdResult};
+use crate::enums::HoneyEndpointMethodCode;
+use crate::types::error::{HoneyIdError, HoneyIdResult};
 
 #[derive(Debug)]
 pub struct HoneyIdConnection {
@@ -18,7 +18,7 @@ pub struct HoneyIdConnection {
 }
 
 impl HoneyIdConnection {
-    pub async fn connect(addr: Url, auth: Option<String>) -> HoneyIdResult<HoneyIdConnection> {
+    pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
         let mut request = Request::builder()
             .uri(addr.to_string())
             .method("GET")
@@ -36,7 +36,7 @@ impl HoneyIdConnection {
 
     pub async fn send_request<T: Serialize>(
         &mut self,
-        method: u32,
+        method: HoneyEndpointMethodCode,
         params: T,
     ) -> eyre::Result<()> {
         #[derive(Serialize, Deserialize, Debug)]
@@ -47,7 +47,7 @@ impl HoneyIdConnection {
         }
 
         let json = serde_json::to_string(&ApiMessage {
-            method: method,
+            method: method as u32,
             params,
         })?;
 

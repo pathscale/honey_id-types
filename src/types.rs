@@ -4,6 +4,6 @@ mod generated;
 
 // These modules re-export the generated code to improve the public API of this library
 pub mod endpoints;
-pub mod entity;
 pub mod enums;
-pub mod traits;
+pub mod error;
+pub mod id_entities;

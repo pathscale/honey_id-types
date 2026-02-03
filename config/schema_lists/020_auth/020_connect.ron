@@ -40,24 +40,6 @@ Config(
                     "UserRole::Public",
                 ],
             ),
-            EndpointSchema(
-                name: "GetAppPublicId",
-                code: 202,
-                parameters: [],
-                returns: [
-                    Field(
-                        name: "appPublicId",
-                        ty: UUID,
-                        description: "The public ID of the app initiating this API Key connection. Retrieved from Honey App UI."
-                    ),
-                ],
-                stream_response: None,
-                description: "Returns `appPublicId` which will be used for auth flows",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
-            ),
         ]
     )
 )

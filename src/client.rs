@@ -1,4 +1,3 @@
-use eyre::{Ok, Report};
 use secrecy::ExposeSecret;
 use tokio_tungstenite::tungstenite::http::response;
 use url::Url;

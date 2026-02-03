@@ -42,7 +42,6 @@ ID: 20
 |-----------|-----------|----------|--------|-----------|
 |200|ApiKeyConnect|appApiKey|||
 |201|AccessTokenConnect|accessToken|||
-|202|GetAppPublicId||appPublicId|Returns `appPublicId` which will be used for auth flows|
 
 # tokenApi Server
 ID: 21

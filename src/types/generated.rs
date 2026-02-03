@@ -105,8 +105,6 @@ pub enum EnumEndpoint {
     ///
     AccessTokenConnect = 201,
     ///
-    GetAppPublicId = 202,
-    ///
     ReceiveToken = 210,
     ///
     ReceiveUserInfo = 211,
@@ -129,7 +127,6 @@ impl EnumEndpoint {
             Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AccessTokenConnect => AccessTokenConnectRequest::SCHEMA,
-            Self::GetAppPublicId => GetAppPublicIdRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
             Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
         };
@@ -364,14 +361,6 @@ pub struct EditUserRequest {
 pub struct EditUserResponse {
     pub userPublicId: uuid::Uuid,
     pub newStatus: EnumUserStatus,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAppPublicIdRequest {}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct GetAppPublicIdResponse {
-    pub appPublicId: uuid::Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -920,32 +909,6 @@ impl WsRequest for AccessTokenConnectRequest {
 }
 impl WsResponse for AccessTokenConnectResponse {
     type Request = AccessTokenConnectRequest;
-}
-
-impl WsRequest for GetAppPublicIdRequest {
-    type Response = GetAppPublicIdResponse;
-    const METHOD_ID: u32 = 202;
-    const ROLES: &[u32] = &[0];
-    const SCHEMA: &'static str = r#"{
-  "name": "GetAppPublicId",
-  "code": 202,
-  "parameters": [],
-  "returns": [
-    {
-      "name": "appPublicId",
-      "ty": "UUID"
-    }
-  ],
-  "stream_response": null,
-  "description": "Returns `appPublicId` which will be used for auth flows",
-  "json_schema": null,
-  "roles": [
-    "UserRole::Public"
-  ]
-}"#;
-}
-impl WsResponse for GetAppPublicIdResponse {
-    type Request = GetAppPublicIdRequest;
 }
 
 impl WsRequest for ReceiveTokenRequest {

@@ -24,6 +24,8 @@ impl HoneyIdConnection {
             .method("GET")
             .header("Connection", "Upgrade")
             .header("Upgrade", "websocket")
+            .header("Host", "localhost")
+            .header("Sec-WebSocket-Key", "e0adf80f-47b6-465e-9379-0ae350646ff3")
             .header("Sec-WebSocket-Version", "13");
         if let Some(header) = auth {
             request = request.header("Sec-WebSocket-Protocol", header)
@@ -52,13 +54,13 @@ impl HoneyIdConnection {
         params: T,
     ) -> eyre::Result<()> {
         #[derive(Serialize, Deserialize, Debug)]
-        #[serde(tag = "seq", rename = "1")]
         struct ApiMessage<T> {
             method: u32,
             params: T,
+            seq: u32,
         }
 
-        let json = serde_json::to_string(&ApiMessage { method, params })?;
+        let json = serde_json::to_string(&ApiMessage { method, params, seq: 1 })?;
 
         self.stream.send(Message::Text(json.into())).await?;
 

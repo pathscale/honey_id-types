@@ -3,25 +3,29 @@
 
 Config(
     definition: EndpointSchemaList(
-        "platformApiKeyConnection",
-        10,
-        [
-            EndpointSchema(
-                name: "PlatformConnect",
-                code: 100,
-                parameters: [
-                    Field(
-                        name: "platformApiKey",
-                        ty: String,
-                    ),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Handles platform API Key login to initiate the connection session between Honey API Backend and this server",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+        service_name: "platformApiKeyConnection",
+        service_id: 10,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "PlatformConnect",
+                    code: 100,
+                    parameters: [
+                        Field(
+                            name: "platformApiKey",
+                            ty: String,
+                        ),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Handles platform API Key login to initiate the connection session between Honey API Backend and this server",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
         ]
     )

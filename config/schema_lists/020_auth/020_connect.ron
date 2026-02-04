@@ -3,42 +3,50 @@
 
 Config(
     definition: EndpointSchemaList(
-        "authEndpoints",
-        20,
-        [
-            EndpointSchema(
-                name: "ApiKeyConnect",
-                code: 200,
-                parameters: [
-                    Field(
-                        name: "appApiKey",
-                        ty: String,
-                    ),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+        service_name: "authEndpoints",
+        service_id: 20,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ApiKeyConnect",
+                    code: 200,
+                    parameters: [
+                        Field(
+                            name: "appApiKey",
+                            ty: String,
+                        ),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "AuthorizedConnect",
-                code: 201,
-                parameters: [
-                    Field(
-                        name: "accessToken",
-                        ty: String,
-                    ),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: true,
+                schema: (
+                    name: "AuthorizedConnect",
+                    code: 201,
+                    parameters: [
+                        Field(
+                            name: "accessToken",
+                            ty: String,
+                        ),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
         ]
     )

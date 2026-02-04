@@ -3,20 +3,24 @@
 
 Config(
     definition: EndpointSchemaList(
-        "publicApiConnection",
-        0,
-        [
-            EndpointSchema(
-                name: "PublicConnect",
-                code: 0,
-                parameters: [],
-                returns: [],
-                stream_response: None,
-                description: "Initiates a websocket connection session with that permits access to endpoints with the UserRole::Public role",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+        service_name: "publicApiConnection",
+        service_id: 0,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: true,
+                schema: (
+                    name: "PublicConnect",
+                    code: 0,
+                    parameters: [],
+                    returns: [],
+                    stream_response: None,
+                    description: "Initiates a websocket connection session with that permits access to endpoints with the UserRole::Public role",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
         ]
     )

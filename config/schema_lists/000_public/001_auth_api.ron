@@ -3,59 +3,71 @@
 
 Config(
     definition: EndpointSchemaList(
-        "publicAuthApi",
-        1,
-        [
-            EndpointSchema(
-                name: "Signup",
-                code: 10,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "username", ty: String),
-                    Field(name: "password", ty: String),
-                ],
-                returns: [
-                    Field(name: "accessToken", ty: String),
-                ],
-                stream_response: None,
-                description: "Frontend creates new user account.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+        service_name: "publicAuthApi",
+        service_id: 1,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: true,
+                schema: (
+                    name: "Signup",
+                    code: 10,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "username", ty: String),
+                        Field(name: "password", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "accessToken", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Frontend creates new user account.",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "SubmitUsername",
-                code: 12,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "username", ty: String),
-                ],
-                returns: [
-                    Field(name: "expiresAt", ty: BigInt),
-                ],
-                stream_response: None,
-                description: "Step 1: Frontend submits username during auth flow.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: true,
+                schema: (
+                    name: "SubmitUsername",
+                    code: 12,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "username", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "expiresAt", ty: BigInt),
+                    ],
+                    stream_response: None,
+                    description: "Step 1: Frontend submits username during auth flow.",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "SubmitPassword",
-                code: 13,
-                parameters: [
-                    Field(name: "password", ty: String),
-                ],
-                returns: [
-                    Field(name: "accessToken", ty: String),
-                ],
-                stream_response: None,
-                description: "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
-                json_schema: (),
-                roles: [
-                    "UserRole::Public",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: true,
+                schema: (
+                    name: "SubmitPassword",
+                    code: 13,
+                    parameters: [
+                        Field(name: "password", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "accessToken", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Public",
+                    ],
+                )
+                
             ),
         ]
     )

@@ -3,41 +3,49 @@
 
 Config(
     definition: EndpointSchemaList(
-        "tokenApi",
-        21,
-        [
-            EndpointSchema(
-                name: "ReceiveToken",
-                code: 210,
-                parameters: [
-                    Field(name: "token", ty: String),
-                    Field(name: "username", ty: String),
-                    Field(name: "userPubId", ty: UUID),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Backend receives auth tokens, happens after login or signup",
-                json_schema: (),
-                roles: [
-                    "UserRole::AppApiKey",
-                ],
+        service_name: "tokenApi",
+        service_id: 21,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ReceiveToken",
+                    code: 210,
+                    parameters: [
+                        Field(name: "token", ty: String),
+                        Field(name: "username", ty: String),
+                        Field(name: "userPubId", ty: UUID),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Backend receives auth tokens, happens after login or signup",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::AppApiKey",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "ReceiveUserInfo",
-                code: 211,
-                parameters: [
-                    Field(name: "userPubId", ty: UUID),
-                    Field(name: "username", ty: String),
-                    Field(name: "token", ty: String),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ReceiveUserInfo",
+                    code: 211,
+                    parameters: [
+                        Field(name: "userPubId", ty: UUID),
+                        Field(name: "username", ty: String),
+                        Field(name: "token", ty: String),
 
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Backend receives user info with token, happens after new user signs up.",
-                json_schema: (),
-                roles: [
-                    "UserRole::AppApiKey",
-                ],
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Backend receives user info with token, happens after new user signs up.",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::AppApiKey",
+                    ],
+                )
+                
             ),
         ]
     )

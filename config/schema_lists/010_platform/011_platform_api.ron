@@ -3,128 +3,156 @@
 
 Config(
     definition: EndpointSchemaList(
-        "platformApi",
-        11,
-        [
-            EndpointSchema(
-                name: "CreateAppConfig",
-                code: 111,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "callBackUrl", ty: String),
-                ],
-                returns: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "createdAt", ty: BigInt),
-                    Field(name: "appApiKey", ty: String),
-                    Field(name: "minPasswordLength", ty: Int),
-                    Field(name: "requiredPasswordChars", ty: String),
-                ],
-                stream_response: None,
-                description: "Platform can create new apps",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+        service_name: "platformApi",
+        service_id: 11,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "CreateAppConfig",
+                    code: 111,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "callBackUrl", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "createdAt", ty: BigInt),
+                        Field(name: "appApiKey", ty: String),
+                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "requiredPasswordChars", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Platform can create new apps",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "BanUser",
-                code: 112,
-                parameters: [
-                    Field(name: "userPublicId", ty: UUID),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Ban a user",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "BanUser",
+                    code: 112,
+                    parameters: [
+                        Field(name: "userPublicId", ty: UUID),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Ban a user",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "EditUser",
-                code: 113,
-                parameters: [
-                    Field(name: "userPublicId", ty: UUID),
-                    Field(name: "newStatus", ty: EnumRef("UserStatus")),
-                ],
-                returns: [
-                    Field(name: "userPublicId", ty: UUID),
-                    Field(name: "newStatus", ty: EnumRef("UserStatus")),
-                ],
-                stream_response: None,
-                description: "Edit user status",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "EditUser",
+                    code: 113,
+                    parameters: [
+                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "newStatus", ty: EnumRef("UserStatus")),
+                    ],
+                    returns: [
+                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "newStatus", ty: EnumRef("UserStatus")),
+                    ],
+                    stream_response: None,
+                    description: "Edit user status",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "DeleteUser",
-                code: 114,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "userPublicId", ty: UUID),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Delete a user",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "DeleteUser",
+                    code: 114,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "userPublicId", ty: UUID),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Delete a user",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "DeleteAppConfig",
-                code: 115,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                ],
-                returns: [],
-                stream_response: None,
-                description: "Delete app configuration",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "DeleteAppConfig",
+                    code: 115,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Delete app configuration",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "EditAppConfig",
-                code: 116,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "minPasswordLength", ty: Optional(Int)),
-                    Field(name: "requiredPasswordChars", ty: Optional(String)),
-                ],
-                returns: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "minPasswordLength", ty: Int),
-                    Field(name: "requiredPasswordChars", ty: String),
-                ],
-                stream_response: None,
-                description: "Edit app configuration",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "EditAppConfig",
+                    code: 116,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "minPasswordLength", ty: Optional(Int)),
+                        Field(name: "requiredPasswordChars", ty: Optional(String)),
+                    ],
+                    returns: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "requiredPasswordChars", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Edit app configuration",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
-            EndpointSchema(
-                name: "GetAppSecurityRules",
-                code: 117,
-                parameters: [
-                    Field(name: "appPublicId", ty: UUID),
-                ],
-                returns: [
-                    Field(name: "appPublicId", ty: UUID),
-                    Field(name: "minPasswordLength", ty: Int),
-                    Field(name: "requiredPasswordChars", ty: String),
-                ],
-                stream_response: None,
-                description: "Get security rules contained within current app's configuration",
-                json_schema: (),
-                roles: [
-                    "UserRole::Platform",
-                ],
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "GetAppSecurityRules",
+                    code: 117,
+                    parameters: [
+                        Field(name: "appPublicId", ty: UUID),
+                    ],
+                    returns: [
+                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "requiredPasswordChars", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Get security rules contained within current app's configuration",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+                
             ),
         ]
     )

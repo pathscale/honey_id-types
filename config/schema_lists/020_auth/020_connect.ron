@@ -24,12 +24,12 @@ Config(
                 ],
             ),
             EndpointSchema(
-                name: "AccessTokenConnect",
+                name: "AuthorizedConnect",
                 code: 201,
                 parameters: [
                     Field(
                         name: "accessToken",
-                        ty: UUID,
+                        ty: String,
                     ),
                 ],
                 returns: [],

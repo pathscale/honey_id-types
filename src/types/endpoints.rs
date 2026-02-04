@@ -1,10 +1,10 @@
 #![allow(unused_imports)]
 
 pub mod connect {
-    pub use crate::types::generated::AccessTokenConnectRequest as HoneyAccessTokenConnectRequest;
-    pub use crate::types::generated::AccessTokenConnectResponse as HoneyAccessTokenConnectResponse;
     pub use crate::types::generated::ApiKeyConnectRequest as HoneyApiKeyConnectRequest;
     pub use crate::types::generated::ApiKeyConnectResponse as HoneyApiKeyConnectResponse;
+    pub use crate::types::generated::AuthorizedConnectRequest as HoneyAuthorizedConnectRequest;
+    pub use crate::types::generated::AuthorizedConnectResponse as HoneyAuthorizedConnectResponse;
     pub use crate::types::generated::PublicConnectRequest as HoneyPublicConnectRequest;
     pub use crate::types::generated::PublicConnectResponse as HoneyPublicConnectResponse;
 }

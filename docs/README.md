@@ -41,7 +41,7 @@ ID: 20
 |Method Code|Method Name|Parameters|Response|Description|
 |-----------|-----------|----------|--------|-----------|
 |200|ApiKeyConnect|appApiKey|||
-|201|AccessTokenConnect|accessToken|||
+|201|AuthorizedConnect|accessToken|||
 
 # tokenApi Server
 ID: 21

@@ -103,7 +103,7 @@ pub enum EnumEndpoint {
     ///
     ApiKeyConnect = 200,
     ///
-    AccessTokenConnect = 201,
+    AuthorizedConnect = 201,
     ///
     ReceiveToken = 210,
     ///
@@ -126,7 +126,7 @@ impl EnumEndpoint {
             Self::EditAppConfig => EditAppConfigRequest::SCHEMA,
             Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
-            Self::AccessTokenConnect => AccessTokenConnectRequest::SCHEMA,
+            Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
             Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
         };
@@ -280,20 +280,20 @@ impl From<EnumErrorCode> for ErrorCode {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct AccessTokenConnectRequest {
-    pub accessToken: uuid::Uuid,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct AccessTokenConnectResponse {}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectRequest {
     pub appApiKey: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiKeyConnectResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorizedConnectRequest {
+    pub accessToken: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthorizedConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BanUserRequest {
@@ -885,17 +885,17 @@ impl WsResponse for ApiKeyConnectResponse {
     type Request = ApiKeyConnectRequest;
 }
 
-impl WsRequest for AccessTokenConnectRequest {
-    type Response = AccessTokenConnectResponse;
+impl WsRequest for AuthorizedConnectRequest {
+    type Response = AuthorizedConnectResponse;
     const METHOD_ID: u32 = 201;
     const ROLES: &[u32] = &[0];
     const SCHEMA: &'static str = r#"{
-  "name": "AccessTokenConnect",
+  "name": "AuthorizedConnect",
   "code": 201,
   "parameters": [
     {
       "name": "accessToken",
-      "ty": "UUID"
+      "ty": "String"
     }
   ],
   "returns": [],
@@ -907,8 +907,8 @@ impl WsRequest for AccessTokenConnectRequest {
   ]
 }"#;
 }
-impl WsResponse for AccessTokenConnectResponse {
-    type Request = AccessTokenConnectRequest;
+impl WsResponse for AuthorizedConnectResponse {
+    type Request = AuthorizedConnectRequest;
 }
 
 impl WsRequest for ReceiveTokenRequest {

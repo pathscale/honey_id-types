@@ -4,26 +4,27 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
 use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
-use eyre::{Result, bail};
+use eyre::{Context, Result, bail};
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde_json::Value;
+use uuid::Uuid;
 
 use crate::endpoints::connect::{
-    HoneyAccessTokenConnectRequest, HoneyAccessTokenConnectResponse, HoneyPublicConnectRequest,
+    HoneyAuthorizedConnectRequest, HoneyAuthorizedConnectResponse, HoneyPublicConnectRequest,
     HoneyPublicConnectResponse,
 };
 use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
 use crate::handlers::convenience_utils::user_management::UserStorage;
 
-pub struct MethodAccessTokenConnect {
+pub struct MethodAuthorizedConnect {
     pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,
 }
 
 #[async_trait(?Send)]
-impl SubAuthController for MethodAccessTokenConnect {
+impl SubAuthController for MethodAuthorizedConnect {
     fn auth(
         self: Arc<Self>,
         _toolbox: &ArcToolbox,
@@ -32,12 +33,20 @@ impl SubAuthController for MethodAccessTokenConnect {
         conn: Arc<WsConnection>,
     ) -> LocalBoxFuture<'static, Result<Value>> {
         async move {
-            let req: HoneyAccessTokenConnectRequest =
+            let req: HoneyAuthorizedConnectRequest =
                 serde_json::from_value(param).map_err(|x| {
                     CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
                 })?;
 
-            let Ok(user_pub_id) = self.token_storage.validate_token(req.accessToken) else {
+            let Ok(user_pub_id) =
+                self.token_storage
+                    .validate_token(Uuid::try_parse(&req.accessToken).map_err(|x| {
+                        CustomError::new(
+                            HoneyErrorCode::BadRequest,
+                            format!("Invalid request: {x}"),
+                        )
+                    })?)
+            else {
                 tracing::error!(
                     error = "Wrong `accessToken`",
                     "`AccessTokenConnect` failed to validate the `accessToken`."
@@ -52,7 +61,7 @@ impl SubAuthController for MethodAccessTokenConnect {
 
             conn.set_roles(Arc::new(vec![role]));
 
-            Ok(serde_json::to_value(HoneyAccessTokenConnectResponse {})?)
+            Ok(serde_json::to_value(HoneyAuthorizedConnectResponse {})?)
         }
         .boxed_local()
     }

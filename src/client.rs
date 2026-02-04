@@ -1,5 +1,4 @@
 use secrecy::ExposeSecret;
-use tokio_tungstenite::tungstenite::http::response;
 use url::Url;
 use uuid::Uuid;
 
@@ -32,8 +31,11 @@ impl HoneyIdClient {
         self.config.app_public_id
     }
 
-    pub fn validate_auth_api_key(&self, key: &str) -> bool {
-        self.config.auth_api_key.expose_secret() == key
+    pub fn validate_auth_api_key(&self, key: &str) -> Option<bool> {
+        self.config
+            .auth_api_key
+            .as_ref()
+            .map(|secret| secret.expose_secret() == key)
     }
 
     // TODOVEON: signup call for use in API

@@ -11,10 +11,7 @@ use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
 use crate::client::HoneyIdClient;
-use crate::endpoints::callback::{
-    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
-    HoneyReceiveUserInfoResponse,
-};
+use crate::endpoints::callback::HoneyReceiveTokenRequest;
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
@@ -39,16 +36,23 @@ impl SubAuthController for MethodApiKeyConnect {
                 CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
             })?;
 
-            if !self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
-                tracing::error!(
-                    error = "Wrong `authApiKey`",
-                    "`ApiKeyConnect` failed to validate the auth api key."
-                );
-                // TODO: Define actual error codes specific to Honey
+            if let Some(valid) = self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
+                if !valid {
+                    tracing::error!(
+                        error = "Wrong `authApiKey`",
+                        "`ApiKeyConnect` failed to validate the auth api key."
+                    );
+                    // TODO: Define actual error codes specific to Honey
+                    bail!(CustomError::new(
+                        HoneyErrorCode::BadRequest,
+                        "Wrong `authApiKey`"
+                    ))
+                }
+            } else {
                 bail!(CustomError::new(
-                    HoneyErrorCode::BadRequest,
-                    "Wrong `authApiKey`"
-                ))
+                        HoneyErrorCode::InternalError,
+                        "authApiKey has not been configured within Honey API app. App needs to be configured and restarted"
+                    ))
             }
 
             let auth_role = self.user_storage.get_honey_auth_role();

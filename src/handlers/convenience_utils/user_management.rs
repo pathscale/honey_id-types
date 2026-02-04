@@ -1,10 +1,7 @@
 use async_trait::async_trait;
 
 use crate::{
-    endpoints::callback::{
-        HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
-        HoneyReceiveUserInfoResponse,
-    },
+    endpoints::callback::{HoneyReceiveTokenRequest, HoneyReceiveTokenResponse},
     id_entities::UserPublicId,
 };
 

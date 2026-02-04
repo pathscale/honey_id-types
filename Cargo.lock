@@ -1428,6 +1428,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smart-default",
+ "smart-serde-default",
  "strum",
  "strum_macros",
  "tokio",
@@ -3018,6 +3019,17 @@ name = "smart-default"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0eb01866308440fc64d6c44d9e86c5cc17adfe33c4d6eed55da9145044d0ffc1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.114",
+]
+
+[[package]]
+name = "smart-serde-default"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce503b819c7518c64f2b4b056a17fb6f26592bbf93a68f3158536fb20f90b21b"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -33,7 +33,7 @@ worktable!(
         token: Uuid,
     },
     indexes: {
-        public_id_idx: public_id unique,
+        public_id_idx: public_id,
         token_idx: token unique,
     }
 );

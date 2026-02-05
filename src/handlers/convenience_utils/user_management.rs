@@ -1,9 +1,6 @@
 use async_trait::async_trait;
 
-use crate::{
-    endpoints::callback::{HoneyReceiveTokenRequest, HoneyReceiveTokenResponse},
-    id_entities::UserPublicId,
-};
+use crate::{endpoints::callback::HoneyReceiveTokenRequest, id_entities::UserPublicId};
 
 // TODO: Do we need this?
 
@@ -17,5 +14,5 @@ pub trait UserStorage {
     async fn create_or_update_user(
         &self,
         user_info_request: HoneyReceiveTokenRequest,
-    ) -> eyre::Result<HoneyReceiveTokenResponse>;
+    ) -> eyre::Result<()>;
 }

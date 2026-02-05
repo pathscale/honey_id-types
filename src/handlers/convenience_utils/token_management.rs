@@ -19,7 +19,7 @@ pub trait TokenStorage {
     /// Stores received `token` which belongs to `User` with provided
     /// [`UserPublicId`].
     fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()>;
-    /// Validates provided `token` and returns [`UserPublicId`] if `token` is
+    /// Validates provided `token` and returns User internal ID: u64, and [`UserPublicId`] if `token` is
     /// valid. Errors otherwise.
     fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
 }

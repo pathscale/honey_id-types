@@ -11,7 +11,7 @@ use futures::future::LocalBoxFuture;
 use serde_json::Value;
 
 use crate::client::HoneyIdClient;
-use crate::endpoints::callback::HoneyReceiveTokenRequest;
+use crate::endpoints::callback::{HoneyReceiveTokenRequest, HoneyReceiveTokenResponse};
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
@@ -77,8 +77,10 @@ impl RequestHandler for MethodReceiveToken {
         let token = uuid::Uuid::parse_str(&req.token)?;
         let user_pub_id = crate::types::id_entities::UserPublicId::from(req.userPubId);
 
+        self.user_storage.create_or_update_user(req).await?;
+
         self.token_storage.store_token(user_pub_id, token)?;
 
-        Ok(self.user_storage.create_or_update_user(req).await?)
+        Ok(HoneyReceiveTokenResponse {})
     }
 }

@@ -1031,7 +1031,7 @@ dependencies = [
 [[package]]
 name = "endpoint-libs"
 version = "1.3.0"
-source = "git+https://github.com/pathscale/endpoint-libs.git?branch=logging-stability#fe5f7f7fd19af077cc33a307fa550f369b07f8d0"
+source = "git+https://github.com/pathscale/endpoint-libs.git?branch=logging-stability#4c491f4f1f431ca20ea8d20f0726f4ea64319c02"
 dependencies = [
  "alloy-primitives",
  "async-trait",

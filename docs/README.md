@@ -43,10 +43,10 @@ ID: 20
 |200|ApiKeyConnect|appApiKey|||false|
 |201|AuthorizedConnect|accessToken|||true|
 
-# tokenApi Server
+# beCallbackApi Server
 ID: 21
 ## Endpoints
 |Method Code|Method Name|Parameters|Response|Description| FE Facing |
 |-----------|-----------|----------|--------|-----------|-----------|
-|210|ReceiveToken|token, username, userPubId||Backend receives auth tokens, happens after login or signup|false|
-|211|ReceiveUserInfo|userPubId, username, token||Backend receives user info with token, happens after new user signs up.|false|
+|210|ReceiveToken|token, username, userPubId||Backend receives auth tokens, happens after login|false|
+|211|ReceiveUserInfo|userPubId, username, appPubId, token||Backend receives user info with optional token, happens after new user signs up. Platform app also receives this so that it can maintain records of app users, in which case Token will be set to None|false|

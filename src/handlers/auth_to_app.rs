@@ -5,17 +5,21 @@ use async_trait::async_trait;
 use endpoint_libs::libs::handler::{RequestHandler, Response};
 use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
 use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
-use eyre::{Result, bail};
+use eyre::{Context, Result, bail};
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde_json::Value;
+use uuid::Uuid;
 
 use crate::client::HoneyIdClient;
-use crate::endpoints::callback::{HoneyReceiveTokenRequest, HoneyReceiveTokenResponse};
+use crate::endpoints::callback::{
+    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
+    HoneyReceiveUserInfoResponse,
+};
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
-use crate::handlers::convenience_utils::user_management::UserStorage;
+use crate::handlers::convenience_utils::user_management::{CreateUserInfo, UserStorage};
 
 pub struct MethodApiKeyConnect {
     pub honey_id_client: Arc<HoneyIdClient>,
@@ -77,10 +81,46 @@ impl RequestHandler for MethodReceiveToken {
         let token = uuid::Uuid::parse_str(&req.token)?;
         let user_pub_id = crate::types::id_entities::UserPublicId::from(req.userPubId);
 
-        self.user_storage.create_or_update_user(req).await?;
+        self.user_storage
+            .create_or_update_user(CreateUserInfo {
+                username: req.username,
+                user_pub_id: req.userPubId,
+                app_pub_id: None,
+            })
+            .await?;
 
         self.token_storage.store_token(user_pub_id, token)?;
 
         Ok(HoneyReceiveTokenResponse {})
+    }
+}
+pub struct MethodReceiveUserInfo {
+    pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
+    pub user_storage: Arc<dyn UserStorage + Send + Sync>,
+}
+
+#[async_trait(?Send)]
+impl RequestHandler for MethodReceiveUserInfo {
+    type Request = HoneyReceiveUserInfoRequest;
+
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
+        let user_pub_id = crate::types::id_entities::UserPublicId::from(req.userPubId);
+
+        self.user_storage
+            .create_or_update_user(CreateUserInfo {
+                username: req.username,
+                user_pub_id: req.userPubId,
+                app_pub_id: req.appPubId,
+            })
+            .await?;
+
+        if let Some(token) = req.token {
+            self.token_storage.store_token(
+                user_pub_id,
+                Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
+            )?;
+        }
+
+        Ok(HoneyReceiveUserInfoResponse {})
     }
 }

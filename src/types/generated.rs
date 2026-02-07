@@ -403,7 +403,10 @@ pub struct ReceiveTokenResponse {}
 pub struct ReceiveUserInfoRequest {
     pub userPubId: uuid::Uuid,
     pub username: String,
-    pub token: String,
+    #[serde(default)]
+    pub appPubId: Option<uuid::Uuid>,
+    #[serde(default)]
+    pub token: Option<String>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -934,7 +937,7 @@ impl WsRequest for ReceiveTokenRequest {
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Backend receives auth tokens, happens after login or signup",
+  "description": "Backend receives auth tokens, happens after login",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
@@ -962,13 +965,21 @@ impl WsRequest for ReceiveUserInfoRequest {
       "ty": "String"
     },
     {
+      "name": "appPubId",
+      "ty": {
+        "Optional": "UUID"
+      }
+    },
+    {
       "name": "token",
-      "ty": "String"
+      "ty": {
+        "Optional": "String"
+      }
     }
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Backend receives user info with token, happens after new user signs up.",
+  "description": "Backend receives user info with optional token, happens after new user signs up. Platform app also receives this so that it can maintain records of app users, in which case Token will be set to None",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"

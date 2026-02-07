@@ -3,7 +3,7 @@
 
 Config(
     definition: EndpointSchemaList(
-        service_name: "tokenApi",
+        service_name: "beCallbackApi",
         service_id: 21,
         endpoints: [
             EndpointSchemaElement(
@@ -18,7 +18,7 @@ Config(
                     ],
                     returns: [],
                     stream_response: None,
-                    description: "Backend receives auth tokens, happens after login or signup",
+                    description: "Backend receives auth tokens, happens after login",
                     json_schema: (),
                     roles: [
                         "UserRole::AppApiKey",
@@ -34,12 +34,13 @@ Config(
                     parameters: [
                         Field(name: "userPubId", ty: UUID),
                         Field(name: "username", ty: String),
-                        Field(name: "token", ty: String),
+                        Field(name: "appPubId", ty: Optional(UUID)),
+                        Field(name: "token", ty: Optional(String)),
 
                     ],
                     returns: [],
                     stream_response: None,
-                    description: "Backend receives user info with token, happens after new user signs up.",
+                    description: "Backend receives user info with optional token, happens after new user signs up. Platform app also receives this so that it can maintain records of app users, in which case Token will be set to None",
                     json_schema: (),
                     roles: [
                         "UserRole::AppApiKey",

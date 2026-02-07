@@ -60,7 +60,11 @@ impl HoneyIdConnection {
             seq: u32,
         }
 
-        let json = serde_json::to_string(&ApiMessage { method, params, seq: 1 })?;
+        let json = serde_json::to_string(&ApiMessage {
+            method,
+            params,
+            seq: 1,
+        })?;
 
         self.stream.send(Message::Text(json.into())).await?;
 

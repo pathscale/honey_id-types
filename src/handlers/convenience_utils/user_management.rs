@@ -1,8 +1,15 @@
 use async_trait::async_trait;
+use uuid::Uuid;
 
-use crate::{endpoints::callback::HoneyReceiveTokenRequest, id_entities::UserPublicId};
+use crate::id_entities::UserPublicId;
 
-// TODO: Do we need this?
+#[derive(Debug, Clone)]
+pub struct CreateUserInfo {
+    pub username: String,
+    pub user_pub_id: Uuid,
+    /// Required for platform app, since it needs to keep track of users of other Apps
+    pub app_pub_id: Option<Uuid>,
+}
 
 /// Defines the basic API needed by authentication
 /// methods for proper role assignments.
@@ -11,8 +18,5 @@ pub trait UserStorage {
     fn get_api_role_by_pub_id(&self, user_pub_id: UserPublicId) -> eyre::Result<u32>;
     fn get_public_role(&self) -> u32;
     fn get_honey_auth_role(&self) -> u32;
-    async fn create_or_update_user(
-        &self,
-        user_info_request: HoneyReceiveTokenRequest,
-    ) -> eyre::Result<()>;
+    async fn create_or_update_user(&self, user_info_request: CreateUserInfo) -> eyre::Result<()>;
 }

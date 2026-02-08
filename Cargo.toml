@@ -11,7 +11,7 @@ derive_more = { version = "2.1.1", features = [
     "from",
     "into",
 ] }
-endpoint-libs = { git = "https://github.com/pathscale/endpoint-libs.git", branch = "logging-stability", features = [
+endpoint-libs = { git = "https://github.com/pathscale/endpoint-libs.git", features = [
     "ws",
 ] }
 eyre = "0.6.12"

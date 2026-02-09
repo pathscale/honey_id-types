@@ -25,7 +25,7 @@ use crate::id_entities::UserPublicId;
 /// Extensible: add fields here to give apps more info without changing their closure signature.
 pub struct AuthorizedConnectContext {
     pub user_pub_id: UserPublicId,
-    pub user_api_role: u32,
+    pub user_api_roles: Vec<u32>,
     pub conn: Arc<WsConnection>,
 }
 
@@ -187,12 +187,12 @@ where
                 );
             };
 
-            let role = self.user_storage.get_api_role_by_pub_id(user_pub_id)?;
-            conn.set_roles(Arc::new(vec![role]));
+            let roles = Vec::from(self.user_storage.get_api_roles_by_pub_id(user_pub_id)?);
+            conn.set_roles(Arc::new(roles.clone()));
 
             let ctx = AuthorizedConnectContext {
                 user_pub_id,
-                user_api_role: role,
+                user_api_roles: roles,
                 conn,
             };
             let res = (self.on_connect)(req, ctx).await?;
@@ -280,8 +280,8 @@ where
                 CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
             })?;
 
-            let role = self.user_storage.get_public_role();
-            conn.set_roles(Arc::new(vec![role]));
+            let roles = self.user_storage.get_public_roles();
+            conn.set_roles(Arc::new(Vec::from(roles)));
 
             let ctx = PublicConnectContext { conn };
             let res = (self.on_connect)(req, ctx).await?;

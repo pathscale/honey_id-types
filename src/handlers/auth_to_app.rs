@@ -11,7 +11,7 @@ use futures::future::LocalBoxFuture;
 use serde_json::Value;
 use uuid::Uuid;
 
-use crate::client::HoneyIdClient;
+use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
     HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
     HoneyReceiveUserInfoResponse,
@@ -40,23 +40,28 @@ impl SubAuthController for MethodApiKeyConnect {
                 CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
             })?;
 
-            if let Some(valid) = self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
-                if !valid {
+            match self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
+                Ok(_) => (),
+                Err(err) => {
                     tracing::error!(
-                        error = "Wrong `authApiKey`",
-                        "`ApiKeyConnect` failed to validate the auth api key."
+                        error = %err,
+                        "Failed to validate Auth API key due to error"
                     );
-                    // TODO: Define actual error codes specific to Honey
-                    bail!(CustomError::new(
-                        HoneyErrorCode::BadRequest,
-                        "Wrong `authApiKey`"
-                    ))
+                    match err {
+                        ApiKeyError::NotConfigured => {
+                            bail!(CustomError::new(
+                                HoneyErrorCode::BadRequest,
+                                format!("Auth API key Error: {err}")
+                            ))
+                        }
+                        ApiKeyError::IncorrectKey => {
+                            bail!(CustomError::new(
+                                HoneyErrorCode::BadRequest,
+                                format!("Auth API key Error: {err}")
+                            ))
+                        }
+                    }
                 }
-            } else {
-                bail!(CustomError::new(
-                        HoneyErrorCode::InternalError,
-                        "authApiKey has not been configured within Honey API app. App needs to be configured and restarted"
-                    ))
             }
 
             let auth_role = self.user_storage.get_honey_auth_role();

@@ -28,6 +28,10 @@ pub struct HoneyIdConfig {
     /// Will be used by `Auth` for callback endpoints authorization.
     #[serde(deserialize_with = "util::deserialize_secret_string")]
     pub auth_api_key: SecretString,
+
+    /// The Public ID of the user that will be the first "Admin" within the app.
+    #[serde(default)]
+    pub admin_pub_id: Option<Uuid>,
 }
 
 mod util {

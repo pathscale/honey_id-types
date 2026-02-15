@@ -48,12 +48,6 @@ impl SubAuthController for MethodApiKeyConnect {
                         "Failed to validate Auth API key due to error"
                     );
                     match err {
-                        ApiKeyError::NotConfigured => {
-                            bail!(CustomError::new(
-                                HoneyErrorCode::BadRequest,
-                                format!("Auth API key Error: {err}")
-                            ))
-                        }
                         ApiKeyError::IncorrectKey => {
                             bail!(CustomError::new(
                                 HoneyErrorCode::BadRequest,

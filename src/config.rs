@@ -22,19 +22,12 @@ pub struct HoneyIdConfig {
     /// Public ID of the API app that is defined in the Auth server's config. This must match that value
     pub app_public_id: Uuid,
 
-    /// `App` API key, which you can retrieve after `App` creation in `honey.id`
-    /// UI.
-    #[serde(deserialize_with = "util::deserialize_secret_string")]
-    #[serde(default)]
-    pub app_api_key: Option<SecretString>,
-
     /// `Auth` API key, which you can retrieve after `App` creation in
     /// `honey.id` UI.
     ///
     /// Will be used by `Auth` for callback endpoints authorization.
     #[serde(deserialize_with = "util::deserialize_secret_string")]
-    #[serde(default)]
-    pub auth_api_key: Option<SecretString>,
+    pub auth_api_key: SecretString,
 }
 
 mod util {
@@ -57,8 +50,8 @@ mod util {
 
     pub fn deserialize_secret_string<'de, D: Deserializer<'de>>(
         d: D,
-    ) -> Result<Option<SecretString>, D::Error> {
+    ) -> Result<SecretString, D::Error> {
         let c = Cow::<'_, str>::deserialize(d)?;
-        Ok(Some(SecretString::from(c.to_string())))
+        Ok(SecretString::from(c.to_string()))
     }
 }

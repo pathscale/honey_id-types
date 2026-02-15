@@ -22,8 +22,6 @@ pub struct HoneyIdClient {
 
 #[derive(Debug, Clone, derive_more::Display)]
 pub enum ApiKeyError {
-    #[display("Auth API key not configured in App. Please configure and restart the app")]
-    NotConfigured,
     #[display(
         "Incorrect Auth API key provided to App. Either reconfigure with the correct key on the App's server, or report an Auth server bug"
     )]
@@ -42,15 +40,10 @@ impl HoneyIdClient {
     }
 
     pub fn validate_auth_api_key(&self, key: &str) -> Result<(), ApiKeyError> {
-        match &self.config.auth_api_key {
-            Some(config_key) => {
-                if config_key.expose_secret() == key {
-                    Ok(())
-                } else {
-                    Err(ApiKeyError::IncorrectKey)
-                }
-            }
-            None => Err(ApiKeyError::NotConfigured),
+        if self.config.auth_api_key.expose_secret() == key {
+            Ok(())
+        } else {
+            Err(ApiKeyError::IncorrectKey)
         }
     }
 

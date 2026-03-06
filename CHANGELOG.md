@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 ## [1.3.4] - 2026-03-06
 
+### Miscellaneous Tasks
+
+- Add required package information
+
+## [1.3.4] - 2026-03-06
+
 ### Bug Fixes
 
 - Fix CI

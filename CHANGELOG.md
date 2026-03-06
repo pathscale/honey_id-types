@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [0.1.0] - 2026-03-06
+## [1.3.4] - 2026-03-06
 
 ### Bug Fixes
 
@@ -23,5 +23,9 @@ All notable changes to this project will be documented in this file.
 - Add support for receiving user info after signups, separate from the existing token receiving callback flow
 - Improve auth api key validation error
 - Add `admin_pub_id` to the main honey config for use in apps
+
+### Miscellaneous Tasks
+
+- Pre-release
 
 

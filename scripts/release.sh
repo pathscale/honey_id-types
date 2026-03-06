@@ -35,7 +35,11 @@ fi
 
 if [ "$SKIP_BUMP" = false ]; then
     echo "Running cargo-release $LEVEL ..."
-    cargo release --manifest-path "$CARGO_TOML" --execute --no-confirm "$LEVEL"
+    if ["$LEVEL" = "release"] then
+        cargo release --manifest-path "$CARGO_TOML" --execute --no-confirm --no-tag "$LEVEL" 
+    else
+        cargo release --manifest-path "$CARGO_TOML" --execute --no-confirm "$LEVEL"
+    fi
     echo ""
 fi
 

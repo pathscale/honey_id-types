@@ -187,7 +187,7 @@ where
                 );
             };
 
-            let roles = Vec::from(self.user_storage.get_api_roles_by_pub_id(user_pub_id)?);
+            let roles = self.user_storage.get_api_roles_by_pub_id(user_pub_id)?;
             conn.set_roles(Arc::new(roles.clone()));
 
             let ctx = AuthorizedConnectContext {

@@ -1,0 +1,9 @@
+allow-branch = ["master"]
+sign-commit = false
+sign-tag = false
+push = false        # script handles push (tag message must be set first)
+tag = false         # script handles tag (uses git-cliff content as body)
+publish = false     # script handles publish (interactive prompt)
+pre-release-commit-message = "chore(release): v{{version}}"
+
+pre-release-hook = ["git", "cliff", "--tag", "v{{version}}", "--output", "CHANGELOG.md"]

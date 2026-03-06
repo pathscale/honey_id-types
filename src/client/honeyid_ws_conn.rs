@@ -42,7 +42,7 @@ impl HoneyIdConnection {
         method: HoneyEndpointMethodCode,
         params: T,
     ) -> eyre::Result<()> {
-        let _ = self.send_request_raw(method as u32, params).await?;
+        self.send_request_raw(method as u32, params).await?;
 
         Ok(())
     }
@@ -92,10 +92,7 @@ impl HoneyIdConnection {
             Ok(value)
         } else if let Ok(err) = serde_json::from_value::<WsResponseError>(response.clone()) {
             bail!(HoneyIdError::new(
-                err.code
-                    .try_into()
-                    .map(ErrorCode::new)
-                    .unwrap_or(ErrorCode::INTERNAL_ERROR),
+                ErrorCode::new(err.code),
                 err.params.to_string()
             ));
         } else {

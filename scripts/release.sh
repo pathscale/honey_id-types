@@ -14,8 +14,8 @@ if [[ "${1:-}" == "--skip-bump" ]]; then
 fi
 
 LEVEL="${1:-}"
-if [[ "$LEVEL" != "patch" && "$LEVEL" != "minor" && "$LEVEL" != "major" ]]; then
-    echo "Usage: $0 [--skip-bump] <patch|minor|major>" >&2
+if [[ "$LEVEL" != "patch" && "$LEVEL" != "minor" && "$LEVEL" != "major"&& "$LEVEL" != "release" ]]; then
+    echo "Usage: $0 [--skip-bump] <patch|minor|major|release>" >&2
     exit 1
 fi
 

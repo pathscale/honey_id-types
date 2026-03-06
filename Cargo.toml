@@ -2,6 +2,14 @@
 name = "honey_id-types"
 version = "1.3.4"
 edition = "2024"
+authors = [
+    "Maxim Volkov <https://github.com/Handy-caT>",
+    "Veon <dveonloch@protonmail.com>",
+]
+description = "Common types and convenience code to be used within Pathscale projects that make use of honey.id Auth."
+repository = "https://github.com/pathscale/honey_id-types"
+readme = "README.md"
+license = "MIT"
 
 [dependencies]
 async-trait = "0.1.89"

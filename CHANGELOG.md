@@ -1,11 +1,17 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [1.3.4] - 2026-03-06
+## [1.3.5] - 2026-03-12
+
+### Features
+
+- Upgrade worktable to 0.9.0-alpha3
 
 ### Miscellaneous Tasks
 
 - Add required package information
+- Update readme
+- Update Cargo.lock
 
 ## [1.3.4] - 2026-03-06
 

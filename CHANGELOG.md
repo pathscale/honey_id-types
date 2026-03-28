@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [1.3.5] - 2026-03-12
+## [1.3.6] - 2026-03-28
 
 ### Features
 
@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Add required package information
 - Update readme
 - Update Cargo.lock
+- Migrate to ubicloud build machine
+- Update endpoint-libs to 1.3.5
 
 ## [1.3.4] - 2026-03-06
 

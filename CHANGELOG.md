@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.4.0] - 2026-03-28
+
+### Features
+
+- Add callback URL to editable app fields in edit request
+
 ## [1.3.6] - 2026-03-28
 
 ### Features

@@ -2,24 +2,34 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
+use rkyv::Archive;
 use serde::*;
+use std::net::IpAddr;
 use strum_macros::{Display, EnumString};
+use uuid::Uuid;
+use worktable::prelude::*;
+
 #[derive(
-    Debug,
+    MemStat,
+    Archive,
     Clone,
     Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
+    Debug,
+    Display,
     PartialEq,
-    Eq,
     PartialOrd,
+    Eq,
+    Hash,
     Ord,
     EnumString,
-    Display,
-    Hash,
+    rkyv::Deserialize,
+    rkyv::Serialize,
+    serde::Serialize,
+    serde::Deserialize,
 )]
-pub enum EnumUserRole {
+#[rkyv(compare(PartialEq), derive(Debug))]
+#[repr(u8)]
+pub enum UserRole {
     /// Public can only view some data.
     Public = 0,
     /// Platform admin can do literally everything. Very dangerous role.
@@ -37,22 +47,28 @@ pub enum EnumUserRole {
     /// The role is used for platform only.
     Platform = 7,
 }
+
 #[derive(
-    Debug,
+    MemStat,
+    Archive,
     Clone,
     Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
+    Debug,
+    Display,
     PartialEq,
-    Eq,
     PartialOrd,
+    Eq,
+    Hash,
     Ord,
     EnumString,
-    Display,
-    Hash,
+    rkyv::Deserialize,
+    rkyv::Serialize,
+    serde::Serialize,
+    serde::Deserialize,
 )]
-pub enum EnumUserStatus {
+#[rkyv(compare(PartialEq), derive(Debug))]
+#[repr(u8)]
+pub enum UserStatus {
     /// Active user.
     Enabled = 1,
     /// Inactive user.
@@ -60,6 +76,7 @@ pub enum EnumUserStatus {
     /// Banned user.
     Banned = 3,
 }
+
 #[derive(
     Debug,
     Clone,
@@ -134,78 +151,102 @@ impl EnumEndpoint {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorBadRequest {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInternalServerError {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorNotImplemented {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorNotFound {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorDatabaseError {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidService {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserForbidden {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserRoleForbidden {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserNotFound {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserMustAgreeTos {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserMustAgreePrivacyPolicy {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserNoAuthToken {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserInvalidAuthToken {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorUserInvalidPassword {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorDuplicateRequest {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidExpression {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidArgument {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidState {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidSeq {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidMethod {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorProtocolViolation {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorRestrictedUserPrivileges {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInvalidRole {}
-#[derive(Serialize, Deserialize, Debug)]
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErrorInternalError {}
+
 #[derive(
     Debug,
     Clone,
@@ -297,7 +338,7 @@ pub struct AuthorizedConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BanUserRequest {
-    pub userPublicId: uuid::Uuid,
+    pub userPublicId: Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -305,13 +346,13 @@ pub struct BanUserResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAppConfigRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
     pub callBackUrl: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAppConfigResponse {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
     pub createdAt: i64,
     pub appApiKey: String,
     pub minPasswordLength: i32,
@@ -320,7 +361,7 @@ pub struct CreateAppConfigResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAppConfigRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -328,8 +369,8 @@ pub struct DeleteAppConfigResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserRequest {
-    pub appPublicId: uuid::Uuid,
-    pub userPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
+    pub userPublicId: Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -337,7 +378,9 @@ pub struct DeleteUserResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditAppConfigRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
+    #[serde(default)]
+    pub callBackUrl: Option<String>,
     #[serde(default)]
     pub minPasswordLength: Option<i32>,
     #[serde(default)]
@@ -346,31 +389,32 @@ pub struct EditAppConfigRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditAppConfigResponse {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
+    pub callBackUrl: String,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditUserRequest {
-    pub userPublicId: uuid::Uuid,
-    pub newStatus: EnumUserStatus,
+    pub userPublicId: Uuid,
+    pub newStatus: UserStatus,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditUserResponse {
-    pub userPublicId: uuid::Uuid,
-    pub newStatus: EnumUserStatus,
+    pub userPublicId: Uuid,
+    pub newStatus: UserStatus,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAppSecurityRulesRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAppSecurityRulesResponse {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
 }
@@ -393,7 +437,7 @@ pub struct PublicConnectResponse {}
 pub struct ReceiveTokenRequest {
     pub token: String,
     pub username: String,
-    pub userPubId: uuid::Uuid,
+    pub userPubId: Uuid,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -401,10 +445,10 @@ pub struct ReceiveTokenResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveUserInfoRequest {
-    pub userPubId: uuid::Uuid,
+    pub userPubId: Uuid,
     pub username: String,
     #[serde(default)]
-    pub appPubId: Option<uuid::Uuid>,
+    pub appPubId: Option<Uuid>,
     #[serde(default)]
     pub token: Option<String>,
 }
@@ -414,7 +458,7 @@ pub struct ReceiveUserInfoResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SignupRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
     pub username: String,
     pub password: String,
 }
@@ -436,7 +480,7 @@ pub struct SubmitPasswordResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmitUsernameRequest {
-    pub appPublicId: uuid::Uuid,
+    pub appPublicId: Uuid,
     pub username: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -444,6 +488,7 @@ pub struct SubmitUsernameRequest {
 pub struct SubmitUsernameResponse {
     pub expiresAt: i64,
 }
+
 impl WsRequest for PublicConnectRequest {
     type Response = PublicConnectResponse;
     const METHOD_ID: u32 = 0;
@@ -524,7 +569,7 @@ impl WsRequest for SubmitUsernameRequest {
   "returns": [
     {
       "name": "expiresAt",
-      "ty": "BigInt"
+      "ty": "Int64"
     }
   ],
   "stream_response": null,
@@ -620,7 +665,7 @@ impl WsRequest for CreateAppConfigRequest {
     },
     {
       "name": "createdAt",
-      "ty": "BigInt"
+      "ty": "Int64"
     },
     {
       "name": "appApiKey",
@@ -628,7 +673,7 @@ impl WsRequest for CreateAppConfigRequest {
     },
     {
       "name": "minPasswordLength",
-      "ty": "Int"
+      "ty": "Int32"
     },
     {
       "name": "requiredPasswordChars",
@@ -688,7 +733,9 @@ impl WsRequest for EditUserRequest {
     {
       "name": "newStatus",
       "ty": {
-        "EnumRef": "UserStatus"
+        "EnumRef": {
+          "name": "UserStatus"
+        }
       }
     }
   ],
@@ -700,7 +747,9 @@ impl WsRequest for EditUserRequest {
     {
       "name": "newStatus",
       "ty": {
-        "EnumRef": "UserStatus"
+        "EnumRef": {
+          "name": "UserStatus"
+        }
       }
     }
   ],
@@ -785,9 +834,15 @@ impl WsRequest for EditAppConfigRequest {
       "ty": "UUID"
     },
     {
+      "name": "callBackUrl",
+      "ty": {
+        "Optional": "String"
+      }
+    },
+    {
       "name": "minPasswordLength",
       "ty": {
-        "Optional": "Int"
+        "Optional": "Int32"
       }
     },
     {
@@ -803,8 +858,12 @@ impl WsRequest for EditAppConfigRequest {
       "ty": "UUID"
     },
     {
+      "name": "callBackUrl",
+      "ty": "String"
+    },
+    {
       "name": "minPasswordLength",
-      "ty": "Int"
+      "ty": "Int32"
     },
     {
       "name": "requiredPasswordChars",
@@ -843,7 +902,7 @@ impl WsRequest for GetAppSecurityRulesRequest {
     },
     {
       "name": "minPasswordLength",
-      "ty": "Int"
+      "ty": "Int32"
     },
     {
       "name": "requiredPasswordChars",

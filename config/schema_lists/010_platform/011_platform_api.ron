@@ -17,9 +17,9 @@ Config(
                     ],
                     returns: [
                         Field(name: "appPublicId", ty: UUID),
-                        Field(name: "createdAt", ty: BigInt),
+                        Field(name: "createdAt", ty: Int64),
                         Field(name: "appApiKey", ty: String),
-                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
                     ],
                     stream_response: None,
@@ -56,11 +56,11 @@ Config(
                     code: 113,
                     parameters: [
                         Field(name: "userPublicId", ty: UUID),
-                        Field(name: "newStatus", ty: EnumRef("UserStatus")),
+                        Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
                     ],
                     returns: [
                         Field(name: "userPublicId", ty: UUID),
-                        Field(name: "newStatus", ty: EnumRef("UserStatus")),
+                        Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
                     ],
                     stream_response: None,
                     description: "Edit user status",
@@ -115,12 +115,14 @@ Config(
                     code: 116,
                     parameters: [
                         Field(name: "appPublicId", ty: UUID),
-                        Field(name: "minPasswordLength", ty: Optional(Int)),
+                        Field(name: "callBackUrl", ty: Optional(String)),
+                        Field(name: "minPasswordLength", ty: Optional(Int32)),
                         Field(name: "requiredPasswordChars", ty: Optional(String)),
                     ],
                     returns: [
                         Field(name: "appPublicId", ty: UUID),
-                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "callBackUrl", ty: String),
+                        Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
                     ],
                     stream_response: None,
@@ -142,7 +144,7 @@ Config(
                     ],
                     returns: [
                         Field(name: "appPublicId", ty: UUID),
-                        Field(name: "minPasswordLength", ty: Int),
+                        Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
                     ],
                     stream_response: None,

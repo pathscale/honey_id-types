@@ -38,7 +38,7 @@ Config(
                         Field(name: "username", ty: String),
                     ],
                     returns: [
-                        Field(name: "expiresAt", ty: BigInt),
+                        Field(name: "expiresAt", ty: Int64),
                     ],
                     stream_response: None,
                     description: "Step 1: Frontend submits username during auth flow.",

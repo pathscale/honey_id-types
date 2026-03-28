@@ -139,7 +139,7 @@
           "returns": [
             {
               "name": "expiresAt",
-              "ty": "BigInt"
+              "ty": "Int64"
             }
           ],
           "roles": [
@@ -196,5 +196,6 @@
       "id": 20,
       "name": "authEndpoints"
     }
-  ]
+  ],
+  "structs": []
 }

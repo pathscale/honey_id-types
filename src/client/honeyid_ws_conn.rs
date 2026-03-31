@@ -6,9 +6,14 @@ use url::Url;
 use crate::enums::HoneyEndpointMethodCode;
 use crate::types::error::{HoneyIdError, HoneyIdResult};
 
-#[derive(Debug)]
 pub struct HoneyIdConnection {
     client: WsClient,
+}
+
+impl std::fmt::Debug for HoneyIdConnection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HoneyIdConnection").finish_non_exhaustive()
+    }
 }
 
 impl HoneyIdConnection {

@@ -1,41 +1,22 @@
-use endpoint_libs::libs::error_code::ErrorCode;
-use endpoint_libs::libs::ws::WsResponseError;
+use endpoint_libs::libs::ws::{WsClient, WsResponseGeneric};
 use eyre::bail;
-use futures::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::tungstenite::handshake::client::Request;
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use url::Url;
-use uuid::Uuid;
 
 use crate::enums::HoneyEndpointMethodCode;
 use crate::types::error::{HoneyIdError, HoneyIdResult};
 
 #[derive(Debug)]
 pub struct HoneyIdConnection {
-    stream: WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>,
+    client: WsClient,
 }
 
 impl HoneyIdConnection {
     pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
-        let host = addr.host_str().unwrap_or("localhost");
-        let mut request = Request::builder()
-            .uri(addr.to_string())
-            .method("GET")
-            .header("Connection", "Upgrade")
-            .header("Upgrade", "websocket")
-            .header("Host", host)
-            .header("Sec-WebSocket-Key", Uuid::new_v4().to_string())
-            .header("Sec-WebSocket-Version", "13");
-        if let Some(header) = auth {
-            request = request.header("Sec-WebSocket-Protocol", header)
-        }
-        let request = request.body(()).expect("headers should be valid");
-
-        let (stream, _) = connect_async(request).await.map_err(eyre::Report::from)?;
-        Ok(HoneyIdConnection { stream })
+        let client = WsClient::new(addr.as_str(), auth.unwrap_or(""), None)
+            .await
+            .map_err(eyre::Report::from)?;
+        Ok(HoneyIdConnection { client })
     }
 
     /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
@@ -44,9 +25,7 @@ impl HoneyIdConnection {
         method: HoneyEndpointMethodCode,
         params: T,
     ) -> eyre::Result<()> {
-        self.send_request_raw(method as u32, params).await?;
-
-        Ok(())
+        self.send_request_raw(method as u32, params).await
     }
 
     /// Used for compatibility with code that doesn't call HoneyEndpointMethodCode endpoints
@@ -55,50 +34,23 @@ impl HoneyIdConnection {
         method: u32,
         params: T,
     ) -> eyre::Result<()> {
-        #[derive(Serialize, Deserialize, Debug)]
-        struct ApiMessage<T> {
-            method: u32,
-            params: T,
-            seq: u32,
-        }
-
-        let json = serde_json::to_string(&ApiMessage {
-            method,
-            params,
-            seq: 1,
-        })?;
-
-        self.stream.send(Message::Text(json.into())).await?;
-
-        Ok(())
+        self.client.send_req(method, params).await
     }
 
     pub async fn receive_response<T>(&mut self) -> eyre::Result<T>
     where
         T: for<'de> Deserialize<'de>,
     {
-        let response: Value = match self.stream.next().await {
-            Some(Ok(msg)) => {
-                let text = msg.into_text()?;
-                serde_json::from_str(&text)?
+        let raw = self.client.recv_raw().await?;
+        match raw {
+            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_value(resp.params)?),
+            WsResponseGeneric::Error(err) => {
+                bail!(HoneyIdError::new(
+                    endpoint_libs::libs::error_code::ErrorCode::new(err.code),
+                    err.params.to_string()
+                ))
             }
-            Some(Err(e)) => bail!("WebSocket error: {e}"),
-            None => bail!("WebSocket stream closed unexpectedly"),
-        };
-
-        if let Some(value) = response
-            .get("params")
-            .cloned()
-            .and_then(|p| serde_json::from_value::<T>(p).ok())
-        {
-            Ok(value)
-        } else if let Ok(err) = serde_json::from_value::<WsResponseError>(response.clone()) {
-            bail!(HoneyIdError::new(
-                ErrorCode::new(err.code),
-                err.params.to_string()
-            ));
-        } else {
-            bail!("Invalid response received from server: {response}");
+            other => bail!("Unexpected response from server: {:?}", other),
         }
     }
 }

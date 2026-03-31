@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.4.4] - 2026-03-31
+
+### Miscellaneous Tasks
+
+- Update endpoint-libs
+
 ## [1.4.3] - 2026-03-31
 
 ### Bug Fixes

@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.4.2] - 2026-03-31
+
+### Features
+
+- Use endpoint-libs wsclient for honey client connection
+
 ## [1.4.0] - 2026-03-28
 
 ### Features

@@ -27,3 +27,9 @@ impl From<eyre::Report> for HoneyIdError {
             .unwrap_or_else(|e| Self::new(ErrorCode::INTERNAL_ERROR, e))
     }
 }
+
+impl Into<eyre::Report> for HoneyIdError {
+    fn into(self) -> eyre::Report {
+        eyre::Report::msg(self.msg)
+    }
+}

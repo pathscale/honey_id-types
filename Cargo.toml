@@ -1,6 +1,6 @@
 [package]
 name = "honey_id-types"
-version = "1.4.5"
+version = "1.4.6"
 edition = "2024"
 authors = [
     "Maxim Volkov <https://github.com/Handy-caT>",

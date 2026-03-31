@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.4.3] - 2026-03-31
+
+### Bug Fixes
+
+- Implement custom debug
+
 ## [1.4.2] - 2026-03-31
 
 ### Features

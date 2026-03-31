@@ -8,6 +8,7 @@ use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::handshake::client::Request;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use url::Url;
+use uuid::Uuid;
 
 use crate::enums::HoneyEndpointMethodCode;
 use crate::types::error::{HoneyIdError, HoneyIdResult};
@@ -19,13 +20,14 @@ pub struct HoneyIdConnection {
 
 impl HoneyIdConnection {
     pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
+        let host = addr.host_str().unwrap_or("localhost");
         let mut request = Request::builder()
             .uri(addr.to_string())
             .method("GET")
             .header("Connection", "Upgrade")
             .header("Upgrade", "websocket")
-            .header("Host", "localhost")
-            .header("Sec-WebSocket-Key", "e0adf80f-47b6-465e-9379-0ae350646ff3")
+            .header("Host", host)
+            .header("Sec-WebSocket-Key", Uuid::new_v4().to_string())
             .header("Sec-WebSocket-Version", "13");
         if let Some(header) = auth {
             request = request.header("Sec-WebSocket-Protocol", header)

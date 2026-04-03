@@ -21,7 +21,7 @@ impl HoneyIdConnection {
         let client = WsClient::new(addr.as_str(), auth.unwrap_or(""), None)
             .await
             .map_err(eyre::Report::from)?;
-        Ok(HoneyIdConnection { client })
+        Ok(HoneyIdConnection { client: client.0 })
     }
 
     /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
@@ -48,7 +48,7 @@ impl HoneyIdConnection {
     {
         let raw = self.client.recv_raw().await?;
         match raw {
-            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_value(resp.params)?),
+            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_str(resp.params.get())?),
             WsResponseGeneric::Error(err) => {
                 bail!(HoneyIdError::new(
                     endpoint_libs::libs::error_code::ErrorCode::new(err.code),

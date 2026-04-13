@@ -48,7 +48,7 @@ impl HoneyIdConnection {
     {
         let raw = self.client.recv_raw().await?;
         match raw {
-            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_str(resp.params.get())?),
+            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_value(resp.params)?),
             WsResponseGeneric::Error(err) => {
                 bail!(HoneyIdError::new(
                     endpoint_libs::libs::error_code::ErrorCode::new(err.code),

@@ -1039,9 +1039,9 @@ dependencies = [
 
 [[package]]
 name = "endpoint-libs"
-version = "1.5.1"
+version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ac4e3b00f52a649fa1475900d0012a404b491a0dbb596e29b35290c3c6326d7"
+checksum = "0a2e397122547071ffebfb599f69971fa7506548cd1d8fbd3015e8a9eecd7d1c"
 dependencies = [
  "alloy-primitives",
  "async-trait",
@@ -1054,6 +1054,7 @@ dependencies = [
  "futures",
  "hex",
  "http-body-util",
+ "httpdate",
  "hyper",
  "hyper-util",
  "itertools 0.12.1",
@@ -1081,6 +1082,7 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "urlencoding",
+ "webpki-roots 0.26.11",
 ]
 
 [[package]]
@@ -2147,8 +2149,6 @@ dependencies = [
  "prost",
  "reqwest",
  "thiserror 2.0.18",
- "tokio",
- "tonic",
  "tracing",
 ]
 

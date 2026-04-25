@@ -2,6 +2,7 @@
 //! without duplicating the common auth infrastructure.
 
 use std::future::Future;
+use crate::enums::HoneyErrorCode;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
@@ -18,7 +19,6 @@ use uuid::Uuid;
 
 use super::token_management::TokenStorage;
 use super::user_management::UserStorage;
-use crate::enums::HoneyErrorCode;
 use crate::id_entities::UserPublicId;
 
 /// Context passed to the `on_connect` callback for authorized connections.

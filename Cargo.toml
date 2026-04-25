@@ -19,10 +19,7 @@ derive_more = { version = "2.1.1", features = [
     "from",
     "into",
 ] }
-# endpoint-libs = { git = "https://github.com/pathscale/endpoint-libs.git", features = [
-#     "ws",
-# ] }
-
+# endpoint-libs = { path = "../endpoint-libs", features = ["ws"] }
 endpoint-libs = { version = "1.7.0", features = ["ws"] }
 
 eyre = "0.6.12"
@@ -37,8 +34,9 @@ smart-serde-default = "0.1"
 strum = "0.26"
 strum_macros = "0.26"
 tokio = "1.49.0"
-tokio-tungstenite = { version = "0.28.0", features = [
+tokio-tungstenite = { version = "0.29.0", default-features = false, features = [
     "rustls-tls-webpki-roots",
+    "connect",
 ] }
 url = "2.5.8"
 uuid = { version = "1.8", features = ["v4", "serde"] }

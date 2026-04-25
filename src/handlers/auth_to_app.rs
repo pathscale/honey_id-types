@@ -1,5 +1,6 @@
 //! Defines all handlers that are for Auth (BE) to App (BE) communication
 use std::sync::Arc;
+use crate::enums::HoneyErrorCode;
 
 use async_trait::async_trait;
 use endpoint_libs::libs::handler::{RequestHandler, Response};
@@ -17,7 +18,6 @@ use crate::endpoints::callback::{
     HoneyReceiveUserInfoResponse,
 };
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
-use crate::enums::HoneyErrorCode;
 use crate::handlers::convenience_utils::token_management::TokenStorage;
 use crate::handlers::convenience_utils::user_management::{CreateUserInfo, UserStorage};
 

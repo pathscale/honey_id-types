@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.8.1] - 2026-04-25
+
+### Miscellaneous Tasks
+
+- Minor cleanup and update deps
+
 ## [1.4.7] - 2026-04-13
 
 ### Miscellaneous Tasks

@@ -1,4 +1,4 @@
-use endpoint_libs::libs::ws::{WsClient, WsResponseGeneric};
+use endpoint_libs::libs::ws::{WsClient, WsClientBuilder, WsResponseGeneric, WsVersionMode};
 use eyre::bail;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -18,10 +18,13 @@ impl std::fmt::Debug for HoneyIdConnection {
 
 impl HoneyIdConnection {
     pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
-        let client = WsClient::new(addr.as_str(), auth.unwrap_or(""), None)
+        let (client, _) = WsClientBuilder::new()
+            .mode(WsVersionMode::Http2Only)
+            .protocol_header(auth.unwrap_or(""))
+            .build(addr.as_str())
             .await
             .map_err(eyre::Report::from)?;
-        Ok(HoneyIdConnection { client: client.0 })
+        Ok(HoneyIdConnection { client })
     }
 
     /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
@@ -47,15 +50,16 @@ impl HoneyIdConnection {
         T: for<'de> Deserialize<'de>,
     {
         let raw = self.client.recv_raw().await?;
-        match raw {
-            WsResponseGeneric::Immediate(resp) => Ok(serde_json::from_str(resp.params.get())?),
+        let resp: WsResponseGeneric<T> = serde_json::from_value(raw)?;
+        match resp {
+            WsResponseGeneric::Immediate(resp) => Ok(resp.params),
             WsResponseGeneric::Error(err) => {
                 bail!(HoneyIdError::new(
                     endpoint_libs::libs::error_code::ErrorCode::new(err.code),
                     err.params.to_string()
                 ))
             }
-            other => bail!("Unexpected response from server: {:?}", other),
+            _ => bail!("Unexpected response from server"),
         }
     }
 }

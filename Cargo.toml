@@ -23,7 +23,7 @@ derive_more = { version = "2.1.1", features = [
 #     "ws",
 # ] }
 
-endpoint-libs = { version = "1.6", features = ["ws"] }
+endpoint-libs = { version = "1.7.0", features = ["ws"] }
 
 eyre = "0.6.12"
 futures = "0.3.31"

@@ -19,7 +19,7 @@ impl std::fmt::Debug for HoneyIdConnection {
 impl HoneyIdConnection {
     pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
         let (client, _) = WsClientBuilder::new()
-            .mode(WsVersionMode::Http2Only)
+            .mode(WsVersionMode::Auto)
             .protocol_header(auth.unwrap_or(""))
             .build(addr.as_str())
             .await

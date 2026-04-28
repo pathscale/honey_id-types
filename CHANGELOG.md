@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.8.6] - 2026-04-28
+
+### Features
+
+- Use new endpoint-libs with specific ws-client feature
+
 ## [1.8.2] - 2026-04-26
 
 ### Bug Fixes

@@ -22,8 +22,7 @@ impl HoneyIdConnection {
             .mode(WsVersionMode::Auto)
             .protocol_header(auth.unwrap_or(""))
             .build(addr.as_str())
-            .await
-            .map_err(eyre::Report::from)?;
+            .await?;
         Ok(HoneyIdConnection { client })
     }
 

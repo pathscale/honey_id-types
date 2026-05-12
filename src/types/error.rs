@@ -28,8 +28,8 @@ impl From<eyre::Report> for HoneyIdError {
     }
 }
 
-impl Into<eyre::Report> for HoneyIdError {
-    fn into(self) -> eyre::Report {
-        eyre::Report::msg(self.msg)
+impl From<HoneyIdError> for eyre::Report {
+    fn from(val: HoneyIdError) -> Self {
+        eyre::Report::msg(val.msg)
     }
 }

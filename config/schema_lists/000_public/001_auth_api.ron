@@ -12,7 +12,7 @@ Config(
                     name: "Signup",
                     code: 10,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "username", ty: String),
                         Field(name: "password", ty: String),
                     ],
@@ -34,7 +34,7 @@ Config(
                     name: "SubmitUsername",
                     code: 12,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "username", ty: String),
                     ],
                     returns: [

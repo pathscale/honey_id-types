@@ -1,6 +1,6 @@
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use secrecy::ExposeSecret;
 use url::Url;
-use uuid::Uuid;
 
 use crate::{
     HoneyIdConfig,
@@ -35,7 +35,7 @@ impl HoneyIdClient {
         Self { config }
     }
 
-    pub fn get_app_pub_id(&self) -> Uuid {
+    pub fn get_app_pub_id(&self) -> Nanoid<16, Base62Alphabet> {
         self.config.app_public_id
     }
 
@@ -82,9 +82,7 @@ impl HoneyIdClient {
         )
         .await?;
 
-        let response = conn
-            .receive_response::<HoneySubmitUsernameResponse>()
-            .await?;
+        let response = conn.receive_response::<HoneySubmitUsernameResponse>().await?;
 
         HoneyIdResult::Ok((response, conn))
     }
@@ -103,9 +101,7 @@ impl HoneyIdClient {
             )
             .await?;
 
-        let response = session_conn
-            .receive_response::<HoneySubmitPasswordResponse>()
-            .await?;
+        let response = session_conn.receive_response::<HoneySubmitPasswordResponse>().await?;
 
         HoneyIdResult::Ok(response)
     }
@@ -115,10 +111,7 @@ impl HoneyIdClient {
     }
 
     pub async fn connect_public(&self) -> HoneyIdResult<HoneyIdConnection> {
-        let auth_endpoint_name = HoneyEndpointMethodCode::PublicConnect
-            .schema()
-            .name
-            .to_lowercase();
+        let auth_endpoint_name = HoneyEndpointMethodCode::PublicConnect.schema().name.to_lowercase();
         let header = format!("0{auth_endpoint_name}");
 
         Self::raw_connect(&self.config.addr, &header).await

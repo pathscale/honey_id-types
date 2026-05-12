@@ -53,10 +53,7 @@ impl TokenStorage for TokenWorkTableStorage {
     }
 
     fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
-        let entry = self
-            .0
-            .select_by_token(token)
-            .ok_or_else(|| eyre!("token not found"))?;
+        let entry = self.0.select_by_token(token).ok_or_else(|| eyre!("token not found"))?;
         Ok(entry.public_id)
     }
 }

@@ -1,8 +1,8 @@
 //! Generic authentication handler that allows apps to define custom connection logic
 //! without duplicating the common auth infrastructure.
 
-use std::future::Future;
 use crate::enums::HoneyErrorCode;
+use std::future::Future;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
@@ -119,9 +119,7 @@ where
 {
     pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,
-    on_connect: Arc<
-        dyn Fn(Req, AuthorizedConnectContext) -> LocalBoxFuture<'static, Result<Res>> + Send + Sync,
-    >,
+    on_connect: Arc<dyn Fn(Req, AuthorizedConnectContext) -> LocalBoxFuture<'static, Result<Res>> + Send + Sync>,
     _phantom: PhantomData<(Req, Res)>,
 }
 
@@ -169,22 +167,18 @@ where
         conn: Arc<WsConnection>,
     ) -> LocalBoxFuture<'static, Result<Value>> {
         async move {
-            let req: Req = serde_json::from_value(param).map_err(|x| {
-                CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
-            })?;
+            let req: Req = serde_json::from_value(param)
+                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
 
-            let token = Uuid::parse_str(req.get_access_token()).map_err(|x| {
-                CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
-            })?;
+            let token = Uuid::parse_str(req.get_access_token())
+                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
 
             let Ok(user_pub_id) = self.token_storage.validate_token(token) else {
                 tracing::error!(
                     error = "Wrong `accessToken`",
                     "`GenericAuthorizedConnect` failed to validate the `accessToken`."
                 );
-                return Err(
-                    CustomError::new(HoneyErrorCode::BadRequest, "Wrong `accessToken`").into(),
-                );
+                return Err(CustomError::new(HoneyErrorCode::BadRequest, "Wrong `accessToken`").into());
             };
 
             let roles = self.user_storage.get_api_roles_by_pub_id(user_pub_id)?;
@@ -232,9 +226,7 @@ where
     Res: serde::Serialize + Send + Sync + 'static,
 {
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,
-    on_connect: Arc<
-        dyn Fn(Req, PublicConnectContext) -> LocalBoxFuture<'static, Result<Res>> + Send + Sync,
-    >,
+    on_connect: Arc<dyn Fn(Req, PublicConnectContext) -> LocalBoxFuture<'static, Result<Res>> + Send + Sync>,
     _phantom: PhantomData<(Req, Res)>,
 }
 
@@ -276,9 +268,8 @@ where
         conn: Arc<WsConnection>,
     ) -> LocalBoxFuture<'static, Result<Value>> {
         async move {
-            let req: Req = serde_json::from_value(param).map_err(|x| {
-                CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
-            })?;
+            let req: Req = serde_json::from_value(param)
+                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
 
             let roles = self.user_storage.get_public_roles();
             conn.set_roles(Arc::new(Vec::from(roles)));
@@ -307,10 +298,7 @@ pub struct ClosureHandler<F>(pub F);
 #[async_trait(?Send)]
 impl<F> CustomConnectHandler for ClosureHandler<F>
 where
-    F: Fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>>
-        + Send
-        + Sync
-        + 'static,
+    F: Fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>> + Send + Sync + 'static,
 {
     async fn handle(&self, param: Value, conn: Arc<WsConnection>) -> Result<Value> {
         (self.0)(param, conn).await
@@ -325,8 +313,6 @@ mod tests {
     fn closure_handler_is_send_sync() {
         fn assert_send_sync<T: Send + Sync>() {}
 
-        assert_send_sync::<
-            ClosureHandler<fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>>>,
-        >();
+        assert_send_sync::<ClosureHandler<fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>>>>();
     }
 }

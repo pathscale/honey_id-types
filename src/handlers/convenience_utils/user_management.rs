@@ -1,14 +1,14 @@
 use async_trait::async_trait;
-use uuid::Uuid;
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 
 use crate::id_entities::UserPublicId;
 
 #[derive(Debug, Clone)]
 pub struct CreateUserInfo {
     pub username: String,
-    pub user_pub_id: Uuid,
+    pub user_pub_id: Nanoid<16, Base62Alphabet>,
     /// Required for platform app, since it needs to keep track of users of other Apps
-    pub app_pub_id: Option<Uuid>,
+    pub app_pub_id: Option<Nanoid<16, Base62Alphabet>>,
 }
 
 /// Defines the basic API needed by authentication

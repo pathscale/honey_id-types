@@ -12,11 +12,11 @@ Config(
                     name: "CreateAppConfig",
                     code: 111,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "callBackUrl", ty: String),
                     ],
                     returns: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "createdAt", ty: Int64),
                         Field(name: "appApiKey", ty: String),
                         Field(name: "minPasswordLength", ty: Int32),
@@ -37,7 +37,7 @@ Config(
                     name: "BanUser",
                     code: 112,
                     parameters: [
-                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "userPublicId", ty: NanoId(len: 16)),
                     ],
                     returns: [],
                     stream_response: None,
@@ -55,11 +55,11 @@ Config(
                     name: "EditUser",
                     code: 113,
                     parameters: [
-                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "userPublicId", ty: NanoId(len: 16)),
                         Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
                     ],
                     returns: [
-                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "userPublicId", ty: NanoId(len: 16)),
                         Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
                     ],
                     stream_response: None,
@@ -77,8 +77,8 @@ Config(
                     name: "DeleteUser",
                     code: 114,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
-                        Field(name: "userPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "userPublicId", ty: NanoId(len: 16)),
                     ],
                     returns: [],
                     stream_response: None,
@@ -96,7 +96,7 @@ Config(
                     name: "DeleteAppConfig",
                     code: 115,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                     ],
                     returns: [],
                     stream_response: None,
@@ -114,13 +114,13 @@ Config(
                     name: "EditAppConfig",
                     code: 116,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "callBackUrl", ty: Optional(String)),
                         Field(name: "minPasswordLength", ty: Optional(Int32)),
                         Field(name: "requiredPasswordChars", ty: Optional(String)),
                     ],
                     returns: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "callBackUrl", ty: String),
                         Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
@@ -140,10 +140,10 @@ Config(
                     name: "GetAppSecurityRules",
                     code: 117,
                     parameters: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                     ],
                     returns: [
-                        Field(name: "appPublicId", ty: UUID),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
                     ],

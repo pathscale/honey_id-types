@@ -11,12 +11,10 @@ pub mod connect {
 
 pub mod callback {
     pub use crate::types::generated::{
-        ReceiveTokenRequest as HoneyReceiveTokenRequest,
-        ReceiveTokenResponse as HoneyReceiveTokenResponse,
+        ReceiveTokenRequest as HoneyReceiveTokenRequest, ReceiveTokenResponse as HoneyReceiveTokenResponse,
     };
     pub use crate::types::generated::{
-        ReceiveUserInfoRequest as HoneyReceiveUserInfoRequest,
-        ReceiveUserInfoResponse as HoneyReceiveUserInfoResponse,
+        ReceiveUserInfoRequest as HoneyReceiveUserInfoRequest, ReceiveUserInfoResponse as HoneyReceiveUserInfoResponse,
     };
 }
 

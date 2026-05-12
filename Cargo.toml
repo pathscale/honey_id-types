@@ -20,13 +20,13 @@ derive_more = { version = "2.1.1", features = [
     "into",
 ] }
 # endpoint-libs = { path = "../endpoint-libs", features = ["ws"] }
-endpoint-libs = { version = "1.7.12", features = ["ws-client"] }
+endpoint-libs = { version = "1.7.28", features = ["ws-client"] }
 
 eyre = "0.6.12"
 futures = "0.3.31"
 num-derive = "0.4"
 num-traits = "0.2"
-secrecy = "0.10.3"
+secrecy = { version = "0.10.3", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 smart-default = "0.7.1"
@@ -38,8 +38,9 @@ tokio-tungstenite = { version = "0.29.0", default-features = false, features = [
     "rustls-tls-webpki-roots",
     "connect",
 ] }
-url = "2.5.8"
+url = { version = "2.5.8", features = ["serde"] }
 uuid = { version = "1.8", features = ["v4", "serde"] }
+psc-nanoid = { version = "3.1.0", features = ["serde", "packed", "rkyv"] }
 tracing = "0.1.44"
-worktable = "0.9.0-alpha3"
+worktable = "0.9.0-beta0.2.2"
 rkyv = { version = "0.8.9", features = ["uuid-1"] }

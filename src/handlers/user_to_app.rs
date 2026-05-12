@@ -40,5 +40,4 @@ pub type MethodAuthorizedConnect =
 ///     Ok(HoneyPublicConnectResponse {})
 /// })
 /// ```
-pub type MethodPublicConnect =
-    GenericPublicConnect<HoneyPublicConnectRequest, HoneyPublicConnectResponse>;
+pub type MethodPublicConnect = GenericPublicConnect<HoneyPublicConnectRequest, HoneyPublicConnectResponse>;

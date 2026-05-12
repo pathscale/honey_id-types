@@ -99,7 +99,11 @@
           "parameters": [
             {
               "name": "appPublicId",
-              "ty": "UUID"
+              "ty": {
+                "NanoId": {
+                  "len": 16
+                }
+              }
             },
             {
               "name": "username",
@@ -129,7 +133,11 @@
           "parameters": [
             {
               "name": "appPublicId",
-              "ty": "UUID"
+              "ty": {
+                "NanoId": {
+                  "len": 16
+                }
+              }
             },
             {
               "name": "username",

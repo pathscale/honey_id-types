@@ -14,7 +14,7 @@ Config(
                     parameters: [
                         Field(name: "token", ty: String),
                         Field(name: "username", ty: String),
-                        Field(name: "userPubId", ty: UUID),
+                        Field(name: "userPubId", ty: NanoId(len: 16)),
                     ],
                     returns: [],
                     stream_response: None,
@@ -32,9 +32,9 @@ Config(
                     name: "ReceiveUserInfo",
                     code: 211,
                     parameters: [
-                        Field(name: "userPubId", ty: UUID),
+                        Field(name: "userPubId", ty: NanoId(len: 16)),
                         Field(name: "username", ty: String),
-                        Field(name: "appPubId", ty: Optional(UUID)),
+                        Field(name: "appPubId", ty: Optional(NanoId(len: 16))),
                         Field(name: "token", ty: Optional(String)),
 
                     ],

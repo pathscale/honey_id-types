@@ -1,6 +1,6 @@
 //! Defines all handlers that are for Auth (BE) to App (BE) communication
-use std::sync::Arc;
 use crate::enums::HoneyErrorCode;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use endpoint_libs::libs::handler::{RequestHandler, Response};
@@ -14,8 +14,7 @@ use uuid::Uuid;
 
 use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
-    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
-    HoneyReceiveUserInfoResponse,
+    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
 };
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
@@ -36,9 +35,8 @@ impl SubAuthController for MethodApiKeyConnect {
         conn: Arc<WsConnection>,
     ) -> LocalBoxFuture<'static, Result<Value>> {
         async move {
-            let req: HoneyApiKeyConnectRequest = serde_json::from_value(param).map_err(|x| {
-                CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}"))
-            })?;
+            let req: HoneyApiKeyConnectRequest = serde_json::from_value(param)
+                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
 
             match self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
                 Ok(_) => (),

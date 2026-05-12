@@ -28,20 +28,12 @@ impl HoneyIdConnection {
     }
 
     /// Used specifically for [HoneyEndpointMethodCode] endpoints that are defined within this project
-    pub async fn send_request<T: Serialize>(
-        &mut self,
-        method: HoneyEndpointMethodCode,
-        params: T,
-    ) -> eyre::Result<()> {
+    pub async fn send_request<T: Serialize>(&mut self, method: HoneyEndpointMethodCode, params: T) -> eyre::Result<()> {
         self.send_request_raw(method as u32, params).await
     }
 
     /// Used for compatibility with code that doesn't call HoneyEndpointMethodCode endpoints
-    pub async fn send_request_raw<T: Serialize>(
-        &mut self,
-        method: u32,
-        params: T,
-    ) -> eyre::Result<()> {
+    pub async fn send_request_raw<T: Serialize>(&mut self, method: u32, params: T) -> eyre::Result<()> {
         self.client.send_req(method, params).await
     }
 

@@ -2,6 +2,7 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;
@@ -78,19 +79,7 @@ pub enum UserStatus {
 }
 
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
+    Debug, Clone, Copy, Serialize, Deserialize, FromPrimitive, PartialEq, Eq, PartialOrd, Ord, EnumString, Display, Hash,
 )]
 pub enum EnumEndpoint {
     ///
@@ -248,19 +237,7 @@ pub struct ErrorInvalidRole {}
 pub struct ErrorInternalError {}
 
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    Serialize,
-    Deserialize,
-    FromPrimitive,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    EnumString,
-    Display,
-    Hash,
+    Debug, Clone, Copy, Serialize, Deserialize, FromPrimitive, PartialEq, Eq, PartialOrd, Ord, EnumString, Display, Hash,
 )]
 pub enum EnumErrorCode {
     /// Custom Bad Request
@@ -338,7 +315,7 @@ pub struct AuthorizedConnectResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BanUserRequest {
-    pub userPublicId: Uuid,
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -346,13 +323,13 @@ pub struct BanUserResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAppConfigRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub callBackUrl: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAppConfigResponse {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub createdAt: i64,
     pub appApiKey: String,
     pub minPasswordLength: i32,
@@ -361,7 +338,7 @@ pub struct CreateAppConfigResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAppConfigRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -369,8 +346,8 @@ pub struct DeleteAppConfigResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserRequest {
-    pub appPublicId: Uuid,
-    pub userPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -378,7 +355,7 @@ pub struct DeleteUserResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditAppConfigRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     #[serde(default)]
     pub callBackUrl: Option<String>,
     #[serde(default)]
@@ -389,7 +366,7 @@ pub struct EditAppConfigRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditAppConfigResponse {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub callBackUrl: String,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
@@ -397,24 +374,24 @@ pub struct EditAppConfigResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditUserRequest {
-    pub userPublicId: Uuid,
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
     pub newStatus: UserStatus,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct EditUserResponse {
-    pub userPublicId: Uuid,
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
     pub newStatus: UserStatus,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAppSecurityRulesRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAppSecurityRulesResponse {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
 }
@@ -437,7 +414,7 @@ pub struct PublicConnectResponse {}
 pub struct ReceiveTokenRequest {
     pub token: String,
     pub username: String,
-    pub userPubId: Uuid,
+    pub userPubId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -445,10 +422,10 @@ pub struct ReceiveTokenResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveUserInfoRequest {
-    pub userPubId: Uuid,
+    pub userPubId: Nanoid<16, Base62Alphabet>,
     pub username: String,
     #[serde(default)]
-    pub appPubId: Option<Uuid>,
+    pub appPubId: Option<Nanoid<16, Base62Alphabet>>,
     #[serde(default)]
     pub token: Option<String>,
 }
@@ -458,7 +435,7 @@ pub struct ReceiveUserInfoResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SignupRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub username: String,
     pub password: String,
 }
@@ -480,7 +457,7 @@ pub struct SubmitPasswordResponse {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmitUsernameRequest {
-    pub appPublicId: Uuid,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub username: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -520,7 +497,11 @@ impl WsRequest for SignupRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "username",
@@ -559,7 +540,11 @@ impl WsRequest for SubmitUsernameRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "username",
@@ -651,7 +636,11 @@ impl WsRequest for CreateAppConfigRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "callBackUrl",
@@ -661,7 +650,11 @@ impl WsRequest for CreateAppConfigRequest {
   "returns": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "createdAt",
@@ -702,7 +695,11 @@ impl WsRequest for BanUserRequest {
   "parameters": [
     {
       "name": "userPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [],
@@ -728,7 +725,11 @@ impl WsRequest for EditUserRequest {
   "parameters": [
     {
       "name": "userPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "newStatus",
@@ -742,7 +743,11 @@ impl WsRequest for EditUserRequest {
   "returns": [
     {
       "name": "userPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "newStatus",
@@ -775,11 +780,19 @@ impl WsRequest for DeleteUserRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "userPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [],
@@ -805,7 +818,11 @@ impl WsRequest for DeleteAppConfigRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [],
@@ -831,7 +848,11 @@ impl WsRequest for EditAppConfigRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "callBackUrl",
@@ -855,7 +876,11 @@ impl WsRequest for EditAppConfigRequest {
   "returns": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "callBackUrl",
@@ -892,13 +917,21 @@ impl WsRequest for GetAppSecurityRulesRequest {
   "parameters": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [
     {
       "name": "appPublicId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "minPasswordLength",
@@ -991,7 +1024,11 @@ impl WsRequest for ReceiveTokenRequest {
     },
     {
       "name": "userPubId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [],
@@ -1017,7 +1054,11 @@ impl WsRequest for ReceiveUserInfoRequest {
   "parameters": [
     {
       "name": "userPubId",
-      "ty": "UUID"
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     },
     {
       "name": "username",
@@ -1026,7 +1067,11 @@ impl WsRequest for ReceiveUserInfoRequest {
     {
       "name": "appPubId",
       "ty": {
-        "Optional": "UUID"
+        "Optional": {
+          "NanoId": {
+            "len": 16
+          }
+        }
       }
     },
     {

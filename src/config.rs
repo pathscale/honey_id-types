@@ -13,8 +13,8 @@ use url::Url;
 pub struct HoneyIdConfig {
     /// `honey.id` WebSocket [`Url`].
     ///
-    /// Set default to `wss://api.honey.id:443`.
-    #[default(Url::parse("wss://api.honey.id:443").unwrap())]
+    /// Set default to `wss://auth.honey.id:443`.
+    #[default(Url::parse("wss://auth.honey.id:443").unwrap())]
     pub addr: Url,
 
     /// Public ID of the API app that is defined in the Auth server's config. This must match that value

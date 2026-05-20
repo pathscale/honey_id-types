@@ -44,6 +44,7 @@ pub struct TokenWorkTableStorage(TokenWorkTable);
 
 impl TokenStorage for TokenWorkTableStorage {
     fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
+        tracing::debug!(user_pub_id = %user_pub_id, token = %token, "storing token");
         self.0.insert(TokenRow {
             id: self.0.get_next_pk().into(),
             public_id: user_pub_id,
@@ -53,6 +54,7 @@ impl TokenStorage for TokenWorkTableStorage {
     }
 
     fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
+        tracing::debug!(token = %token, "validating token");
         let entry = self.0.select_by_token(token).ok_or_else(|| eyre!("token not found"))?;
         Ok(entry.public_id)
     }

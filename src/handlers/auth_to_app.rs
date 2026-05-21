@@ -14,11 +14,13 @@ use uuid::Uuid;
 
 use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
-    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
+    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserDeletedRequest,
+    HoneyReceiveUserDeletedResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
 };
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
-use crate::handlers::convenience_utils::user_management::{CreateUserInfo, UserStorage};
+use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
+use crate::types::id_entities::UserPublicId;
 
 pub struct MethodApiKeyConnect {
     pub honey_id_client: Arc<HoneyIdClient>,
@@ -76,7 +78,7 @@ impl RequestHandler for MethodReceiveToken {
 
     async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
         let token = uuid::Uuid::parse_str(&req.token)?;
-        let user_pub_id = crate::types::id_entities::UserPublicId::from(req.userPubId);
+        let user_pub_id = UserPublicId::from(req.userPubId);
 
         self.user_storage
             .create_or_update_user(CreateUserInfo {
@@ -86,7 +88,7 @@ impl RequestHandler for MethodReceiveToken {
             })
             .await?;
 
-        self.token_storage.store_token(user_pub_id, token)?;
+        self.token_storage.store_token(user_pub_id, token).await?;
 
         Ok(HoneyReceiveTokenResponse {})
     }
@@ -101,7 +103,7 @@ impl RequestHandler for MethodReceiveUserInfo {
     type Request = HoneyReceiveUserInfoRequest;
 
     async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
-        let user_pub_id = crate::types::id_entities::UserPublicId::from(req.userPubId);
+        let user_pub_id = UserPublicId::from(req.userPubId);
 
         self.user_storage
             .create_or_update_user(CreateUserInfo {
@@ -112,12 +114,39 @@ impl RequestHandler for MethodReceiveUserInfo {
             .await?;
 
         if let Some(token) = req.token {
-            self.token_storage.store_token(
-                user_pub_id,
-                Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
-            )?;
+            self.token_storage
+                .store_token(
+                    user_pub_id,
+                    Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
+                )
+                .await?;
         }
 
         Ok(HoneyReceiveUserInfoResponse {})
+    }
+}
+
+pub struct MethodReceiveUserDeleted {
+    pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
+    pub user_storage: Arc<dyn UserStorage + Send + Sync>,
+}
+
+#[async_trait(?Send)]
+impl RequestHandler for MethodReceiveUserDeleted {
+    type Request = HoneyReceiveUserDeletedRequest;
+
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
+        let user_pub_id = UserPublicId::from(req.userPubId);
+
+        self.token_storage.remove_tokens_for_user(user_pub_id).await?;
+
+        self.user_storage
+            .delete_user(DeleteUserInfo {
+                user_pub_id: req.userPubId,
+                app_pub_id: req.appPubId,
+            })
+            .await?;
+
+        Ok(HoneyReceiveUserDeletedResponse {})
     }
 }

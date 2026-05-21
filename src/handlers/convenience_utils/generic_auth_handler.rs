@@ -173,7 +173,7 @@ where
             let token = Uuid::parse_str(req.get_access_token())
                 .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
 
-            let Ok(user_pub_id) = self.token_storage.validate_token(token) else {
+            let Ok(user_pub_id) = self.token_storage.validate_token(token).await else {
                 tracing::error!(
                     error = "Wrong `accessToken`",
                     "`GenericAuthorizedConnect` failed to validate the `accessToken`."

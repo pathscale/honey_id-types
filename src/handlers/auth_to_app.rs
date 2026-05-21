@@ -14,12 +14,12 @@ use uuid::Uuid;
 
 use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
-    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserInfoRequest,
-    HoneyReceiveUserInfoResponse, HoneyReceiveUserDeletedRequest, HoneyReceiveUserDeletedResponse,
+    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserDeletedRequest,
+    HoneyReceiveUserDeletedResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
 };
-use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
+use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
 use crate::types::id_entities::UserPublicId;
 
 pub struct MethodApiKeyConnect {
@@ -88,7 +88,7 @@ impl RequestHandler for MethodReceiveToken {
             })
             .await?;
 
-        self.token_storage.store_token(user_pub_id, token)?;
+        self.token_storage.store_token(user_pub_id, token).await?;
 
         Ok(HoneyReceiveTokenResponse {})
     }
@@ -114,10 +114,12 @@ impl RequestHandler for MethodReceiveUserInfo {
             .await?;
 
         if let Some(token) = req.token {
-            self.token_storage.store_token(
-                user_pub_id,
-                Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
-            )?;
+            self.token_storage
+                .store_token(
+                    user_pub_id,
+                    Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
+                )
+                .await?;
         }
 
         Ok(HoneyReceiveUserInfoResponse {})

@@ -14,11 +14,11 @@ pub mod callback {
         ReceiveTokenRequest as HoneyReceiveTokenRequest, ReceiveTokenResponse as HoneyReceiveTokenResponse,
     };
     pub use crate::types::generated::{
-        ReceiveUserInfoRequest as HoneyReceiveUserInfoRequest, ReceiveUserInfoResponse as HoneyReceiveUserInfoResponse,
-    };
-    pub use crate::types::generated::{
         ReceiveUserDeletedRequest as HoneyReceiveUserDeletedRequest,
         ReceiveUserDeletedResponse as HoneyReceiveUserDeletedResponse,
+    };
+    pub use crate::types::generated::{
+        ReceiveUserInfoRequest as HoneyReceiveUserInfoRequest, ReceiveUserInfoResponse as HoneyReceiveUserInfoResponse,
     };
 }
 

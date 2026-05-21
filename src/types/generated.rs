@@ -2,7 +2,7 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
-use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;

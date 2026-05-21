@@ -20,10 +20,10 @@ use crate::types::id_entities::UserPublicId;
 pub trait TokenStorage {
     /// Stores received `token` which belongs to `User` with provided
     /// [`UserPublicId`].
-    fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()>;
+    async fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()>;
     /// Validates provided `token` and returns User internal ID: u64, and [`UserPublicId`] if `token` is
     /// valid. Errors otherwise.
-    fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
+    async fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
     /// Remove all tokens associated with a user.
     async fn remove_tokens_for_user(&self, user_pub_id: UserPublicId) -> eyre::Result<()>;
 }
@@ -53,7 +53,7 @@ pub struct TokenWorkTableStorage(TokenWorkTable);
 
 #[async_trait]
 impl TokenStorage for TokenWorkTableStorage {
-    fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
+    async fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
         self.0.insert(TokenRow {
             id: self.0.get_next_pk().into(),
             public_id: user_pub_id,
@@ -62,7 +62,7 @@ impl TokenStorage for TokenWorkTableStorage {
         Ok(())
     }
 
-    fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
+    async fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
         let entry = self.0.select_by_token(token).ok_or_else(|| eyre!("token not found"))?;
         Ok(entry.public_id)
     }

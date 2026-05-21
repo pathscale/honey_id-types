@@ -2,7 +2,7 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
-use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
+use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
 use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;
@@ -114,6 +114,8 @@ pub enum EnumEndpoint {
     ReceiveToken = 210,
     ///
     ReceiveUserInfo = 211,
+    ///
+    ReceiveUserDeleted = 212,
 }
 
 impl EnumEndpoint {
@@ -135,6 +137,7 @@ impl EnumEndpoint {
             Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
             Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
+            Self::ReceiveUserDeleted => ReceiveUserDeletedRequest::SCHEMA,
         };
         serde_json::from_str(schema).unwrap()
     }
@@ -419,6 +422,16 @@ pub struct ReceiveTokenRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveTokenResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserDeletedRequest {
+    pub userPubId: Nanoid<16, Base62Alphabet>,
+    #[serde(default)]
+    pub appPubId: Option<Nanoid<16, Base62Alphabet>>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ReceiveUserDeletedResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveUserInfoRequest {
@@ -1092,4 +1105,44 @@ impl WsRequest for ReceiveUserInfoRequest {
 }
 impl WsResponse for ReceiveUserInfoResponse {
     type Request = ReceiveUserInfoRequest;
+}
+
+impl WsRequest for ReceiveUserDeletedRequest {
+    type Response = ReceiveUserDeletedResponse;
+    const METHOD_ID: u32 = 212;
+    const ROLES: &[u32] = &[6];
+    const SCHEMA: &'static str = r#"{
+  "name": "ReceiveUserDeleted",
+  "code": 212,
+  "parameters": [
+    {
+      "name": "userPubId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "appPubId",
+      "ty": {
+        "Optional": {
+          "NanoId": {
+            "len": 16
+          }
+        }
+      }
+    }
+  ],
+  "returns": [],
+  "stream_response": null,
+  "description": "Backend receives notification when a user is deleted or banned. App should clean up all user data and invalidate tokens.",
+  "json_schema": null,
+  "roles": [
+    "UserRole::AppApiKey"
+  ]
+}"#;
+}
+impl WsResponse for ReceiveUserDeletedResponse {
+    type Request = ReceiveUserDeletedRequest;
 }

@@ -11,6 +11,12 @@ pub struct CreateUserInfo {
     pub app_pub_id: Option<Nanoid<16, Base62Alphabet>>,
 }
 
+#[derive(Debug, Clone)]
+pub struct DeleteUserInfo {
+    pub user_pub_id: Nanoid<16, Base62Alphabet>,
+    pub app_pub_id: Option<Nanoid<16, Base62Alphabet>>,
+}
+
 /// Defines the basic API needed by authentication
 /// methods for proper role assignments.
 #[async_trait]
@@ -19,4 +25,5 @@ pub trait UserStorage {
     fn get_public_roles(&self) -> &[u32];
     fn get_honey_auth_role(&self) -> u32;
     async fn create_or_update_user(&self, user_info_request: CreateUserInfo) -> eyre::Result<()>;
+    async fn delete_user(&self, user_info: DeleteUserInfo) -> eyre::Result<()>;
 }

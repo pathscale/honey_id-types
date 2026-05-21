@@ -6,6 +6,7 @@
 //!
 //! Tokens are not persisted, so `User`'s should re-login on app restart.
 
+use async_trait::async_trait;
 use eyre::eyre;
 use uuid::Uuid;
 use worktable::prelude::*;
@@ -15,6 +16,7 @@ use crate::types::id_entities::UserPublicId;
 
 /// Describes the API of [`TokenStorage`], which simplifies and abstracts the storage and validation
 /// of tokens sent from Auth to App BEs.
+#[async_trait]
 pub trait TokenStorage {
     /// Stores received `token` which belongs to `User` with provided
     /// [`UserPublicId`].
@@ -22,6 +24,8 @@ pub trait TokenStorage {
     /// Validates provided `token` and returns User internal ID: u64, and [`UserPublicId`] if `token` is
     /// valid. Errors otherwise.
     fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
+    /// Remove all tokens associated with a user.
+    async fn remove_tokens_for_user(&self, user_pub_id: UserPublicId) -> eyre::Result<()>;
 }
 
 worktable!(
@@ -35,6 +39,11 @@ worktable!(
     indexes: {
         public_id_idx: public_id,
         token_idx: token unique,
+    },
+    queries: {
+        delete: {
+            ByPublicId() by public_id,
+        }
     }
 );
 
@@ -42,6 +51,7 @@ worktable!(
 #[derive(Default)]
 pub struct TokenWorkTableStorage(TokenWorkTable);
 
+#[async_trait]
 impl TokenStorage for TokenWorkTableStorage {
     fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
         self.0.insert(TokenRow {
@@ -55,5 +65,10 @@ impl TokenStorage for TokenWorkTableStorage {
     fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
         let entry = self.0.select_by_token(token).ok_or_else(|| eyre!("token not found"))?;
         Ok(entry.public_id)
+    }
+
+    async fn remove_tokens_for_user(&self, user_pub_id: UserPublicId) -> eyre::Result<()> {
+        self.0.delete_by_public_id(user_pub_id).await?;
+        Ok(())
     }
 }

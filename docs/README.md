@@ -72,3 +72,4 @@ ID: 21
 |-----------|-----------|----------|--------|-----------|-----------|
 |210|ReceiveToken|`token: String`, `username: String`, `userPubId: Nanoid<16, Base62Alphabet>`||Backend receives auth tokens, happens after login|false|
 |211|ReceiveUserInfo|`userPubId: Nanoid<16, Base62Alphabet>`, `username: String`, `appPubId: Option<Nanoid<16, Base62Alphabet>>`, `token: Option<String>`||Backend receives user info with optional token, happens after new user signs up. Platform app also receives this so that it can maintain records of app users, in which case Token will be set to None|false|
+|212|ReceiveUserDeleted|`userPubId: Nanoid<16, Base62Alphabet>`, `appPubId: Option<Nanoid<16, Base62Alphabet>>`||Backend receives notification when a user is deleted or banned. App should clean up all user data and invalidate tokens.|false|

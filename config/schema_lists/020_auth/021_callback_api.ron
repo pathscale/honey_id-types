@@ -48,6 +48,25 @@ Config(
                 )
                 
             ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ReceiveUserDeleted",
+                    code: 212,
+                    parameters: [
+                        Field(name: "userPubId", ty: NanoId(len: 16)),
+                        Field(name: "appPubId", ty: Optional(NanoId(len: 16))),
+                    ],
+                    returns: [],
+                    stream_response: None,
+                    description: "Backend receives notification when a user is deleted or banned. App should clean up all user data and invalidate tokens.",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::AppApiKey",
+                    ],
+                )
+
+            ),
         ]
     )
 )

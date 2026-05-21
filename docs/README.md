@@ -50,7 +50,7 @@ ID: 11
 |Code|Name|Parameters|Response|Description|FE Facing|
 |-----------|-----------|----------|--------|-----------|-----------|
 |111|CreateAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`|`appPublicId: Nanoid<16, Base62Alphabet>`, `createdAt: i64`, `appApiKey: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Platform can create new apps|false|
-|112|BanUser|`userPublicId: Nanoid<16, Base62Alphabet>`||Ban a user|false|
+|112|BanUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `appPublicId: Nanoid<16, Base62Alphabet>`||Ban a user from provided app|false|
 |113|EditUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `newStatus: UserStatus`|`userPublicId: Nanoid<16, Base62Alphabet>`, `newStatus: UserStatus`|Edit user status|false|
 |114|DeleteUser|`appPublicId: Nanoid<16, Base62Alphabet>`, `userPublicId: Nanoid<16, Base62Alphabet>`||Delete a user|false|
 |115|DeleteAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`||Delete app configuration|false|

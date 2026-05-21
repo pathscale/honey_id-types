@@ -2,7 +2,7 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
-use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
+use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
 use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;
@@ -316,6 +316,7 @@ pub struct AuthorizedConnectResponse {}
 #[serde(rename_all = "camelCase")]
 pub struct BanUserRequest {
     pub userPublicId: Nanoid<16, Base62Alphabet>,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -700,11 +701,19 @@ impl WsRequest for BanUserRequest {
           "len": 16
         }
       }
+    },
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
     }
   ],
   "returns": [],
   "stream_response": null,
-  "description": "Ban a user",
+  "description": "Ban a user from provided app",
   "json_schema": null,
   "roles": [
     "UserRole::Platform"

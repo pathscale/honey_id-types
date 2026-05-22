@@ -11,6 +11,9 @@
 ## Enums
 
 ```rust
+enum LogLevel { off, error, warn, info, debug, trace, detail }
+
+
 enum UserRole { Public, PlatformAdmin, PlatformSupport, AppNewUser, AppAdmin, AppSupport, AppApiKey, Platform }
 
 
@@ -51,11 +54,12 @@ ID: 11
 |-----------|-----------|----------|--------|-----------|-----------|
 |111|CreateAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`|`appPublicId: Nanoid<16, Base62Alphabet>`, `createdAt: i64`, `appApiKey: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Platform can create new apps|false|
 |112|BanUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `appPublicId: Nanoid<16, Base62Alphabet>`||Ban a user from provided app|false|
-|113|EditUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `newStatus: UserStatus`|`userPublicId: Nanoid<16, Base62Alphabet>`, `newStatus: UserStatus`|Edit user status|false|
+|113|UnbanUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `appPublicId: Nanoid<16, Base62Alphabet>`||Unban a user from a specific app|false|
 |114|DeleteUser|`appPublicId: Nanoid<16, Base62Alphabet>`, `userPublicId: Nanoid<16, Base62Alphabet>`||Delete a user|false|
 |115|DeleteAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`||Delete app configuration|false|
 |116|EditAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: Option<String>`, `minPasswordLength: Option<i32>`, `requiredPasswordChars: Option<String>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Edit app configuration|false|
 |117|GetAppSecurityRules|`appPublicId: Nanoid<16, Base62Alphabet>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Get security rules contained within current app's configuration|false|
+|118|SetLogLevel|`logLevel: Option<LogLevel>`|`logLevel: LogLevel`|Set log level at runtime|false|
 
 ## authEndpoints Server
 ID: 20

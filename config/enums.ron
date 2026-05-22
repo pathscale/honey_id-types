@@ -76,6 +76,48 @@ Config(
                     ],
                 ),
             ),
+            EnumElement(
+                inner: Enum(
+                    name: "LogLevel",
+                    variants: [
+                        EnumVariant(
+                            name: "off",
+                            value: 0,
+                            description: "Logging disabled.",
+                        ),
+                        EnumVariant(
+                            name: "error",
+                            value: 1,
+                            description: "Error level logging.",
+                        ),
+                        EnumVariant(
+                            name: "warn",
+                            value: 2,
+                            description: "Warning level logging.",
+                        ),
+                        EnumVariant(
+                            name: "info",
+                            value: 3,
+                            description: "Info level logging.",
+                        ),
+                        EnumVariant(
+                            name: "debug",
+                            value: 4,
+                            description: "Debug level logging.",
+                        ),
+                        EnumVariant(
+                            name: "trace",
+                            value: 5,
+                            description: "Trace level logging.",
+                        ),
+                        EnumVariant(
+                            name: "detail",
+                            value: 6,
+                            description: "Detailed trace logging (no crate filtering).",
+                        ),
+                    ],
+                ),
+            ),
         ],
     )
 )

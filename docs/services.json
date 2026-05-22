@@ -2,6 +2,48 @@
   "enums": [
     {
       "Enum": {
+        "name": "LogLevel",
+        "variants": [
+          {
+            "description": "Logging disabled.",
+            "name": "off",
+            "value": 0
+          },
+          {
+            "description": "Error level logging.",
+            "name": "error",
+            "value": 1
+          },
+          {
+            "description": "Warning level logging.",
+            "name": "warn",
+            "value": 2
+          },
+          {
+            "description": "Info level logging.",
+            "name": "info",
+            "value": 3
+          },
+          {
+            "description": "Debug level logging.",
+            "name": "debug",
+            "value": 4
+          },
+          {
+            "description": "Trace level logging.",
+            "name": "trace",
+            "value": 5
+          },
+          {
+            "description": "Detailed trace logging (no crate filtering).",
+            "name": "detail",
+            "value": 6
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
         "name": "UserRole",
         "variants": [
           {

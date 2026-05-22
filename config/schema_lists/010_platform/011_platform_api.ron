@@ -53,18 +53,15 @@ Config(
             EndpointSchemaElement(
                 frontend_facing: false,
                 schema: (
-                    name: "EditUser",
+                    name: "UnbanUser",
                     code: 113,
                     parameters: [
                         Field(name: "userPublicId", ty: NanoId(len: 16)),
-                        Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
                     ],
-                    returns: [
-                        Field(name: "userPublicId", ty: NanoId(len: 16)),
-                        Field(name: "newStatus", ty: EnumRef(name: "UserStatus")),
-                    ],
+                    returns: [],
                     stream_response: None,
-                    description: "Edit user status",
+                    description: "Unban a user from a specific app",
                     json_schema: (),
                     roles: [
                         "UserRole::Platform",
@@ -147,6 +144,25 @@ Config(
                     ],
                     stream_response: None,
                     description: "Get security rules contained within current app's configuration",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                )
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "SetLogLevel",
+                    code: 118,
+                    parameters: [
+                        Field(name: "logLevel", ty: Optional(EnumRef(name: "LogLevel"))),
+                    ],
+                    returns: [
+                        Field(name: "logLevel", ty: EnumRef(name: "LogLevel")),
+                    ],
+                    stream_response: None,
+                    description: "Set log level at runtime",
                     json_schema: (),
                     roles: [
                         "UserRole::Platform",

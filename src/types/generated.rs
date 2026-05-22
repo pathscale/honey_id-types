@@ -2,13 +2,50 @@ use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
-use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;
 use strum_macros::{Display, EnumString};
 use uuid::Uuid;
 use worktable::prelude::*;
+
+#[derive(
+    MemStat,
+    Archive,
+    Clone,
+    Copy,
+    Debug,
+    Display,
+    PartialEq,
+    PartialOrd,
+    Eq,
+    Hash,
+    Ord,
+    EnumString,
+    rkyv::Deserialize,
+    rkyv::Serialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+#[rkyv(compare(PartialEq), derive(Debug))]
+#[repr(u8)]
+pub enum LogLevel {
+    /// Logging disabled.
+    Off = 0,
+    /// Error level logging.
+    Error = 1,
+    /// Warning level logging.
+    Warn = 2,
+    /// Info level logging.
+    Info = 3,
+    /// Debug level logging.
+    Debug = 4,
+    /// Trace level logging.
+    Trace = 5,
+    /// Detailed trace logging (no crate filtering).
+    Detail = 6,
+}
 
 #[derive(
     MemStat,
@@ -97,7 +134,7 @@ pub enum EnumEndpoint {
     ///
     BanUser = 112,
     ///
-    EditUser = 113,
+    UnbanUser = 113,
     ///
     DeleteUser = 114,
     ///
@@ -106,6 +143,8 @@ pub enum EnumEndpoint {
     EditAppConfig = 116,
     ///
     GetAppSecurityRules = 117,
+    ///
+    SetLogLevel = 118,
     ///
     ApiKeyConnect = 200,
     ///
@@ -128,11 +167,12 @@ impl EnumEndpoint {
             Self::PlatformConnect => PlatformConnectRequest::SCHEMA,
             Self::CreateAppConfig => CreateAppConfigRequest::SCHEMA,
             Self::BanUser => BanUserRequest::SCHEMA,
-            Self::EditUser => EditUserRequest::SCHEMA,
+            Self::UnbanUser => UnbanUserRequest::SCHEMA,
             Self::DeleteUser => DeleteUserRequest::SCHEMA,
             Self::DeleteAppConfig => DeleteAppConfigRequest::SCHEMA,
             Self::EditAppConfig => EditAppConfigRequest::SCHEMA,
             Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
+            Self::SetLogLevel => SetLogLevelRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
@@ -377,18 +417,6 @@ pub struct EditAppConfigResponse {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct EditUserRequest {
-    pub userPublicId: Nanoid<16, Base62Alphabet>,
-    pub newStatus: UserStatus,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct EditUserResponse {
-    pub userPublicId: Nanoid<16, Base62Alphabet>,
-    pub newStatus: UserStatus,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct GetAppSecurityRulesRequest {
     pub appPublicId: Nanoid<16, Base62Alphabet>,
 }
@@ -448,6 +476,17 @@ pub struct ReceiveUserInfoRequest {
 pub struct ReceiveUserInfoResponse {}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct SetLogLevelRequest {
+    #[serde(default)]
+    pub logLevel: Option<LogLevel>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SetLogLevelResponse {
+    pub logLevel: LogLevel,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SignupRequest {
     pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub username: String,
@@ -479,6 +518,15 @@ pub struct SubmitUsernameRequest {
 pub struct SubmitUsernameResponse {
     pub expiresAt: i64,
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct UnbanUserRequest {
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct UnbanUserResponse {}
 
 impl WsRequest for PublicConnectRequest {
     type Response = PublicConnectResponse;
@@ -737,12 +785,12 @@ impl WsResponse for BanUserResponse {
     type Request = BanUserRequest;
 }
 
-impl WsRequest for EditUserRequest {
-    type Response = EditUserResponse;
+impl WsRequest for UnbanUserRequest {
+    type Response = UnbanUserResponse;
     const METHOD_ID: u32 = 113;
     const ROLES: &[u32] = &[7];
     const SCHEMA: &'static str = r#"{
-  "name": "EditUser",
+  "name": "UnbanUser",
   "code": 113,
   "parameters": [
     {
@@ -754,42 +802,25 @@ impl WsRequest for EditUserRequest {
       }
     },
     {
-      "name": "newStatus",
-      "ty": {
-        "EnumRef": {
-          "name": "UserStatus"
-        }
-      }
-    }
-  ],
-  "returns": [
-    {
-      "name": "userPublicId",
+      "name": "appPublicId",
       "ty": {
         "NanoId": {
           "len": 16
         }
       }
-    },
-    {
-      "name": "newStatus",
-      "ty": {
-        "EnumRef": {
-          "name": "UserStatus"
-        }
-      }
     }
   ],
+  "returns": [],
   "stream_response": null,
-  "description": "Edit user status",
+  "description": "Unban a user from a specific app",
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
   ]
 }"#;
 }
-impl WsResponse for EditUserResponse {
-    type Request = EditUserRequest;
+impl WsResponse for UnbanUserResponse {
+    type Request = UnbanUserRequest;
 }
 
 impl WsRequest for DeleteUserRequest {
@@ -974,6 +1005,47 @@ impl WsRequest for GetAppSecurityRulesRequest {
 }
 impl WsResponse for GetAppSecurityRulesResponse {
     type Request = GetAppSecurityRulesRequest;
+}
+
+impl WsRequest for SetLogLevelRequest {
+    type Response = SetLogLevelResponse;
+    const METHOD_ID: u32 = 118;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "SetLogLevel",
+  "code": 118,
+  "parameters": [
+    {
+      "name": "logLevel",
+      "ty": {
+        "Optional": {
+          "EnumRef": {
+            "name": "LogLevel"
+          }
+        }
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "logLevel",
+      "ty": {
+        "EnumRef": {
+          "name": "LogLevel"
+        }
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "Set log level at runtime",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ]
+}"#;
+}
+impl WsResponse for SetLogLevelResponse {
+    type Request = SetLogLevelRequest;
 }
 
 impl WsRequest for ApiKeyConnectRequest {

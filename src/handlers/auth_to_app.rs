@@ -16,6 +16,7 @@ use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
     HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserDeletedRequest,
     HoneyReceiveUserDeletedResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
+    HoneyValidateTokenRequest, HoneyValidateTokenResponse,
 };
 use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
@@ -148,5 +149,29 @@ impl RequestHandler for MethodReceiveUserDeleted {
             .await?;
 
         Ok(HoneyReceiveUserDeletedResponse {})
+    }
+}
+
+pub struct MethodValidateToken {
+    pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
+}
+
+#[async_trait(?Send)]
+impl RequestHandler for MethodValidateToken {
+    type Request = HoneyValidateTokenRequest;
+
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
+        let token = Uuid::parse_str(&req.token)?;
+
+        match self.token_storage.validate_token(token).await {
+            Ok(user_pub_id) => Ok(HoneyValidateTokenResponse {
+                valid: true,
+                userPubId: Some(user_pub_id.into()),
+            }),
+            Err(_) => Ok(HoneyValidateTokenResponse {
+                valid: false,
+                userPubId: None,
+            }),
+        }
     }
 }

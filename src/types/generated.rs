@@ -499,6 +499,7 @@ pub struct SignupRequest {
 #[serde(rename_all = "camelCase")]
 pub struct SignupResponse {
     pub accessToken: String,
+    pub encryptionKey: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -509,6 +510,7 @@ pub struct SubmitPasswordRequest {
 #[serde(rename_all = "camelCase")]
 pub struct SubmitPasswordResponse {
     pub accessToken: String,
+    pub encryptionKey: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -593,6 +595,10 @@ impl WsRequest for SignupRequest {
     {
       "name": "accessToken",
       "ty": "String"
+    },
+    {
+      "name": "encryptionKey",
+      "ty": "String"
     }
   ],
   "stream_response": null,
@@ -662,6 +668,10 @@ impl WsRequest for SubmitPasswordRequest {
   "returns": [
     {
       "name": "accessToken",
+      "ty": "String"
+    },
+    {
+      "name": "encryptionKey",
       "ty": "String"
     }
   ],

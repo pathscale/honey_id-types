@@ -160,6 +160,10 @@
             {
               "name": "accessToken",
               "ty": "String"
+            },
+            {
+              "name": "encryptionKey",
+              "ty": "String"
             }
           ],
           "roles": [
@@ -211,6 +215,10 @@
           "returns": [
             {
               "name": "accessToken",
+              "ty": "String"
+            },
+            {
+              "name": "encryptionKey",
               "ty": "String"
             }
           ],

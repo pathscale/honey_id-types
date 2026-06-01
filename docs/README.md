@@ -36,9 +36,9 @@ ID: 1
 ### Endpoints
 |Code|Name|Parameters|Response|Description|FE Facing|
 |-----------|-----------|----------|--------|-----------|-----------|
-|10|Signup|`appPublicId: Nanoid<16, Base62Alphabet>`, `username: String`, `password: String`|`accessToken: String`|Frontend creates new user account.|true|
+|10|Signup|`appPublicId: Nanoid<16, Base62Alphabet>`, `username: String`, `password: String`|`accessToken: String`, `encryptionKey: String`|Frontend creates new user account.|true|
 |12|SubmitUsername|`appPublicId: Nanoid<16, Base62Alphabet>`, `username: String`|`expiresAt: i64`|Step 1: Frontend submits username during auth flow.|true|
-|13|SubmitPassword|`password: String`|`accessToken: String`|Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.|true|
+|13|SubmitPassword|`password: String`|`accessToken: String`, `encryptionKey: String`|Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.|true|
 
 ## platformApiKeyConnection Server
 ID: 10

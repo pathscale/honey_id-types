@@ -155,6 +155,8 @@ pub enum EnumEndpoint {
     ReceiveUserInfo = 211,
     ///
     ReceiveUserDeleted = 212,
+    ///
+    ValidateToken = 213,
 }
 
 impl EnumEndpoint {
@@ -178,6 +180,7 @@ impl EnumEndpoint {
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
             Self::ReceiveUserInfo => ReceiveUserInfoRequest::SCHEMA,
             Self::ReceiveUserDeleted => ReceiveUserDeletedRequest::SCHEMA,
+            Self::ValidateToken => ValidateTokenRequest::SCHEMA,
         };
         serde_json::from_str(schema).unwrap()
     }
@@ -527,6 +530,18 @@ pub struct UnbanUserRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UnbanUserResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ValidateTokenRequest {
+    pub token: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ValidateTokenResponse {
+    pub valid: bool,
+    #[serde(default)]
+    pub userPubId: Option<Nanoid<16, Base62Alphabet>>,
+}
 
 impl WsRequest for PublicConnectRequest {
     type Response = PublicConnectResponse;
@@ -1226,4 +1241,45 @@ impl WsRequest for ReceiveUserDeletedRequest {
 }
 impl WsResponse for ReceiveUserDeletedResponse {
     type Request = ReceiveUserDeletedRequest;
+}
+
+impl WsRequest for ValidateTokenRequest {
+    type Response = ValidateTokenResponse;
+    const METHOD_ID: u32 = 213;
+    const ROLES: &[u32] = &[6];
+    const SCHEMA: &'static str = r#"{
+  "name": "ValidateToken",
+  "code": 213,
+  "parameters": [
+    {
+      "name": "token",
+      "ty": "String"
+    }
+  ],
+  "returns": [
+    {
+      "name": "valid",
+      "ty": "Boolean"
+    },
+    {
+      "name": "userPubId",
+      "ty": {
+        "Optional": {
+          "NanoId": {
+            "len": 16
+          }
+        }
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "App validates an existing token and returns whether it is valid along with the associated userPubId",
+  "json_schema": null,
+  "roles": [
+    "UserRole::AppApiKey"
+  ]
+}"#;
+}
+impl WsResponse for ValidateTokenResponse {
+    type Request = ValidateTokenRequest;
 }

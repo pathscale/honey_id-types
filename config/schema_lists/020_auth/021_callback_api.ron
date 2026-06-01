@@ -67,6 +67,26 @@ Config(
                 )
 
             ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ValidateToken",
+                    code: 213,
+                    parameters: [
+                        Field(name: "token", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "valid", ty: Boolean),
+                        Field(name: "userPubId", ty: Optional(NanoId(len: 16))),
+                    ],
+                    stream_response: None,
+                    description: "App validates an existing token and returns whether it is valid along with the associated userPubId",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::AppApiKey",
+                    ],
+                )
+            ),
         ]
     )
 )

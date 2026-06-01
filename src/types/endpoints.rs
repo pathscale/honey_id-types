@@ -20,6 +20,9 @@ pub mod callback {
     pub use crate::types::generated::{
         ReceiveUserInfoRequest as HoneyReceiveUserInfoRequest, ReceiveUserInfoResponse as HoneyReceiveUserInfoResponse,
     };
+    pub use crate::types::generated::{
+        ValidateTokenRequest as HoneyValidateTokenRequest, ValidateTokenResponse as HoneyValidateTokenResponse,
+    };
 }
 
 pub mod auth_flow {

@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "honey_id-types"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "async-trait",
  "derive_more 2.1.1",

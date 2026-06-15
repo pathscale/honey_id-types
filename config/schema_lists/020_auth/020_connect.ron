@@ -24,6 +24,9 @@ Config(
                     roles: [
                         "UserRole::Public",
                     ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidApiKey", code: "ErrorCode::Unauthorized", message: "Wrong appApiKey", fields: []),
+                    ],
                 )
                 
             ),
@@ -44,6 +47,9 @@ Config(
                     json_schema: (),
                     roles: [
                         "UserRole::Public",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidAccessToken", code: "ErrorCode::Unauthorized", message: "Wrong accessToken", fields: []),
                     ],
                 )
                 

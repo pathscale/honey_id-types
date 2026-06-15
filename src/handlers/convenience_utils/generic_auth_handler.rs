@@ -7,13 +7,13 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use endpoint_libs::libs::handler::{HandlerError, Response};
 use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
-use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
+use endpoint_libs::libs::ws::{SubAuthController, WsConnection, WsRequest, WsResponse};
 use eyre::Result;
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde::de::DeserializeOwned;
-use serde_json::Value;
 use tracing;
 use uuid::Uuid;
 
@@ -48,40 +48,68 @@ pub trait PublicConnectRequest: DeserializeOwned + Send + Sync + 'static {}
 /// Trait for custom connection handling logic.
 /// Implementations define app-specific behavior during WebSocket connection establishment.
 #[async_trait(?Send)]
-pub trait CustomConnectHandler: Send + Sync + 'static {
+pub trait CustomConnectHandler<Req>: Send + Sync + 'static
+where
+    Req: WsRequest + 'static,
+{
     /// Handle custom connection logic.
     /// The handler is responsible for:
-    /// - Deserializing the request to the app's custom type
     /// - Performing any validation or authorization checks
     /// - Setting connection roles via `conn.set_roles(...)`
-    /// - Returning the response as a JSON value
+    /// - Returning the endpoint response
     ///
     /// # Arguments
-    /// * `param` - The raw request payload as JSON
+    /// * `req` - The typed endpoint request
     /// * `conn` - The WebSocket connection to set up roles and metadata
     ///
     /// # Returns
-    /// The response to send back to the client, as a JSON value
-    async fn handle(&self, param: Value, conn: Arc<WsConnection>) -> Result<Value>;
+    /// The response to send back to the client.
+    async fn handle(&self, req: Req, conn: Arc<WsConnection>) -> Result<Req::Response>;
 }
 
 /// Simple wrapper that implements `SubAuthController` to allow custom handlers to work with the WebSocket server.
 /// This eliminates the need for each app to create a new struct implementing `SubAuthController`.
-pub struct GenericConnectHandler {
-    pub custom_handler: Arc<dyn CustomConnectHandler>,
+pub struct GenericConnectHandler<Req>
+where
+    Req: WsRequest + 'static,
+{
+    pub custom_handler: Arc<dyn CustomConnectHandler<Req>>,
+    _phantom: PhantomData<Req>,
+}
+
+impl<Req> GenericConnectHandler<Req>
+where
+    Req: WsRequest + 'static,
+{
+    pub fn new(custom_handler: Arc<dyn CustomConnectHandler<Req>>) -> Self {
+        Self {
+            custom_handler,
+            _phantom: PhantomData,
+        }
+    }
 }
 
 #[async_trait(?Send)]
-impl SubAuthController for GenericConnectHandler {
+impl<Req> SubAuthController for GenericConnectHandler<Req>
+where
+    Req: WsRequest + 'static,
+{
+    type Request = Req;
+    type Error = CustomError;
+
     fn auth(
         self: Arc<Self>,
         _toolbox: &ArcToolbox,
-        param: Value,
+        req: Self::Request,
         _ctx: RequestContext,
         conn: Arc<WsConnection>,
-    ) -> LocalBoxFuture<'static, Result<Value>> {
+    ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         let custom_handler = self.custom_handler.clone();
-        async move { custom_handler.handle(param, conn).await }.boxed_local()
+        async move {
+            let res = custom_handler.handle(req, conn).await.map_err(HandlerError::internal)?;
+            Ok(res)
+        }
+        .boxed_local()
     }
 }
 
@@ -114,8 +142,8 @@ impl SubAuthController for GenericConnectHandler {
 /// For Honey types, see [`crate::handlers::user_to_app::MethodAuthorizedConnect`].
 pub struct GenericAuthorizedConnect<Req, Res>
 where
-    Req: AuthorizedConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: AuthorizedConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
     pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,
@@ -125,8 +153,8 @@ where
 
 impl<Req, Res> GenericAuthorizedConnect<Req, Res>
 where
-    Req: AuthorizedConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: AuthorizedConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
     /// Create a new authorized connect handler.
     ///
@@ -156,32 +184,37 @@ where
 #[async_trait(?Send)]
 impl<Req, Res> SubAuthController for GenericAuthorizedConnect<Req, Res>
 where
-    Req: AuthorizedConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: AuthorizedConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
+    type Request = Req;
+    type Error = CustomError;
+
     fn auth(
         self: Arc<Self>,
         _toolbox: &ArcToolbox,
-        param: Value,
+        req: Self::Request,
         _ctx: RequestContext,
         conn: Arc<WsConnection>,
-    ) -> LocalBoxFuture<'static, Result<Value>> {
+    ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         async move {
-            let req: Req = serde_json::from_value(param)
-                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
-
             let token = Uuid::parse_str(req.get_access_token())
-                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
+                .map_err(|_| CustomError::new(HoneyErrorCode::Unauthorized).with_message("Wrong accessToken"))?;
 
             let Ok(user_pub_id) = self.token_storage.validate_token(token).await else {
                 tracing::error!(
                     error = "Wrong `accessToken`",
                     "`GenericAuthorizedConnect` failed to validate the `accessToken`."
                 );
-                return Err(CustomError::new(HoneyErrorCode::BadRequest, "Wrong `accessToken`").into());
+                return Err(CustomError::new(HoneyErrorCode::Unauthorized)
+                    .with_message("Wrong accessToken")
+                    .into());
             };
 
-            let roles = self.user_storage.get_api_roles_by_pub_id(user_pub_id)?;
+            let roles = self
+                .user_storage
+                .get_api_roles_by_pub_id(user_pub_id)
+                .map_err(HandlerError::internal)?;
             conn.set_roles(Arc::new(roles.clone()));
 
             let ctx = AuthorizedConnectContext {
@@ -189,9 +222,9 @@ where
                 user_api_roles: roles,
                 conn,
             };
-            let res = (self.on_connect)(req, ctx).await?;
+            let res = (self.on_connect)(req, ctx).await.map_err(HandlerError::internal)?;
 
-            Ok(serde_json::to_value(res)?)
+            Ok(res)
         }
         .boxed_local()
     }
@@ -222,8 +255,8 @@ where
 /// For Honey types, see [`crate::handlers::user_to_app::MethodPublicConnect`].
 pub struct GenericPublicConnect<Req, Res>
 where
-    Req: PublicConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: PublicConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
     pub user_storage: Arc<dyn UserStorage + Sync + Send>,
     on_connect: Arc<dyn Fn(Req, PublicConnectContext) -> LocalBoxFuture<'static, Result<Res>> + Send + Sync>,
@@ -232,8 +265,8 @@ where
 
 impl<Req, Res> GenericPublicConnect<Req, Res>
 where
-    Req: PublicConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: PublicConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
     /// Create a new public connect handler.
     ///
@@ -257,27 +290,27 @@ where
 #[async_trait(?Send)]
 impl<Req, Res> SubAuthController for GenericPublicConnect<Req, Res>
 where
-    Req: PublicConnectRequest,
-    Res: serde::Serialize + Send + Sync + 'static,
+    Req: PublicConnectRequest + WsRequest<Response = Res>,
+    Res: WsResponse<Request = Req> + Send + Sync + 'static,
 {
+    type Request = Req;
+    type Error = CustomError;
+
     fn auth(
         self: Arc<Self>,
         _toolbox: &ArcToolbox,
-        param: Value,
+        req: Self::Request,
         _ctx: RequestContext,
         conn: Arc<WsConnection>,
-    ) -> LocalBoxFuture<'static, Result<Value>> {
+    ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         async move {
-            let req: Req = serde_json::from_value(param)
-                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
-
             let roles = self.user_storage.get_public_roles();
             conn.set_roles(Arc::new(Vec::from(roles)));
 
             let ctx = PublicConnectContext { conn };
-            let res = (self.on_connect)(req, ctx).await?;
+            let res = (self.on_connect)(req, ctx).await.map_err(HandlerError::internal)?;
 
-            Ok(serde_json::to_value(res)?)
+            Ok(res)
         }
         .boxed_local()
     }
@@ -288,20 +321,22 @@ where
 ///
 /// # Example
 /// ```ignore
-/// let handler = ClosureHandler(|param, conn| async move {
+/// let handler = ClosureHandler(|req: MyConnectRequest, conn| async move {
 ///     // Custom logic here
-///     Ok(Value::Null)
+///     Ok(MyConnectResponse {})
 /// });
 /// ```
 pub struct ClosureHandler<F>(pub F);
 
 #[async_trait(?Send)]
-impl<F> CustomConnectHandler for ClosureHandler<F>
+impl<F, Req, Fut> CustomConnectHandler<Req> for ClosureHandler<F>
 where
-    F: Fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>> + Send + Sync + 'static,
+    Req: WsRequest + 'static,
+    F: Fn(Req, Arc<WsConnection>) -> Fut + Send + Sync + 'static,
+    Fut: Future<Output = Result<Req::Response>> + 'static,
 {
-    async fn handle(&self, param: Value, conn: Arc<WsConnection>) -> Result<Value> {
-        (self.0)(param, conn).await
+    async fn handle(&self, req: Req, conn: Arc<WsConnection>) -> Result<Req::Response> {
+        (self.0)(req, conn).await
     }
 }
 
@@ -313,6 +348,15 @@ mod tests {
     fn closure_handler_is_send_sync() {
         fn assert_send_sync<T: Send + Sync>() {}
 
-        assert_send_sync::<ClosureHandler<fn(Value, Arc<WsConnection>) -> LocalBoxFuture<'static, Result<Value>>>>();
+        use crate::endpoints::connect::{HoneyPublicConnectRequest, HoneyPublicConnectResponse};
+
+        assert_send_sync::<
+            ClosureHandler<
+                fn(
+                    HoneyPublicConnectRequest,
+                    Arc<WsConnection>,
+                ) -> LocalBoxFuture<'static, Result<HoneyPublicConnectResponse>>,
+            >,
+        >();
     }
 }

@@ -110,6 +110,208 @@
           }
         ]
       }
+    },
+    {
+      "Enum": {
+        "name": "ErrorCode",
+        "variants": [
+          {
+            "description": "Bad request",
+            "name": "BadRequest",
+            "value": 100400
+          },
+          {
+            "description": "Authentication is required",
+            "name": "Unauthorized",
+            "value": 100401
+          },
+          {
+            "description": "Payment is required",
+            "name": "PaymentRequired",
+            "value": 100402
+          },
+          {
+            "description": "Access is forbidden",
+            "name": "Forbidden",
+            "value": 100403
+          },
+          {
+            "description": "Resource was not found",
+            "name": "NotFound",
+            "value": 100404
+          },
+          {
+            "description": "Method is not allowed",
+            "name": "MethodNotAllowed",
+            "value": 100405
+          },
+          {
+            "description": "Response format is not acceptable",
+            "name": "NotAcceptable",
+            "value": 100406
+          },
+          {
+            "description": "Proxy authentication is required",
+            "name": "ProxyAuthenticationRequired",
+            "value": 100407
+          },
+          {
+            "description": "Request timed out",
+            "name": "RequestTimeout",
+            "value": 100408
+          },
+          {
+            "description": "Request conflicts with current state",
+            "name": "Conflict",
+            "value": 100409
+          },
+          {
+            "description": "Resource is gone",
+            "name": "Gone",
+            "value": 100410
+          },
+          {
+            "description": "Content length is required",
+            "name": "LengthRequired",
+            "value": 100411
+          },
+          {
+            "description": "Precondition failed",
+            "name": "PreconditionFailed",
+            "value": 100412
+          },
+          {
+            "description": "Payload is too large",
+            "name": "PayloadTooLarge",
+            "value": 100413
+          },
+          {
+            "description": "URI is too long",
+            "name": "UriTooLong",
+            "value": 100414
+          },
+          {
+            "description": "Media type is unsupported",
+            "name": "UnsupportedMediaType",
+            "value": 100415
+          },
+          {
+            "description": "Requested range cannot be satisfied",
+            "name": "RangeNotSatisfiable",
+            "value": 100416
+          },
+          {
+            "description": "Expectation failed",
+            "name": "ExpectationFailed",
+            "value": 100417
+          },
+          {
+            "description": "I'm a teapot",
+            "name": "ImATeapot",
+            "value": 100418
+          },
+          {
+            "description": "Request was misdirected",
+            "name": "MisdirectedRequest",
+            "value": 100421
+          },
+          {
+            "description": "Entity could not be processed",
+            "name": "UnprocessableEntity",
+            "value": 100422
+          },
+          {
+            "description": "Resource is locked",
+            "name": "Locked",
+            "value": 100423
+          },
+          {
+            "description": "Dependency failed",
+            "name": "FailedDependency",
+            "value": 100424
+          },
+          {
+            "description": "Request must be upgraded",
+            "name": "UpgradeRequired",
+            "value": 100426
+          },
+          {
+            "description": "Precondition is required",
+            "name": "PreconditionRequired",
+            "value": 100428
+          },
+          {
+            "description": "Too many requests",
+            "name": "TooManyRequests",
+            "value": 100429
+          },
+          {
+            "description": "Request header fields are too large",
+            "name": "RequestHeaderFieldsTooLarge",
+            "value": 100431
+          },
+          {
+            "description": "Unavailable for legal reasons",
+            "name": "UnavailableForLegalReasons",
+            "value": 100451
+          },
+          {
+            "description": "Internal server error",
+            "name": "InternalError",
+            "value": 100500
+          },
+          {
+            "description": "Endpoint is not implemented",
+            "name": "NotImplemented",
+            "value": 100501
+          },
+          {
+            "description": "Bad gateway",
+            "name": "BadGateway",
+            "value": 100502
+          },
+          {
+            "description": "Service is unavailable",
+            "name": "ServiceUnavailable",
+            "value": 100503
+          },
+          {
+            "description": "Gateway timed out",
+            "name": "GatewayTimeout",
+            "value": 100504
+          },
+          {
+            "description": "HTTP version is not supported",
+            "name": "HttpVersionNotSupported",
+            "value": 100505
+          },
+          {
+            "description": "Content negotiation variant problem",
+            "name": "VariantAlsoNegotiates",
+            "value": 100506
+          },
+          {
+            "description": "Insufficient storage",
+            "name": "InsufficientStorage",
+            "value": 100507
+          },
+          {
+            "description": "Loop was detected",
+            "name": "LoopDetected",
+            "value": 100508
+          },
+          {
+            "description": "Request must be extended",
+            "name": "NotExtended",
+            "value": 100510
+          },
+          {
+            "description": "Network authentication is required",
+            "name": "NetworkAuthenticationRequired",
+            "value": 100511
+          }
+        ]
+      }
     }
   ],
   "services": [
@@ -118,6 +320,7 @@
         {
           "code": 0,
           "description": "Initiates a websocket connection session with that permits access to endpoints with the UserRole::Public role",
+          "errors": [],
           "json_schema": null,
           "name": "PublicConnect",
           "parameters": [],
@@ -136,6 +339,73 @@
         {
           "code": 10,
           "description": "Frontend creates new user account.",
+          "errors": [
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "BadRequest"
+              },
+              "fields": [],
+              "message": "Invalid username",
+              "name": "InvalidUsername"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "NotFound"
+              },
+              "fields": [],
+              "message": "App not found",
+              "name": "AppNotFound"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Forbidden"
+              },
+              "fields": [],
+              "message": "Account is disabled or banned",
+              "name": "AccountForbidden"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Unauthorized"
+              },
+              "fields": [],
+              "message": "Invalid password",
+              "name": "InvalidPassword"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "BadGateway"
+              },
+              "fields": [],
+              "message": "App callback failed",
+              "name": "CallbackFailed"
+            }
+          ],
           "json_schema": null,
           "name": "Signup",
           "parameters": [
@@ -174,6 +444,47 @@
         {
           "code": 12,
           "description": "Step 1: Frontend submits username during auth flow.",
+          "errors": [
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "NotFound"
+              },
+              "fields": [],
+              "message": "App not found",
+              "name": "AppNotFound"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "NotFound"
+              },
+              "fields": [],
+              "message": "User not found",
+              "name": "UserNotFound"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Forbidden"
+              },
+              "fields": [],
+              "message": "Account is disabled or banned",
+              "name": "AccountForbidden"
+            }
+          ],
           "json_schema": null,
           "name": "SubmitUsername",
           "parameters": [
@@ -204,6 +515,60 @@
         {
           "code": 13,
           "description": "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
+          "errors": [
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "BadRequest"
+              },
+              "fields": [],
+              "message": "Call SubmitUsername before SubmitPassword",
+              "name": "AuthFlowRequired"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Unauthorized"
+              },
+              "fields": [],
+              "message": "Invalid password",
+              "name": "InvalidPassword"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Forbidden"
+              },
+              "fields": [],
+              "message": "Access denied to this app",
+              "name": "AccessDenied"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "BadGateway"
+              },
+              "fields": [],
+              "message": "App callback failed",
+              "name": "CallbackFailed"
+            }
+          ],
           "json_schema": null,
           "name": "SubmitPassword",
           "parameters": [
@@ -236,6 +601,21 @@
         {
           "code": 201,
           "description": "",
+          "errors": [
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Unauthorized"
+              },
+              "fields": [],
+              "message": "Wrong accessToken",
+              "name": "InvalidAccessToken"
+            }
+          ],
           "json_schema": null,
           "name": "AuthorizedConnect",
           "parameters": [

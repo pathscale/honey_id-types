@@ -1,5 +1,6 @@
 use endpoint_libs::libs::error_code::ErrorCode;
 use endpoint_libs::libs::types::*;
+use endpoint_libs::libs::ws::toolbox::CustomError;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
 use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
@@ -186,154 +187,88 @@ impl EnumEndpoint {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorBadRequest {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInternalServerError {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorNotImplemented {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorNotFound {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorDatabaseError {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidService {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserForbidden {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserRoleForbidden {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserNotFound {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserMustAgreeTos {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserMustAgreePrivacyPolicy {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserNoAuthToken {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserInvalidAuthToken {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorUserInvalidPassword {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorDuplicateRequest {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidExpression {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidArgument {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidState {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidSeq {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidMethod {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorProtocolViolation {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorRestrictedUserPrivileges {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInvalidRole {}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorInternalError {}
-
 #[derive(
     Debug, Clone, Copy, Serialize, Deserialize, FromPrimitive, PartialEq, Eq, PartialOrd, Ord, EnumString, Display, Hash,
 )]
 pub enum EnumErrorCode {
-    /// Custom Bad Request
+    /// Bad request
     BadRequest = 100400,
-    /// Custom NotFoundResource
+    /// Authentication is required
+    Unauthorized = 100401,
+    /// Payment is required
+    PaymentRequired = 100402,
+    /// Access is forbidden
+    Forbidden = 100403,
+    /// Resource was not found
     NotFound = 100404,
-    /// Custom Internal Server Error
-    InternalServerError = 100500,
-    /// Custom Method not implemented
+    /// Method is not allowed
+    MethodNotAllowed = 100405,
+    /// Response format is not acceptable
+    NotAcceptable = 100406,
+    /// Proxy authentication is required
+    ProxyAuthenticationRequired = 100407,
+    /// Request timed out
+    RequestTimeout = 100408,
+    /// Request conflicts with current state
+    Conflict = 100409,
+    /// Resource is gone
+    Gone = 100410,
+    /// Content length is required
+    LengthRequired = 100411,
+    /// Precondition failed
+    PreconditionFailed = 100412,
+    /// Payload is too large
+    PayloadTooLarge = 100413,
+    /// URI is too long
+    UriTooLong = 100414,
+    /// Media type is unsupported
+    UnsupportedMediaType = 100415,
+    /// Requested range cannot be satisfied
+    RangeNotSatisfiable = 100416,
+    /// Expectation failed
+    ExpectationFailed = 100417,
+    /// I'm a teapot
+    ImATeapot = 100418,
+    /// Request was misdirected
+    MisdirectedRequest = 100421,
+    /// Entity could not be processed
+    UnprocessableEntity = 100422,
+    /// Resource is locked
+    Locked = 100423,
+    /// Dependency failed
+    FailedDependency = 100424,
+    /// Request must be upgraded
+    UpgradeRequired = 100426,
+    /// Precondition is required
+    PreconditionRequired = 100428,
+    /// Too many requests
+    TooManyRequests = 100429,
+    /// Request header fields are too large
+    RequestHeaderFieldsTooLarge = 100431,
+    /// Unavailable for legal reasons
+    UnavailableForLegalReasons = 100451,
+    /// Internal server error
+    InternalError = 100500,
+    /// Endpoint is not implemented
     NotImplemented = 100501,
-    /// Custom Database error
-    DatabaseError = 100601,
-    /// Custom Invalid Service
-    InvalidService = 100602,
-    /// Custom Forbidden user
-    UserForbidden = 101403,
-    /// Custom User not found
-    UserNotFound = 101404,
-    /// Custom Must agree to the terms of service
-    UserMustAgreeTos = 101601,
-    /// Custom Must agree to the privacy policy
-    UserMustAgreePrivacyPolicy = 101602,
-    /// Custom No auth token
-    UserNoAuthToken = 101604,
-    /// Custom token invalid
-    UserInvalidAuthToken = 101605,
-    /// Custom password invalid
-    UserInvalidPassword = 101606,
-    /// Custom Insufficient role for user
-    UserRoleForbidden = 102403,
-    /// Custom Duplicate request
-    DuplicateRequest = 103001,
-    /// Custom Invalid expression
-    InvalidExpression = 104000,
-    /// SQL R0001 InvalidArgument
-    InvalidArgument = 45349633,
-    /// SQL R0002 InvalidState
-    InvalidState = 45349634,
-    /// SQL R0003 InvalidSeq
-    InvalidSeq = 45349635,
-    /// SQL R0004 InvalidMethod
-    InvalidMethod = 45349636,
-    /// SQL R0005 ProtocolViolation
-    ProtocolViolation = 45349637,
-    /// SQL R000N RestrictedUserPrivileges
-    RestrictedUserPrivileges = 45349655,
-    /// SQL R000S InvalidRole
-    InvalidRole = 45349660,
-    /// SQL R001G InternalError
-    InternalError = 45349684,
+    /// Bad gateway
+    BadGateway = 100502,
+    /// Service is unavailable
+    ServiceUnavailable = 100503,
+    /// Gateway timed out
+    GatewayTimeout = 100504,
+    /// HTTP version is not supported
+    HttpVersionNotSupported = 100505,
+    /// Content negotiation variant problem
+    VariantAlsoNegotiates = 100506,
+    /// Insufficient storage
+    InsufficientStorage = 100507,
+    /// Loop was detected
+    LoopDetected = 100508,
+    /// Request must be extended
+    NotExtended = 100510,
+    /// Network authentication is required
+    NetworkAuthenticationRequired = 100511,
 }
 
 impl From<EnumErrorCode> for ErrorCode {
@@ -544,6 +479,347 @@ pub struct ValidateTokenResponse {
     #[serde(default)]
     pub userPubId: Option<Nanoid<16, Base62Alphabet>>,
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SignupError {
+    /// Invalid username
+    InvalidUsername,
+    /// App not found
+    AppNotFound,
+    /// Account is disabled or banned
+    AccountForbidden,
+    /// Invalid password
+    InvalidPassword,
+    /// App callback failed
+    CallbackFailed,
+}
+
+impl From<SignupError> for CustomError {
+    fn from(err: SignupError) -> Self {
+        match err {
+            SignupError::InvalidUsername => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid username")
+                .with_kind("InvalidUsername"),
+            SignupError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            SignupError::AccountForbidden => CustomError::new(EnumErrorCode::Forbidden)
+                .with_message("Account is disabled or banned")
+                .with_kind("AccountForbidden"),
+            SignupError::InvalidPassword => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Invalid password")
+                .with_kind("InvalidPassword"),
+            SignupError::CallbackFailed => CustomError::new(EnumErrorCode::BadGateway)
+                .with_message("App callback failed")
+                .with_kind("CallbackFailed"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SubmitUsernameError {
+    /// App not found
+    AppNotFound,
+    /// User not found
+    UserNotFound,
+    /// Account is disabled or banned
+    AccountForbidden,
+}
+
+impl From<SubmitUsernameError> for CustomError {
+    fn from(err: SubmitUsernameError) -> Self {
+        match err {
+            SubmitUsernameError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            SubmitUsernameError::UserNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("User not found")
+                .with_kind("UserNotFound"),
+            SubmitUsernameError::AccountForbidden => CustomError::new(EnumErrorCode::Forbidden)
+                .with_message("Account is disabled or banned")
+                .with_kind("AccountForbidden"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SubmitPasswordError {
+    /// Call SubmitUsername before SubmitPassword
+    AuthFlowRequired,
+    /// Invalid password
+    InvalidPassword,
+    /// Access denied to this app
+    AccessDenied,
+    /// App callback failed
+    CallbackFailed,
+}
+
+impl From<SubmitPasswordError> for CustomError {
+    fn from(err: SubmitPasswordError) -> Self {
+        match err {
+            SubmitPasswordError::AuthFlowRequired => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Call SubmitUsername before SubmitPassword")
+                .with_kind("AuthFlowRequired"),
+            SubmitPasswordError::InvalidPassword => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Invalid password")
+                .with_kind("InvalidPassword"),
+            SubmitPasswordError::AccessDenied => CustomError::new(EnumErrorCode::Forbidden)
+                .with_message("Access denied to this app")
+                .with_kind("AccessDenied"),
+            SubmitPasswordError::CallbackFailed => CustomError::new(EnumErrorCode::BadGateway)
+                .with_message("App callback failed")
+                .with_kind("CallbackFailed"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum PlatformConnectError {
+    /// Wrong platformApiKey
+    InvalidApiKey,
+}
+
+impl From<PlatformConnectError> for CustomError {
+    fn from(err: PlatformConnectError) -> Self {
+        match err {
+            PlatformConnectError::InvalidApiKey => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Wrong platformApiKey")
+                .with_kind("InvalidApiKey"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum CreateAppConfigError {
+    /// Failed to create app configuration
+    InternalError,
+}
+
+impl From<CreateAppConfigError> for CustomError {
+    fn from(err: CreateAppConfigError) -> Self {
+        match err {
+            CreateAppConfigError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to create app configuration")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum BanUserError {
+    /// User not found
+    UserNotFound,
+    /// App not found
+    AppNotFound,
+    /// Membership not found
+    MembershipNotFound,
+}
+
+impl From<BanUserError> for CustomError {
+    fn from(err: BanUserError) -> Self {
+        match err {
+            BanUserError::UserNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("User not found")
+                .with_kind("UserNotFound"),
+            BanUserError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            BanUserError::MembershipNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("Membership not found")
+                .with_kind("MembershipNotFound"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum UnbanUserError {
+    /// User not found
+    UserNotFound,
+    /// App not found
+    AppNotFound,
+    /// Membership not found
+    MembershipNotFound,
+}
+
+impl From<UnbanUserError> for CustomError {
+    fn from(err: UnbanUserError) -> Self {
+        match err {
+            UnbanUserError::UserNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("User not found")
+                .with_kind("UserNotFound"),
+            UnbanUserError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            UnbanUserError::MembershipNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("Membership not found")
+                .with_kind("MembershipNotFound"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum DeleteUserError {
+    /// Failed to delete user
+    InternalError,
+}
+
+impl From<DeleteUserError> for CustomError {
+    fn from(err: DeleteUserError) -> Self {
+        match err {
+            DeleteUserError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to delete user")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum DeleteAppConfigError {
+    /// Failed to delete app configuration
+    InternalError,
+}
+
+impl From<DeleteAppConfigError> for CustomError {
+    fn from(err: DeleteAppConfigError) -> Self {
+        match err {
+            DeleteAppConfigError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to delete app configuration")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum EditAppConfigError {
+    /// App not found
+    AppNotFound,
+    /// Failed to edit app configuration
+    InternalError,
+}
+
+impl From<EditAppConfigError> for CustomError {
+    fn from(err: EditAppConfigError) -> Self {
+        match err {
+            EditAppConfigError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            EditAppConfigError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to edit app configuration")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum GetAppSecurityRulesError {
+    /// App not found
+    AppNotFound,
+}
+
+impl From<GetAppSecurityRulesError> for CustomError {
+    fn from(err: GetAppSecurityRulesError) -> Self {
+        match err {
+            GetAppSecurityRulesError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SetLogLevelError {
+    /// Failed to set log level
+    InvalidLogLevel,
+}
+
+impl From<SetLogLevelError> for CustomError {
+    fn from(err: SetLogLevelError) -> Self {
+        match err {
+            SetLogLevelError::InvalidLogLevel => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Failed to set log level")
+                .with_kind("InvalidLogLevel"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ApiKeyConnectError {
+    /// Wrong appApiKey
+    InvalidApiKey,
+}
+
+impl From<ApiKeyConnectError> for CustomError {
+    fn from(err: ApiKeyConnectError) -> Self {
+        match err {
+            ApiKeyConnectError::InvalidApiKey => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Wrong appApiKey")
+                .with_kind("InvalidApiKey"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum AuthorizedConnectError {
+    /// Wrong accessToken
+    InvalidAccessToken,
+}
+
+impl From<AuthorizedConnectError> for CustomError {
+    fn from(err: AuthorizedConnectError) -> Self {
+        match err {
+            AuthorizedConnectError::InvalidAccessToken => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Wrong accessToken")
+                .with_kind("InvalidAccessToken"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ReceiveTokenError {
+    /// Invalid token
+    InvalidToken,
+}
+
+impl From<ReceiveTokenError> for CustomError {
+    fn from(err: ReceiveTokenError) -> Self {
+        match err {
+            ReceiveTokenError::InvalidToken => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid token")
+                .with_kind("InvalidToken"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ReceiveUserInfoError {
+    /// Invalid token
+    InvalidToken,
+}
+
+impl From<ReceiveUserInfoError> for CustomError {
+    fn from(err: ReceiveUserInfoError) -> Self {
+        match err {
+            ReceiveUserInfoError::InvalidToken => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid token")
+                .with_kind("InvalidToken"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ValidateTokenError {
+    /// Invalid token
+    InvalidToken,
+}
+
+impl From<ValidateTokenError> for CustomError {
+    fn from(err: ValidateTokenError) -> Self {
+        match err {
+            ValidateTokenError::InvalidToken => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid token")
+                .with_kind("InvalidToken"),
+        }
+    }
+}
 
 impl WsRequest for PublicConnectRequest {
     type Response = PublicConnectResponse;
@@ -559,7 +835,8 @@ impl WsRequest for PublicConnectRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
-  ]
+  ],
+  "errors": []
 }"#;
 }
 impl WsResponse for PublicConnectResponse {
@@ -606,6 +883,73 @@ impl WsRequest for SignupRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "InvalidUsername",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid username",
+      "fields": []
+    },
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "AccountForbidden",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Forbidden"
+      },
+      "message": "Account is disabled or banned",
+      "fields": []
+    },
+    {
+      "name": "InvalidPassword",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Invalid password",
+      "fields": []
+    },
+    {
+      "name": "CallbackFailed",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadGateway"
+      },
+      "message": "App callback failed",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -645,6 +989,47 @@ impl WsRequest for SubmitUsernameRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "UserNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "User not found",
+      "fields": []
+    },
+    {
+      "name": "AccountForbidden",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Forbidden"
+      },
+      "message": "Account is disabled or banned",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -680,6 +1065,60 @@ impl WsRequest for SubmitPasswordRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "AuthFlowRequired",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Call SubmitUsername before SubmitPassword",
+      "fields": []
+    },
+    {
+      "name": "InvalidPassword",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Invalid password",
+      "fields": []
+    },
+    {
+      "name": "AccessDenied",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Forbidden"
+      },
+      "message": "Access denied to this app",
+      "fields": []
+    },
+    {
+      "name": "CallbackFailed",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadGateway"
+      },
+      "message": "App callback failed",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -706,6 +1145,21 @@ impl WsRequest for PlatformConnectRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "InvalidApiKey",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Wrong platformApiKey",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -765,6 +1219,21 @@ impl WsRequest for CreateAppConfigRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to create app configuration",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -803,6 +1272,47 @@ impl WsRequest for BanUserRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "UserNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "User not found",
+      "fields": []
+    },
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "MembershipNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "Membership not found",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -841,6 +1351,47 @@ impl WsRequest for UnbanUserRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "UserNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "User not found",
+      "fields": []
+    },
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "MembershipNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "Membership not found",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -879,6 +1430,21 @@ impl WsRequest for DeleteUserRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to delete user",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -909,6 +1475,21 @@ impl WsRequest for DeleteAppConfigRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to delete app configuration",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -978,6 +1559,34 @@ impl WsRequest for EditAppConfigRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to edit app configuration",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1025,6 +1634,21 @@ impl WsRequest for GetAppSecurityRulesRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1066,6 +1690,21 @@ impl WsRequest for SetLogLevelRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "InvalidLogLevel",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Failed to set log level",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1092,6 +1731,21 @@ impl WsRequest for ApiKeyConnectRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "InvalidApiKey",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Wrong appApiKey",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1118,6 +1772,21 @@ impl WsRequest for AuthorizedConnectRequest {
   "json_schema": null,
   "roles": [
     "UserRole::Public"
+  ],
+  "errors": [
+    {
+      "name": "InvalidAccessToken",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Wrong accessToken",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1156,6 +1825,21 @@ impl WsRequest for ReceiveTokenRequest {
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
+  ],
+  "errors": [
+    {
+      "name": "InvalidToken",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid token",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1206,6 +1890,21 @@ impl WsRequest for ReceiveUserInfoRequest {
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
+  ],
+  "errors": [
+    {
+      "name": "InvalidToken",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid token",
+      "fields": []
+    }
   ]
 }"#;
 }
@@ -1246,7 +1945,8 @@ impl WsRequest for ReceiveUserDeletedRequest {
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
-  ]
+  ],
+  "errors": []
 }"#;
 }
 impl WsResponse for ReceiveUserDeletedResponse {
@@ -1287,6 +1987,21 @@ impl WsRequest for ValidateTokenRequest {
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
+  ],
+  "errors": [
+    {
+      "name": "InvalidToken",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid token",
+      "fields": []
+    }
   ]
 }"#;
 }

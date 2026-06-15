@@ -24,6 +24,9 @@ Config(
                     roles: [
                         "UserRole::Public",
                     ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidApiKey", code: "ErrorCode::Unauthorized", message: "Wrong platformApiKey", fields: []),
+                    ],
                 )
                 
             ),

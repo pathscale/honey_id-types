@@ -19,8 +19,8 @@ derive_more = { version = "2.1.1", features = [
     "from",
     "into",
 ] }
-# endpoint-libs = { path = "../endpoint-libs", features = ["ws"] }
-endpoint-libs = { version = "1.7.28", features = ["ws-client"] }
+# endpoint-libs = { path = "../endpoint-libs", features = ["ws", "ws-client"] }
+endpoint-libs = { version = "1.8.2", features = ["ws", "ws-client"] }
 
 eyre = "0.6.12"
 futures = "0.3.31"

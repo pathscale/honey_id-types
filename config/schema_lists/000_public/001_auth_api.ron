@@ -26,6 +26,13 @@ Config(
                     roles: [
                         "UserRole::Public",
                     ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidUsername", code: "ErrorCode::BadRequest", message: "Invalid username", fields: []),
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AccountForbidden", code: "ErrorCode::Forbidden", message: "Account is disabled or banned", fields: []),
+                        EndpointErrorSchema(name: "InvalidPassword", code: "ErrorCode::Unauthorized", message: "Invalid password", fields: []),
+                        EndpointErrorSchema(name: "CallbackFailed", code: "ErrorCode::BadGateway", message: "App callback failed", fields: []),
+                    ],
                 )
                 
             ),
@@ -47,6 +54,11 @@ Config(
                     roles: [
                         "UserRole::Public",
                     ],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "UserNotFound", code: "ErrorCode::NotFound", message: "User not found", fields: []),
+                        EndpointErrorSchema(name: "AccountForbidden", code: "ErrorCode::Forbidden", message: "Account is disabled or banned", fields: []),
+                    ],
                 )
                 
             ),
@@ -67,6 +79,12 @@ Config(
                     json_schema: (),
                     roles: [
                         "UserRole::Public",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "AuthFlowRequired", code: "ErrorCode::BadRequest", message: "Call SubmitUsername before SubmitPassword", fields: []),
+                        EndpointErrorSchema(name: "InvalidPassword", code: "ErrorCode::Unauthorized", message: "Invalid password", fields: []),
+                        EndpointErrorSchema(name: "AccessDenied", code: "ErrorCode::Forbidden", message: "Access denied to this app", fields: []),
+                        EndpointErrorSchema(name: "CallbackFailed", code: "ErrorCode::BadGateway", message: "App callback failed", fields: []),
                     ],
                 )
                 

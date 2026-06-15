@@ -23,6 +23,9 @@ Config(
                     roles: [
                         "UserRole::AppApiKey",
                     ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidToken", code: "ErrorCode::BadRequest", message: "Invalid token", fields: []),
+                    ],
                 )
                 
             ),
@@ -44,6 +47,9 @@ Config(
                     json_schema: (),
                     roles: [
                         "UserRole::AppApiKey",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidToken", code: "ErrorCode::BadRequest", message: "Invalid token", fields: []),
                     ],
                 )
                 
@@ -84,6 +90,9 @@ Config(
                     json_schema: (),
                     roles: [
                         "UserRole::AppApiKey",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "InvalidToken", code: "ErrorCode::BadRequest", message: "Invalid token", fields: []),
                     ],
                 )
             ),

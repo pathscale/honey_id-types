@@ -1,24 +1,21 @@
 //! Defines all handlers that are for Auth (BE) to App (BE) communication
-use crate::enums::HoneyErrorCode;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use endpoint_libs::libs::handler::{RequestHandler, Response};
+use endpoint_libs::libs::handler::{HandlerError, RequestHandler, Response};
 use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
 use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
-use eyre::{Context, Result, bail};
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
-use serde_json::Value;
 use uuid::Uuid;
 
 use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
-    HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserDeletedRequest,
-    HoneyReceiveUserDeletedResponse, HoneyReceiveUserInfoRequest, HoneyReceiveUserInfoResponse,
-    HoneyValidateTokenRequest, HoneyValidateTokenResponse,
+    HoneyReceiveTokenError, HoneyReceiveTokenRequest, HoneyReceiveTokenResponse, HoneyReceiveUserDeletedRequest,
+    HoneyReceiveUserDeletedResponse, HoneyReceiveUserInfoError, HoneyReceiveUserInfoRequest,
+    HoneyReceiveUserInfoResponse, HoneyValidateTokenError, HoneyValidateTokenRequest, HoneyValidateTokenResponse,
 };
-use crate::endpoints::connect::{HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
+use crate::endpoints::connect::{HoneyApiKeyConnectError, HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
 use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
 use crate::types::id_entities::UserPublicId;
@@ -30,39 +27,33 @@ pub struct MethodApiKeyConnect {
 
 #[async_trait(?Send)]
 impl SubAuthController for MethodApiKeyConnect {
+    type Request = HoneyApiKeyConnectRequest;
+    type Error = HoneyApiKeyConnectError;
+
     fn auth(
         self: Arc<Self>,
         _toolbox: &ArcToolbox,
-        param: Value,
+        req: Self::Request,
         _ctx: RequestContext,
         conn: Arc<WsConnection>,
-    ) -> LocalBoxFuture<'static, Result<Value>> {
+    ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         async move {
-            let req: HoneyApiKeyConnectRequest = serde_json::from_value(param)
-                .map_err(|x| CustomError::new(HoneyErrorCode::BadRequest, format!("Invalid request: {x}")))?;
-
-            match self.honey_id_client.validate_auth_api_key(&req.appApiKey) {
-                Ok(_) => (),
-                Err(err) => {
+            self.honey_id_client
+                .validate_auth_api_key(&req.appApiKey)
+                .map_err(|err| {
                     tracing::error!(
                         error = %err,
                         "Failed to validate Auth API key due to error"
                     );
                     match err {
-                        ApiKeyError::IncorrectKey => {
-                            bail!(CustomError::new(
-                                HoneyErrorCode::BadRequest,
-                                format!("Auth API key Error: {err}")
-                            ))
-                        }
+                        ApiKeyError::IncorrectKey => HandlerError::Public(HoneyApiKeyConnectError::InvalidApiKey),
                     }
-                }
-            }
+                })?;
 
             let auth_role = self.user_storage.get_honey_auth_role();
             conn.set_roles(Arc::new(vec![auth_role]));
 
-            Ok(serde_json::to_value(HoneyApiKeyConnectResponse {})?)
+            Ok(HoneyApiKeyConnectResponse {})
         }
         .boxed_local()
     }
@@ -76,9 +67,11 @@ pub struct MethodReceiveToken {
 #[async_trait(?Send)]
 impl RequestHandler for MethodReceiveToken {
     type Request = HoneyReceiveTokenRequest;
+    type Error = HoneyReceiveTokenError;
 
-    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
-        let token = uuid::Uuid::parse_str(&req.token)?;
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
+        let token = uuid::Uuid::parse_str(&req.token)
+            .map_err(|_| HandlerError::Public(HoneyReceiveTokenError::InvalidToken))?;
         let user_pub_id = UserPublicId::from(req.userPubId);
 
         self.user_storage
@@ -87,9 +80,13 @@ impl RequestHandler for MethodReceiveToken {
                 user_pub_id: req.userPubId,
                 app_pub_id: None,
             })
-            .await?;
+            .await
+            .map_err(HandlerError::internal)?;
 
-        self.token_storage.store_token(user_pub_id, token).await?;
+        self.token_storage
+            .store_token(user_pub_id, token)
+            .await
+            .map_err(HandlerError::internal)?;
 
         Ok(HoneyReceiveTokenResponse {})
     }
@@ -102,8 +99,9 @@ pub struct MethodReceiveUserInfo {
 #[async_trait(?Send)]
 impl RequestHandler for MethodReceiveUserInfo {
     type Request = HoneyReceiveUserInfoRequest;
+    type Error = HoneyReceiveUserInfoError;
 
-    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
         let user_pub_id = UserPublicId::from(req.userPubId);
 
         self.user_storage
@@ -112,15 +110,18 @@ impl RequestHandler for MethodReceiveUserInfo {
                 user_pub_id: req.userPubId,
                 app_pub_id: req.appPubId,
             })
-            .await?;
+            .await
+            .map_err(HandlerError::internal)?;
 
         if let Some(token) = req.token {
             self.token_storage
                 .store_token(
                     user_pub_id,
-                    Uuid::try_parse(&token).wrap_err("Error parsing given token as UUID")?,
+                    Uuid::try_parse(&token)
+                        .map_err(|_| HandlerError::Public(HoneyReceiveUserInfoError::InvalidToken))?,
                 )
-                .await?;
+                .await
+                .map_err(HandlerError::internal)?;
         }
 
         Ok(HoneyReceiveUserInfoResponse {})
@@ -135,18 +136,23 @@ pub struct MethodReceiveUserDeleted {
 #[async_trait(?Send)]
 impl RequestHandler for MethodReceiveUserDeleted {
     type Request = HoneyReceiveUserDeletedRequest;
+    type Error = CustomError;
 
-    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
         let user_pub_id = UserPublicId::from(req.userPubId);
 
-        self.token_storage.remove_tokens_for_user(user_pub_id).await?;
+        self.token_storage
+            .remove_tokens_for_user(user_pub_id)
+            .await
+            .map_err(HandlerError::internal)?;
 
         self.user_storage
             .delete_user(DeleteUserInfo {
                 user_pub_id: req.userPubId,
                 app_pub_id: req.appPubId,
             })
-            .await?;
+            .await
+            .map_err(HandlerError::internal)?;
 
         Ok(HoneyReceiveUserDeletedResponse {})
     }
@@ -159,9 +165,11 @@ pub struct MethodValidateToken {
 #[async_trait(?Send)]
 impl RequestHandler for MethodValidateToken {
     type Request = HoneyValidateTokenRequest;
+    type Error = HoneyValidateTokenError;
 
-    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request> {
-        let token = Uuid::parse_str(&req.token)?;
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
+        let token =
+            Uuid::parse_str(&req.token).map_err(|_| HandlerError::Public(HoneyValidateTokenError::InvalidToken))?;
 
         match self.token_storage.validate_token(token).await {
             Ok(user_pub_id) => Ok(HoneyValidateTokenResponse {

@@ -1049,9 +1049,9 @@ dependencies = [
 
 [[package]]
 name = "endpoint-libs"
-version = "1.8.2"
+version = "2.0.0-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52d9959940db6a9a2b5669b28f9a19da93be67b7acc5cdabf598aa3a81ae2075"
+checksum = "c01f4bd8850b41dd1cb2df5a5a32f5bc85c295903b55d62941424e0009d2e7c0"
 dependencies = [
  "alloy-primitives",
  "async-trait",
@@ -1081,7 +1081,6 @@ dependencies = [
  "reqwest",
  "rust_decimal",
  "rustls",
- "rustls-pemfile",
  "serde",
  "serde_json",
  "serde_path_to_error",
@@ -1470,7 +1469,7 @@ dependencies = [
 
 [[package]]
 name = "honey_id-types"
-version = "1.14.0"
+version = "2.0.0"
 dependencies = [
  "async-trait",
  "derive_more 2.1.1",
@@ -2982,15 +2981,6 @@ dependencies = [
  "rustls-webpki",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "rustls-pemfile"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dce314e5fee3f39953d46bb63bb8a46d40c2f8fb7cc5a3b6cab2bde9721d6e50"
-dependencies = [
- "rustls-pki-types",
 ]
 
 [[package]]

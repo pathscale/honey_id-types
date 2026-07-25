@@ -1,6 +1,6 @@
 [package]
 name = "honey_id-types"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2024"
 authors = [
     "Maxim Volkov <https://github.com/Handy-caT>",
@@ -20,7 +20,7 @@ derive_more = { version = "2.1.1", features = [
     "into",
 ] }
 # endpoint-libs = { path = "../endpoint-libs", features = ["ws", "ws-client"] }
-endpoint-libs = { version = "2.0.0-alpha.1", features = ["ws", "ws-client"] }
+endpoint-libs = { version = "2.0", features = ["ws", "ws-client"] }
 
 eyre = "0.6.12"
 futures = "0.3.31"

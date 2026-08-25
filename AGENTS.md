@@ -9,6 +9,13 @@ natively, and Claude Code loads it through the `@AGENTS.md` import in
 
 ## Invariants (don't break these)
 
+- **No Python.** Not a script, not `python3 -c`, not a heredoc. Reaching for it is the
+  tell that a step is being solved by parsing when the tool that owns the answer could
+  just be asked. Do not swap it for another parser either, and do not assume `jq` is
+  present: it does not ship with macOS. A fixed-shape field is one `sed -nE` line;
+  anything needing real parsing belongs in this repo's own language, where it can be
+  tested. If a task seems to need Python, the approach is wrong.
+
 - **This crate re-exports endpoint-libs' `WsRequest`/`WsResponse` traits, so it must
   move in lockstep with `endpoint-libs`.** A consumer that bumps one without the other
   gets two incompatible copies of endpoint-libs in its graph and the traits stop

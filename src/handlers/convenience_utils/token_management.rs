@@ -54,11 +54,13 @@ pub struct TokenWorkTableStorage(TokenWorkTable);
 #[async_trait]
 impl TokenStorage for TokenWorkTableStorage {
     async fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
-        self.0.insert(TokenRow {
-            id: self.0.get_next_pk().into(),
-            public_id: user_pub_id,
-            token,
-        })?;
+        self.0
+            .insert(TokenRow {
+                id: self.0.get_next_pk().into(),
+                public_id: user_pub_id,
+                token,
+            })
+            .await?;
         Ok(())
     }
 

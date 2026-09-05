@@ -37,8 +37,8 @@ worktable!(
         token: Uuid,
     },
     indexes: {
-        public_id_idx: public_id,
-        token_idx: token unique,
+        public_id_idx: public_id using worktables_index,
+        token_idx: token unique using worktables_index,
     },
     queries: {
         delete: {

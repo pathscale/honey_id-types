@@ -1,5 +1,6 @@
 /target
 /generated
+Cargo.lock
 
 # We will not be tracking any AI tool related metadata, as these will not be formalized or used in pathscale projects
 /.claude/settings.local.json

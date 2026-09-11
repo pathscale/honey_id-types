@@ -63,6 +63,7 @@ ID: 11
 |116|EditAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: Option<String>`, `minPasswordLength: Option<i32>`, `requiredPasswordChars: Option<String>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Edit app configuration|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
 |117|GetAppSecurityRules|`appPublicId: Nanoid<16, Base62Alphabet>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Get security rules contained within current app's configuration|false|AppNotFound(ErrorCode::NotFound)|
 |118|SetLogLevel|`logLevel: Option<LogLevel>`|`logLevel: LogLevel`|Set log level at runtime|false|InvalidLogLevel(ErrorCode::BadRequest)|
+|119|RegenerateAppApiKey|`appPublicId: Nanoid<16, Base62Alphabet>`|`appApiKey: String`|Replace an application's callback API key and return the new key once|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
 
 ## authEndpoints Server
 ID: 20

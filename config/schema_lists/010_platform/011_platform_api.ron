@@ -179,6 +179,29 @@ Config(
             EndpointSchemaElement(
                 frontend_facing: false,
                 schema: (
+                    name: "RegenerateAppApiKey",
+                    code: 119,
+                    parameters: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                    ],
+                    returns: [
+                        Field(name: "appApiKey", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Replace an application's callback API key and return the new key once",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to regenerate app API key", fields: []),
+                    ],
+                )
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
                     name: "SetLogLevel",
                     code: 118,
                     parameters: [

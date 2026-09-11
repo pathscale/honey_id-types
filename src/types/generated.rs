@@ -147,6 +147,8 @@ pub enum EnumEndpoint {
     ///
     SetLogLevel = 118,
     ///
+    RegenerateAppApiKey = 119,
+    ///
     ApiKeyConnect = 200,
     ///
     AuthorizedConnect = 201,
@@ -176,6 +178,7 @@ impl EnumEndpoint {
             Self::EditAppConfig => EditAppConfigRequest::SCHEMA,
             Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
             Self::SetLogLevel => SetLogLevelRequest::SCHEMA,
+            Self::RegenerateAppApiKey => RegenerateAppApiKeyRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
@@ -412,6 +415,16 @@ pub struct ReceiveUserInfoRequest {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveUserInfoResponse {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RegenerateAppApiKeyRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RegenerateAppApiKeyResponse {
+    pub appApiKey: String,
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SetLogLevelRequest {
@@ -737,6 +750,27 @@ impl From<SetLogLevelError> for CustomError {
             SetLogLevelError::InvalidLogLevel => CustomError::new(EnumErrorCode::BadRequest)
                 .with_message("Failed to set log level")
                 .with_kind("InvalidLogLevel"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum RegenerateAppApiKeyError {
+    /// App not found
+    AppNotFound,
+    /// Failed to regenerate app API key
+    InternalError,
+}
+
+impl From<RegenerateAppApiKeyError> for CustomError {
+    fn from(err: RegenerateAppApiKeyError) -> Self {
+        match err {
+            RegenerateAppApiKeyError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            RegenerateAppApiKeyError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to regenerate app API key")
+                .with_kind("InternalError"),
         }
     }
 }
@@ -1710,6 +1744,69 @@ impl WsRequest for SetLogLevelRequest {
 }
 impl WsResponse for SetLogLevelResponse {
     type Request = SetLogLevelRequest;
+}
+
+impl WsRequest for RegenerateAppApiKeyRequest {
+    type Response = RegenerateAppApiKeyResponse;
+    const METHOD_ID: u32 = 119;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "RegenerateAppApiKey",
+  "code": 119,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "appApiKey",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Replace an application's callback API key and return the new key once",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to regenerate app API key",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for RegenerateAppApiKeyResponse {
+    type Request = RegenerateAppApiKeyRequest;
 }
 
 impl WsRequest for ApiKeyConnectRequest {

@@ -16,8 +16,12 @@ Provides:
 Add to your `Cargo.toml`:
 
 ```toml
-honey_id-types = "1.3.4"
+honey_id-types = "=2.1.0-alpha1"
 ```
+
+This alpha uses WorkTable 1.9.0-alpha1 and endpoint-libs 2.0.0. Consumers
+must use those compatible versions together. Its authentication-token table
+is in memory; this crate does not migrate any application's persisted stores.
 
 Endpoint request/response types are organized by category under `endpoints`:
 

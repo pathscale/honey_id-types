@@ -37,7 +37,8 @@ use honey_id_types::HoneyIdConfig;
 
 let config = HoneyIdConfig {
     addr: "wss://api.honey.id:443".parse()?,
-    app_public_id: my_app_uuid,
+    // A 16-character base62 Nanoid issued when the application is registered.
+    app_public_id: my_app_public_id,
     auth_api_key: my_api_key,
     admin_pub_id: None,
 };

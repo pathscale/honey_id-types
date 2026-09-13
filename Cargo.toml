@@ -1,6 +1,6 @@
 [package]
 name = "honey_id-types"
-version = "2.1.0"
+version = "2.1.1"
 edition = "2024"
 authors = [
     "Maxim Volkov <https://github.com/Handy-caT>",
@@ -42,5 +42,5 @@ url = { version = "2.5.8", features = ["serde"] }
 uuid = { version = "1.8", features = ["v4", "serde"] }
 psc-nanoid = { version = "3.1.0", features = ["serde", "packed", "rkyv"] }
 tracing = "0.1.44"
-worktable = "^1.9.0-alpha1"
+worktable = "^1.9.0-beta1"
 rkyv = { version = "0.8.9", features = ["uuid-1"] }

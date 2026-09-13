@@ -16,10 +16,10 @@ Provides:
 Add to your `Cargo.toml`:
 
 ```toml
-honey_id-types = "^2.1"
+honey_id-types = "^2"
 ```
 
-This release uses WorkTable 1.9.0-beta1 and endpoint-libs 2.0.0. Consumers
+This release uses WorkTable 1.9.0-beta1 and endpoint-libs 2.x. Consumers
 must use those compatible versions together. Its authentication-token table
 is in memory; this crate does not migrate any application's persisted stores.
 
@@ -75,8 +75,8 @@ Endpoint types are generated from `.ron` schema files using `endpoint-gen`. To a
 
 `honey_id-types` re-exports `endpoint-libs` request and response traits. Use the
 `endpoint-libs` version declared by the selected `honey_id-types` release and ensure
-the application resolves only one copy. `honey_id-types 2.1.x` uses
-`endpoint-libs 2.0.0`.
+the application resolves only one copy. `honey_id-types 2.1.x` accepts the
+compatible endpoint-libs 2.x release line.
 
 `endpoint-gen` is needed only when regenerating the checked-in endpoint model from
 the RON schemas. Consumers of this crate do not need it.

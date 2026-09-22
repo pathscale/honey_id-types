@@ -8,11 +8,10 @@
 
 use async_trait::async_trait;
 use eyre::eyre;
-use uuid::Uuid;
 use worktable::prelude::*;
 use worktable::worktable;
 
-use crate::types::id_entities::UserPublicId;
+use crate::types::id_entities::{AuthToken, UserPublicId};
 
 /// Describes the API of [`TokenStorage`], which simplifies and abstracts the storage and validation
 /// of tokens sent from Auth to App BEs.
@@ -20,10 +19,10 @@ use crate::types::id_entities::UserPublicId;
 pub trait TokenStorage {
     /// Stores received `token` which belongs to `User` with provided
     /// [`UserPublicId`].
-    async fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()>;
+    async fn store_token(&self, user_pub_id: UserPublicId, token: AuthToken) -> eyre::Result<()>;
     /// Validates provided `token` and returns User internal ID: u64, and [`UserPublicId`] if `token` is
     /// valid. Errors otherwise.
-    async fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId>;
+    async fn validate_token(&self, token: AuthToken) -> eyre::Result<UserPublicId>;
     /// Remove all tokens associated with a user.
     async fn remove_tokens_for_user(&self, user_pub_id: UserPublicId) -> eyre::Result<()>;
 }
@@ -34,7 +33,7 @@ worktable!(
     columns: {
         id: u64 primary_key autoincrement,
         public_id: UserPublicId,
-        token: Uuid,
+        token: AuthToken,
     },
     indexes: {
         public_id_idx: public_id using worktables_index,
@@ -53,7 +52,7 @@ pub struct TokenWorkTableStorage(TokenWorkTable);
 
 #[async_trait]
 impl TokenStorage for TokenWorkTableStorage {
-    async fn store_token(&self, user_pub_id: UserPublicId, token: Uuid) -> eyre::Result<()> {
+    async fn store_token(&self, user_pub_id: UserPublicId, token: AuthToken) -> eyre::Result<()> {
         self.0
             .insert(TokenRow {
                 id: self.0.get_next_pk().into(),
@@ -64,7 +63,7 @@ impl TokenStorage for TokenWorkTableStorage {
         Ok(())
     }
 
-    async fn validate_token(&self, token: Uuid) -> eyre::Result<UserPublicId> {
+    async fn validate_token(&self, token: AuthToken) -> eyre::Result<UserPublicId> {
         let entry = self.0.select_by_token(token).ok_or_else(|| eyre!("token not found"))?;
         Ok(entry.public_id)
     }

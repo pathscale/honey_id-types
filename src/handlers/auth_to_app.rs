@@ -7,7 +7,6 @@ use endpoint_libs::libs::toolbox::{ArcToolbox, CustomError, RequestContext};
 use endpoint_libs::libs::ws::{SubAuthController, WsConnection};
 use futures::FutureExt;
 use futures::future::LocalBoxFuture;
-use uuid::Uuid;
 
 use crate::client::{ApiKeyError, HoneyIdClient};
 use crate::endpoints::callback::{
@@ -18,6 +17,7 @@ use crate::endpoints::callback::{
 use crate::endpoints::connect::{HoneyApiKeyConnectError, HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
 use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
+use crate::id_entities::AuthToken;
 use crate::types::id_entities::UserPublicId;
 
 pub struct MethodApiKeyConnect {
@@ -70,7 +70,9 @@ impl RequestHandler for MethodReceiveToken {
     type Error = HoneyReceiveTokenError;
 
     async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
-        let token = uuid::Uuid::parse_str(&req.token)
+        let token = req
+            .token
+            .parse::<AuthToken>()
             .map_err(|_| HandlerError::Public(HoneyReceiveTokenError::InvalidToken))?;
         let user_pub_id = UserPublicId::from(req.userPubId);
 
@@ -117,7 +119,8 @@ impl RequestHandler for MethodReceiveUserInfo {
             self.token_storage
                 .store_token(
                     user_pub_id,
-                    Uuid::try_parse(&token)
+                    token
+                        .parse::<AuthToken>()
                         .map_err(|_| HandlerError::Public(HoneyReceiveUserInfoError::InvalidToken))?,
                 )
                 .await
@@ -168,8 +171,10 @@ impl RequestHandler for MethodValidateToken {
     type Error = HoneyValidateTokenError;
 
     async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
-        let token =
-            Uuid::parse_str(&req.token).map_err(|_| HandlerError::Public(HoneyValidateTokenError::InvalidToken))?;
+        let token = req
+            .token
+            .parse::<AuthToken>()
+            .map_err(|_| HandlerError::Public(HoneyValidateTokenError::InvalidToken))?;
 
         match self.token_storage.validate_token(token).await {
             Ok(user_pub_id) => Ok(HoneyValidateTokenResponse {

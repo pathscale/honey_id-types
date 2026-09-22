@@ -2,6 +2,7 @@
 //! without duplicating the common auth infrastructure.
 
 use crate::enums::HoneyErrorCode;
+use crate::id_entities::AuthToken;
 use std::future::Future;
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -15,7 +16,6 @@ use futures::FutureExt;
 use futures::future::LocalBoxFuture;
 use serde::de::DeserializeOwned;
 use tracing;
-use uuid::Uuid;
 
 use super::token_management::TokenStorage;
 use super::user_management::UserStorage;
@@ -198,7 +198,9 @@ where
         conn: Arc<WsConnection>,
     ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         async move {
-            let token = Uuid::parse_str(req.get_access_token())
+            let token = req
+                .get_access_token()
+                .parse::<AuthToken>()
                 .map_err(|_| CustomError::new(HoneyErrorCode::Unauthorized).with_message("Wrong accessToken"))?;
 
             let Ok(user_pub_id) = self.token_storage.validate_token(token).await else {

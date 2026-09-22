@@ -1,3 +1,4 @@
+use nagoya::reactor::Handle;
 use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use secrecy::ExposeSecret;
 use url::Url;
@@ -49,8 +50,8 @@ impl HoneyIdClient {
 
     // TODOVEON: signup call for use in API
 
-    pub async fn sign_in(&self, username: &str, password: &str) -> HoneyIdResult<String> {
-        let (_username_response, mut session_conn) = self.submit_username(username).await?;
+    pub async fn sign_in(&self, username: &str, password: &str, handle: &Handle) -> HoneyIdResult<String> {
+        let (_username_response, mut session_conn) = self.submit_username(username, handle).await?;
 
         // TODO: Check expires at timestamp, not really necessary though
         let submit_password_return = self.submit_password(&mut session_conn, password).await?;
@@ -70,8 +71,9 @@ impl HoneyIdClient {
     pub async fn submit_username(
         &self,
         username: &str,
+        handle: &Handle,
     ) -> HoneyIdResult<(HoneySubmitUsernameResponse, HoneyIdConnection)> {
-        let mut conn = self.connect_public().await?;
+        let mut conn = self.connect_public(handle).await?;
 
         conn.send_request(
             HoneyEndpointMethodCode::SubmitUsername,
@@ -106,14 +108,14 @@ impl HoneyIdClient {
         HoneyIdResult::Ok(response)
     }
 
-    pub async fn raw_connect(addr: &Url, header: &str) -> HoneyIdResult<HoneyIdConnection> {
-        HoneyIdConnection::connect(addr, Some(header)).await
+    pub async fn raw_connect(addr: &Url, header: &str, handle: &Handle) -> HoneyIdResult<HoneyIdConnection> {
+        HoneyIdConnection::connect(addr, Some(header), handle).await
     }
 
-    pub async fn connect_public(&self) -> HoneyIdResult<HoneyIdConnection> {
+    pub async fn connect_public(&self, handle: &Handle) -> HoneyIdResult<HoneyIdConnection> {
         let auth_endpoint_name = HoneyEndpointMethodCode::PublicConnect.schema().name.to_lowercase();
         let header = format!("0{auth_endpoint_name}");
 
-        Self::raw_connect(&self.config.addr, &header).await
+        Self::raw_connect(&self.config.addr, &header, handle).await
     }
 }

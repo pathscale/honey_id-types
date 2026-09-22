@@ -8,7 +8,6 @@ use rkyv::Archive;
 use serde::*;
 use std::net::IpAddr;
 use strum_macros::{Display, EnumString};
-use uuid::Uuid;
 use worktable::prelude::*;
 
 #[derive(

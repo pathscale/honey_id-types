@@ -1,5 +1,6 @@
 use endpoint_libs::libs::ws::{WsClient, WsClientBuilder, WsResponseGeneric, WsVersionMode};
 use eyre::bail;
+use nagoya::reactor::Handle;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -17,11 +18,20 @@ impl std::fmt::Debug for HoneyIdConnection {
 }
 
 impl HoneyIdConnection {
-    pub async fn connect(addr: &Url, auth: Option<&str>) -> HoneyIdResult<HoneyIdConnection> {
+    /// Connect on the reactor `handle` names.
+    ///
+    /// The handle is a parameter because a nagoya socket belongs to exactly one
+    /// reactor and makes progress only while *that* reactor is polled. There is
+    /// no ambient current-reactor to fall back on, by design, so the caller has
+    /// to say which one it will await this connection on.
+    pub async fn connect(addr: &Url, auth: Option<&str>, handle: &Handle) -> HoneyIdResult<HoneyIdConnection> {
         let (client, _) = WsClientBuilder::new()
-            .mode(WsVersionMode::Auto)
+            // `Auto` and `Http2Only` are deprecated aliases for this: endpoint-libs 3
+            // dropped HTTP/2 extended CONNECT, so HTTP/1.1 upgrade is the only handshake
+            // left. Naming it directly says what happens on the wire.
+            .mode(WsVersionMode::Http1Only)
             .protocol_header(auth.unwrap_or(""))
-            .build(addr.as_str())
+            .build(addr.as_str(), handle)
             .await?;
         Ok(HoneyIdConnection { client })
     }

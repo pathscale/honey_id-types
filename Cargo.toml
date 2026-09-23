@@ -20,8 +20,8 @@ derive_more = { version = "^2.1.1", features = [
     "into",
 ] }
 # endpoint-libs = { path = "../endpoint-libs", features = ["ws", "ws-client"] }
-endpoint-libs = { version = "^3.3", features = ["ws", "ws-client"] }
-nagoya = { version = "^0.1.12", features = ["reactor"] }
+endpoint-libs = { version = "^3.2", features = ["ws", "ws-client"] }
+nagoya = { version = "^0.1", features = ["reactor"] }
 
 eyre = "^0.6.12"
 futures = "^0.3.31"

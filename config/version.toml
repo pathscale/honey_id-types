@@ -1,5 +1,5 @@
 [binary]
-version = "1.6.1"
+version = "1.14.0"
 
 [libs]
-version = "1.8.2"
+version = "3.3.2"

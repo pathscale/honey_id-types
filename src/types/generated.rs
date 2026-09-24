@@ -147,6 +147,7 @@ pub enum EnumEndpoint {
     SetLogLevel = 118,
     ///
     RegenerateAppApiKey = 119,
+    GetUserSecurity = 120,
     ///
     ApiKeyConnect = 200,
     ///
@@ -178,6 +179,7 @@ impl EnumEndpoint {
             Self::GetAppSecurityRules => GetAppSecurityRulesRequest::SCHEMA,
             Self::SetLogLevel => SetLogLevelRequest::SCHEMA,
             Self::RegenerateAppApiKey => RegenerateAppApiKeyRequest::SCHEMA,
+            Self::GetUserSecurity => GetUserSecurityRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
@@ -423,6 +425,19 @@ pub struct RegenerateAppApiKeyRequest {
 #[serde(rename_all = "camelCase")]
 pub struct RegenerateAppApiKeyResponse {
     pub appApiKey: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUserSecurityRequest {
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUserSecurityResponse {
+    pub totpEnabled: bool,
+    #[serde(default)]
+    pub telegramUsername: Option<String>,
+    pub telegramConfirmed: bool,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -770,6 +785,22 @@ impl From<RegenerateAppApiKeyError> for CustomError {
             RegenerateAppApiKeyError::InternalError => CustomError::new(EnumErrorCode::InternalError)
                 .with_message("Failed to regenerate app API key")
                 .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum GetUserSecurityError {
+    /// User not found
+    UserNotFound,
+}
+
+impl From<GetUserSecurityError> for CustomError {
+    fn from(err: GetUserSecurityError) -> Self {
+        match err {
+            GetUserSecurityError::UserNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("User not found")
+                .with_kind("UserNotFound"),
         }
     }
 }
@@ -1806,6 +1837,66 @@ impl WsRequest for RegenerateAppApiKeyRequest {
 }
 impl WsResponse for RegenerateAppApiKeyResponse {
     type Request = RegenerateAppApiKeyRequest;
+}
+
+impl WsRequest for GetUserSecurityRequest {
+    type Response = GetUserSecurityResponse;
+    const METHOD_ID: u32 = 120;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "GetUserSecurity",
+  "code": 120,
+  "parameters": [
+    {
+      "name": "userPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "totpEnabled",
+      "ty": "Boolean"
+    },
+    {
+      "name": "telegramUsername",
+      "ty": {
+        "Optional": "String"
+      }
+    },
+    {
+      "name": "telegramConfirmed",
+      "ty": "Boolean"
+    }
+  ],
+  "stream_response": null,
+  "description": "A user's second factors: whether an authenticator app is enrolled, and the Telegram account bound for recovery, if any",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "UserNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "User not found",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for GetUserSecurityResponse {
+    type Request = GetUserSecurityRequest;
 }
 
 impl WsRequest for ApiKeyConnectRequest {

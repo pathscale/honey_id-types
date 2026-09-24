@@ -600,7 +600,7 @@
       "endpoints": [
         {
           "code": 201,
-          "description": "",
+          "description": "A user connects to an app with the access token auth issued them.",
           "errors": [
             {
               "code": {

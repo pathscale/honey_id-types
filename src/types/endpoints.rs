@@ -51,6 +51,7 @@ pub mod platform {
     pub use crate::types::generated::{
         GetAppSecurityRulesError, GetAppSecurityRulesRequest, GetAppSecurityRulesResponse,
     };
+    pub use crate::types::generated::{GetUserSecurityError, GetUserSecurityRequest, GetUserSecurityResponse};
     pub use crate::types::generated::{PlatformConnectError, PlatformConnectRequest, PlatformConnectResponse};
     pub use crate::types::generated::{
         RegenerateAppApiKeyError, RegenerateAppApiKeyRequest, RegenerateAppApiKeyResponse,
@@ -65,6 +66,7 @@ pub mod platform {
         pub use crate::types::generated::EnumEndpoint::DeleteUser;
         pub use crate::types::generated::EnumEndpoint::EditAppConfig;
         pub use crate::types::generated::EnumEndpoint::GetAppSecurityRules;
+        pub use crate::types::generated::EnumEndpoint::GetUserSecurity;
         pub use crate::types::generated::EnumEndpoint::PlatformConnect;
         pub use crate::types::generated::EnumEndpoint::RegenerateAppApiKey;
         pub use crate::types::generated::EnumEndpoint::SetLogLevel;

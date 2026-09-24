@@ -64,14 +64,15 @@ ID: 11
 |117|GetAppSecurityRules|`appPublicId: Nanoid<16, Base62Alphabet>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Get security rules contained within current app's configuration|false|AppNotFound(ErrorCode::NotFound)|
 |118|SetLogLevel|`logLevel: Option<LogLevel>`|`logLevel: LogLevel`|Set log level at runtime|false|InvalidLogLevel(ErrorCode::BadRequest)|
 |119|RegenerateAppApiKey|`appPublicId: Nanoid<16, Base62Alphabet>`|`appApiKey: String`|Replace an application's callback API key and return the new key once|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
+|120|GetUserSecurity|`userPublicId: Nanoid<16, Base62Alphabet>`|`totpEnabled: bool`, `telegramUsername: Option<String>`, `telegramConfirmed: bool`|A user's second factors: whether an authenticator app is enrolled, and the Telegram account bound for recovery, if any|false|UserNotFound(ErrorCode::NotFound)|
 
 ## authEndpoints Server
 ID: 20
 ### Endpoints
 |Code|Name|Parameters|Response|Description|FE Facing|Errors|
 |-----------|-----------|----------|--------|-----------|-----------|-----------|
-|200|ApiKeyConnect|`appApiKey: String`|||false|InvalidApiKey(ErrorCode::Unauthorized)|
-|201|AuthorizedConnect|`accessToken: String`|||true|InvalidAccessToken(ErrorCode::Unauthorized)|
+|200|ApiKeyConnect|`appApiKey: String`||Auth connects to an app, presenting the app API key the app was issued, so the app can accept its callbacks.|false|InvalidApiKey(ErrorCode::Unauthorized)|
+|201|AuthorizedConnect|`accessToken: String`||A user connects to an app with the access token auth issued them.|true|InvalidAccessToken(ErrorCode::Unauthorized)|
 
 ## beCallbackApi Server
 ID: 21

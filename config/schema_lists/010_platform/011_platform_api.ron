@@ -221,6 +221,30 @@ Config(
                     ],
                 )
             ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "GetUserSecurity",
+                    code: 120,
+                    parameters: [
+                        Field(name: "userPublicId", ty: NanoId(len: 16)),
+                    ],
+                    returns: [
+                        Field(name: "totpEnabled", ty: Boolean),
+                        Field(name: "telegramUsername", ty: Optional(String)),
+                        Field(name: "telegramConfirmed", ty: Boolean),
+                    ],
+                    stream_response: None,
+                    description: "A user's second factors: whether an authenticator app is enrolled, and the Telegram account bound for recovery, if any",
+                    json_schema: (),
+                    roles: [
+                        "UserRole::Platform",
+                    ],
+                    errors: [
+                        EndpointErrorSchema(name: "UserNotFound", code: "ErrorCode::NotFound", message: "User not found", fields: []),
+                    ],
+                )
+            ),
         ]
     )
 )

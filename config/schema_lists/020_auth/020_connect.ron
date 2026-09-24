@@ -19,7 +19,7 @@ Config(
                     ],
                     returns: [],
                     stream_response: None,
-                    description: "",
+                    description: "Auth connects to an app, presenting the app API key the app was issued, so the app can accept its callbacks.",
                     json_schema: (),
                     roles: [
                         "UserRole::Public",
@@ -43,7 +43,7 @@ Config(
                     ],
                     returns: [],
                     stream_response: None,
-                    description: "",
+                    description: "A user connects to an app with the access token auth issued them.",
                     json_schema: (),
                     roles: [
                         "UserRole::Public",

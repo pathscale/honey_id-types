@@ -1,0 +1,130 @@
+{
+  "tools": [
+    {
+      "code": 210,
+      "description": "Backend receives auth tokens, happens after login",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "userPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "username",
+          "userPubId"
+        ],
+        "type": "object"
+      },
+      "name": "receive_token"
+    },
+    {
+      "code": 211,
+      "description": "Backend receives user info with optional token, happens after new user signs up. Platform app also receives this so that it can maintain records of app users, in which case Token will be set to None",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "appPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "userPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userPubId",
+          "username"
+        ],
+        "type": "object"
+      },
+      "name": "receive_user_info"
+    },
+    {
+      "code": 212,
+      "description": "Backend receives notification when a user is deleted or banned. App should clean up all user data and invalidate tokens.",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "appPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "userPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userPubId"
+        ],
+        "type": "object"
+      },
+      "name": "receive_user_deleted"
+    },
+    {
+      "code": 213,
+      "description": "App validates an existing token and returns whether it is valid along with the associated userPubId",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "name": "validate_token",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "userPubId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "valid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valid"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}

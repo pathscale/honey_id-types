@@ -19,7 +19,7 @@ Config(
                     ],
                     returns: [],
                     stream_response: None,
-                    description: "Auth connects to an app, presenting the app API key the app was issued, so the app can accept its callbacks.",
+                    description: "Authenticates Honey Auth callbacks using the app's separate callback credential",
                     json_schema: (),
                     roles: [
                         "UserRole::Public",

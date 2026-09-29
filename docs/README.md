@@ -4,6 +4,7 @@
 ## Structs/Datamodels
 
 ```rust
+struct AppKeyInfo{ keyId: String, label: String, createdAt: i64, lastUsedAt: Option<i64>, expiresAt: Option<i64>, revokedAt: Option<i64> }
 
 ```
 ---
@@ -55,7 +56,7 @@ ID: 11
 ### Endpoints
 |Code|Name|Parameters|Response|Description|FE Facing|Errors|
 |-----------|-----------|----------|--------|-----------|-----------|-----------|
-|111|CreateAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`|`appPublicId: Nanoid<16, Base62Alphabet>`, `createdAt: i64`, `appApiKey: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Platform can create new apps|false|InternalError(ErrorCode::InternalError)|
+|111|CreateAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`|`appPublicId: Nanoid<16, Base62Alphabet>`, `createdAt: i64`, `appApiKey: String`, `callbackApiKey: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Platform creates an app and returns its app key and separate callback credential once|false|InternalError(ErrorCode::InternalError)|
 |112|BanUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `appPublicId: Nanoid<16, Base62Alphabet>`||Ban a user from provided app|false|UserNotFound(ErrorCode::NotFound), AppNotFound(ErrorCode::NotFound), MembershipNotFound(ErrorCode::NotFound)|
 |113|UnbanUser|`userPublicId: Nanoid<16, Base62Alphabet>`, `appPublicId: Nanoid<16, Base62Alphabet>`||Unban a user from a specific app|false|UserNotFound(ErrorCode::NotFound), AppNotFound(ErrorCode::NotFound), MembershipNotFound(ErrorCode::NotFound)|
 |114|DeleteUser|`appPublicId: Nanoid<16, Base62Alphabet>`, `userPublicId: Nanoid<16, Base62Alphabet>`||Delete a user|false|InternalError(ErrorCode::InternalError)|
@@ -63,15 +64,21 @@ ID: 11
 |116|EditAppConfig|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: Option<String>`, `minPasswordLength: Option<i32>`, `requiredPasswordChars: Option<String>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `callBackUrl: String`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Edit app configuration|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
 |117|GetAppSecurityRules|`appPublicId: Nanoid<16, Base62Alphabet>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `minPasswordLength: i32`, `requiredPasswordChars: String`|Get security rules contained within current app's configuration|false|AppNotFound(ErrorCode::NotFound)|
 |118|SetLogLevel|`logLevel: Option<LogLevel>`|`logLevel: LogLevel`|Set log level at runtime|false|InvalidLogLevel(ErrorCode::BadRequest)|
-|119|RegenerateAppApiKey|`appPublicId: Nanoid<16, Base62Alphabet>`|`appApiKey: String`|Replace an application's callback API key and return the new key once|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
+|119|RegenerateAppApiKey|`appPublicId: Nanoid<16, Base62Alphabet>`|`appApiKey: String`|Compatibility rotation: creates a new app key and immediately revokes every other app key|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
 |120|GetUserSecurity|`userPublicId: Nanoid<16, Base62Alphabet>`|`totpEnabled: bool`, `telegramUsername: Option<String>`, `telegramConfirmed: bool`|A user's second factors: whether an authenticator app is enrolled, and the Telegram account bound for recovery, if any|false|UserNotFound(ErrorCode::NotFound)|
+|121|CreateAppKey|`appPublicId: Nanoid<16, Base62Alphabet>`, `label: String`, `expiresInSecs: Option<i64>`, `createdBy: String`|`keyId: String`, `key: String`, `label: String`|Creates a hashed app key and returns its key string once|false|AppNotFound(ErrorCode::NotFound), InvalidKeyRequest(ErrorCode::BadRequest), InternalError(ErrorCode::InternalError)|
+|122|ListAppKeys|`appPublicId: Nanoid<16, Base62Alphabet>`|`keys: Vec<AppKeyInfo>`|Lists app key metadata without secrets or hashes|false|AppNotFound(ErrorCode::NotFound)|
+|123|RevokeAppKey|`appPublicId: Nanoid<16, Base62Alphabet>`, `keyId: String`, `graceSecs: i64`|`keyId: String`, `expiresAt: Option<i64>`, `revokedAt: Option<i64>`|Revokes an app key now or schedules its expiry after a grace period|false|AppNotFound(ErrorCode::NotFound), InvalidGracePeriod(ErrorCode::BadRequest), InternalError(ErrorCode::InternalError)|
+|124|RegenerateAppCallbackCredential|`appPublicId: Nanoid<16, Base62Alphabet>`|`appPublicId: Nanoid<16, Base62Alphabet>`, `callbackApiKey: String`|Creates and returns a separate callback credential once|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
+|125|InspectAppCredential|`appPublicId: Nanoid<16, Base62Alphabet>`, `appKey: String`|`appPublicId: Nanoid<16, Base62Alphabet>`, `keyId: String`, `service: bool`, `expiresAt: Option<i64>`, `revokedAt: Option<i64>`|Proves an app credential and returns its key status metadata to the trusted API backend|false|AppNotService(ErrorCode::Forbidden), InvalidCredential(ErrorCode::Unauthorized), InternalError(ErrorCode::InternalError)|
+|126|SetAppService|`appPublicId: Nanoid<16, Base62Alphabet>`, `service: bool`|`service: bool`|Sets whether an app may act as a service verifier client|false|AppNotFound(ErrorCode::NotFound), InternalError(ErrorCode::InternalError)|
 
 ## authEndpoints Server
 ID: 20
 ### Endpoints
 |Code|Name|Parameters|Response|Description|FE Facing|Errors|
 |-----------|-----------|----------|--------|-----------|-----------|-----------|
-|200|ApiKeyConnect|`appApiKey: String`||Auth connects to an app, presenting the app API key the app was issued, so the app can accept its callbacks.|false|InvalidApiKey(ErrorCode::Unauthorized)|
+|200|ApiKeyConnect|`appApiKey: String`||Authenticates Honey Auth callbacks using the app's separate callback credential|false|InvalidApiKey(ErrorCode::Unauthorized)|
 |201|AuthorizedConnect|`accessToken: String`||A user connects to an app with the access token auth issued them.|true|InvalidAccessToken(ErrorCode::Unauthorized)|
 
 ## beCallbackApi Server

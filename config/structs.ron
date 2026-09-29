@@ -1,0 +1,22 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+Config(
+    definition: StructList(
+        struct_elements: [
+            StructElement(
+                inner: Struct(
+                    name: "AppKeyInfo",
+                    fields: [
+                        Field(name: "keyId", ty: String),
+                        Field(name: "label", ty: String),
+                        Field(name: "createdAt", ty: Int64),
+                        Field(name: "lastUsedAt", ty: Optional(Int64)),
+                        Field(name: "expiresAt", ty: Optional(Int64)),
+                        Field(name: "revokedAt", ty: Optional(Int64)),
+                    ],
+                ),
+            ),
+        ],
+    ),
+)

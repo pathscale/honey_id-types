@@ -1,0 +1,16 @@
+{
+  "tools": [
+    {
+      "code": 0,
+      "description": "Initiates a websocket connection session with that permits access to endpoints with the UserRole::Public role",
+      "frontendFacing": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "public_connect"
+    }
+  ]
+}

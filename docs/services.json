@@ -635,5 +635,43 @@
       "name": "authEndpoints"
     }
   ],
-  "structs": []
+  "structs": [
+    {
+      "Struct": {
+        "fields": [
+          {
+            "name": "keyId",
+            "ty": "String"
+          },
+          {
+            "name": "label",
+            "ty": "String"
+          },
+          {
+            "name": "createdAt",
+            "ty": "Int64"
+          },
+          {
+            "name": "lastUsedAt",
+            "ty": {
+              "Optional": "Int64"
+            }
+          },
+          {
+            "name": "expiresAt",
+            "ty": {
+              "Optional": "Int64"
+            }
+          },
+          {
+            "name": "revokedAt",
+            "ty": {
+              "Optional": "Int64"
+            }
+          }
+        ],
+        "name": "AppKeyInfo"
+      }
+    }
+  ]
 }

@@ -1,0 +1,22 @@
+{
+  "tools": [
+    {
+      "code": 100,
+      "description": "Handles platform API Key login to initiate the connection session between Honey API Backend and this server",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "platformApiKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "platformApiKey"
+        ],
+        "type": "object"
+      },
+      "name": "platform_connect"
+    }
+  ]
+}

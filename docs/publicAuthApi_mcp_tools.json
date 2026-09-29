@@ -1,0 +1,120 @@
+{
+  "tools": [
+    {
+      "code": 10,
+      "description": "Frontend creates new user account.",
+      "frontendFacing": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "appPublicId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appPublicId",
+          "username",
+          "password"
+        ],
+        "type": "object"
+      },
+      "name": "signup",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "encryptionKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "encryptionKey"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "code": 12,
+      "description": "Step 1: Frontend submits username during auth flow.",
+      "frontendFacing": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "appPublicId": {
+            "maxLength": 16,
+            "minLength": 16,
+            "pattern": "^[0-9A-Za-z]+$",
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appPublicId",
+          "username"
+        ],
+        "type": "object"
+      },
+      "name": "submit_username",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "expiresAt": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expiresAt"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "code": 13,
+      "description": "Step 2: Frontend submits password to complete HoneyAuth login. Session is per connection. Returns tokens and token metadata.",
+      "frontendFacing": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password"
+        ],
+        "type": "object"
+      },
+      "name": "submit_password",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "encryptionKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "encryptionKey"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}

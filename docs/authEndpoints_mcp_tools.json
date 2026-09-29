@@ -1,0 +1,40 @@
+{
+  "tools": [
+    {
+      "code": 200,
+      "description": "Authenticates Honey Auth callbacks using the app's separate callback credential",
+      "frontendFacing": false,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "appApiKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "appApiKey"
+        ],
+        "type": "object"
+      },
+      "name": "api_key_connect"
+    },
+    {
+      "code": 201,
+      "description": "A user connects to an app with the access token auth issued them.",
+      "frontendFacing": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken"
+        ],
+        "type": "object"
+      },
+      "name": "authorized_connect"
+    }
+  ]
+}

@@ -19,11 +19,12 @@ Config(
                         Field(name: "appPublicId", ty: NanoId(len: 16)),
                         Field(name: "createdAt", ty: Int64),
                         Field(name: "appApiKey", ty: String),
+                        Field(name: "callbackApiKey", ty: String),
                         Field(name: "minPasswordLength", ty: Int32),
                         Field(name: "requiredPasswordChars", ty: String),
                     ],
                     stream_response: None,
-                    description: "Platform can create new apps",
+                    description: "Platform creates an app and returns its app key and separate callback credential once",
                     json_schema: (),
                     roles: [
                         "UserRole::Platform",
@@ -188,7 +189,7 @@ Config(
                         Field(name: "appApiKey", ty: String),
                     ],
                     stream_response: None,
-                    description: "Replace an application's callback API key and return the new key once",
+                    description: "Compatibility rotation: creates a new app key and immediately revokes every other app key",
                     json_schema: (),
                     roles: [
                         "UserRole::Platform",
@@ -244,6 +245,142 @@ Config(
                         EndpointErrorSchema(name: "UserNotFound", code: "ErrorCode::NotFound", message: "User not found", fields: []),
                     ],
                 )
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "CreateAppKey",
+                    code: 121,
+                    parameters: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "label", ty: String),
+                        Field(name: "expiresInSecs", ty: Optional(Int64)),
+                        Field(name: "createdBy", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "keyId", ty: String),
+                        Field(name: "key", ty: String),
+                        Field(name: "label", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Creates a hashed app key and returns its key string once",
+                    json_schema: (),
+                    roles: ["UserRole::Platform"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "InvalidKeyRequest", code: "ErrorCode::BadRequest", message: "Invalid app key label or expiry", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to create app key", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ListAppKeys",
+                    code: 122,
+                    parameters: [Field(name: "appPublicId", ty: NanoId(len: 16))],
+                    returns: [Field(name: "keys", ty: StructTable(struct_ref: "AppKeyInfo"))],
+                    stream_response: None,
+                    description: "Lists app key metadata without secrets or hashes",
+                    json_schema: (),
+                    roles: ["UserRole::Platform"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "RevokeAppKey",
+                    code: 123,
+                    parameters: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "keyId", ty: String),
+                        Field(name: "graceSecs", ty: Int64),
+                    ],
+                    returns: [
+                        Field(name: "keyId", ty: String),
+                        Field(name: "expiresAt", ty: Optional(Int64)),
+                        Field(name: "revokedAt", ty: Optional(Int64)),
+                    ],
+                    stream_response: None,
+                    description: "Revokes an app key now or schedules its expiry after a grace period",
+                    json_schema: (),
+                    roles: ["UserRole::Platform"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App or app key not found", fields: []),
+                        EndpointErrorSchema(name: "InvalidGracePeriod", code: "ErrorCode::BadRequest", message: "Grace period must be non-negative", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to revoke app key", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "RegenerateAppCallbackCredential",
+                    code: 124,
+                    parameters: [Field(name: "appPublicId", ty: NanoId(len: 16))],
+                    returns: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "callbackApiKey", ty: String),
+                    ],
+                    stream_response: None,
+                    description: "Creates and returns a separate callback credential once",
+                    json_schema: (),
+                    roles: ["UserRole::Platform"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to regenerate callback credential", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "InspectAppCredential",
+                    code: 125,
+                    parameters: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "appKey", ty: String),
+                    ],
+                    returns: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "keyId", ty: String),
+                        Field(name: "service", ty: Boolean),
+                        Field(name: "expiresAt", ty: Optional(Int64)),
+                        Field(name: "revokedAt", ty: Optional(Int64)),
+                    ],
+                    stream_response: None,
+                    description: "Proves an app credential and returns its key status metadata to the trusted API backend",
+                    json_schema: (),
+                    roles: ["UserRole::AppApiKey"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotService", code: "ErrorCode::Forbidden", message: "Only service apps may inspect app credentials", fields: []),
+                        EndpointErrorSchema(name: "InvalidCredential", code: "ErrorCode::Unauthorized", message: "Invalid app credential", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to inspect app credential", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "SetAppService",
+                    code: 126,
+                    parameters: [
+                        Field(name: "appPublicId", ty: NanoId(len: 16)),
+                        Field(name: "service", ty: Boolean),
+                    ],
+                    returns: [Field(name: "service", ty: Boolean)],
+                    stream_response: None,
+                    description: "Sets whether an app may act as a service verifier client",
+                    json_schema: (),
+                    roles: ["UserRole::Platform"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "InternalError", code: "ErrorCode::InternalError", message: "Failed to update app service capability", fields: []),
+                    ],
+                ),
             ),
         ]
     )

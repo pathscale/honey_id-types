@@ -3,11 +3,12 @@ use endpoint_libs::libs::types::*;
 use endpoint_libs::libs::ws::toolbox::CustomError;
 use endpoint_libs::libs::ws::*;
 use num_derive::FromPrimitive;
+use serde::*;
+use strum_macros::{Display, EnumString};
+
 use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use rkyv::Archive;
-use serde::*;
 use std::net::IpAddr;
-use strum_macros::{Display, EnumString};
 use worktable::prelude::*;
 
 #[derive(
@@ -115,50 +116,50 @@ pub enum UserStatus {
     Banned = 3,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct AppKeyInfo {
+    pub keyId: String,
+    pub label: String,
+    pub createdAt: i64,
+    #[serde(default)]
+    pub lastUsedAt: Option<i64>,
+    #[serde(default)]
+    pub expiresAt: Option<i64>,
+    #[serde(default)]
+    pub revokedAt: Option<i64>,
+}
+
 #[derive(
     Debug, Clone, Copy, Serialize, Deserialize, FromPrimitive, PartialEq, Eq, PartialOrd, Ord, EnumString, Display, Hash,
 )]
 pub enum EnumEndpoint {
-    ///
     PublicConnect = 0,
-    ///
     Signup = 10,
-    ///
     SubmitUsername = 12,
-    ///
     SubmitPassword = 13,
-    ///
     PlatformConnect = 100,
-    ///
     CreateAppConfig = 111,
-    ///
     BanUser = 112,
-    ///
     UnbanUser = 113,
-    ///
     DeleteUser = 114,
-    ///
     DeleteAppConfig = 115,
-    ///
     EditAppConfig = 116,
-    ///
     GetAppSecurityRules = 117,
-    ///
     SetLogLevel = 118,
-    ///
     RegenerateAppApiKey = 119,
     GetUserSecurity = 120,
-    ///
+    CreateAppKey = 121,
+    ListAppKeys = 122,
+    RevokeAppKey = 123,
+    RegenerateAppCallbackCredential = 124,
+    InspectAppCredential = 125,
+    SetAppService = 126,
     ApiKeyConnect = 200,
-    ///
     AuthorizedConnect = 201,
-    ///
     ReceiveToken = 210,
-    ///
     ReceiveUserInfo = 211,
-    ///
     ReceiveUserDeleted = 212,
-    ///
     ValidateToken = 213,
 }
 
@@ -180,6 +181,12 @@ impl EnumEndpoint {
             Self::SetLogLevel => SetLogLevelRequest::SCHEMA,
             Self::RegenerateAppApiKey => RegenerateAppApiKeyRequest::SCHEMA,
             Self::GetUserSecurity => GetUserSecurityRequest::SCHEMA,
+            Self::CreateAppKey => CreateAppKeyRequest::SCHEMA,
+            Self::ListAppKeys => ListAppKeysRequest::SCHEMA,
+            Self::RevokeAppKey => RevokeAppKeyRequest::SCHEMA,
+            Self::RegenerateAppCallbackCredential => RegenerateAppCallbackCredentialRequest::SCHEMA,
+            Self::InspectAppCredential => InspectAppCredentialRequest::SCHEMA,
+            Self::SetAppService => SetAppServiceRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
             Self::AuthorizedConnect => AuthorizedConnectRequest::SCHEMA,
             Self::ReceiveToken => ReceiveTokenRequest::SCHEMA,
@@ -189,6 +196,370 @@ impl EnumEndpoint {
         };
         serde_json::from_str(schema).unwrap()
     }
+}
+
+/// JSON-serialized shared struct/enum definitions referenced by endpoint schemas.
+pub const TYPE_DEFINITIONS: &'static str = r#"[
+  {
+    "Struct": {
+      "name": "AppKeyInfo",
+      "fields": [
+        {
+          "name": "keyId",
+          "ty": "String"
+        },
+        {
+          "name": "label",
+          "ty": "String"
+        },
+        {
+          "name": "createdAt",
+          "ty": "Int64"
+        },
+        {
+          "name": "lastUsedAt",
+          "ty": {
+            "Optional": "Int64"
+          }
+        },
+        {
+          "name": "expiresAt",
+          "ty": {
+            "Optional": "Int64"
+          }
+        },
+        {
+          "name": "revokedAt",
+          "ty": {
+            "Optional": "Int64"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "Enum": {
+      "name": "LogLevel",
+      "variants": [
+        {
+          "name": "off",
+          "description": "Logging disabled.",
+          "value": 0
+        },
+        {
+          "name": "error",
+          "description": "Error level logging.",
+          "value": 1
+        },
+        {
+          "name": "warn",
+          "description": "Warning level logging.",
+          "value": 2
+        },
+        {
+          "name": "info",
+          "description": "Info level logging.",
+          "value": 3
+        },
+        {
+          "name": "debug",
+          "description": "Debug level logging.",
+          "value": 4
+        },
+        {
+          "name": "trace",
+          "description": "Trace level logging.",
+          "value": 5
+        },
+        {
+          "name": "detail",
+          "description": "Detailed trace logging (no crate filtering).",
+          "value": 6
+        }
+      ]
+    }
+  },
+  {
+    "Enum": {
+      "name": "UserRole",
+      "variants": [
+        {
+          "name": "Public",
+          "description": "Public can only view some data.",
+          "value": 0
+        },
+        {
+          "name": "PlatformAdmin",
+          "description": "Platform admin can do literally everything. Very dangerous role.",
+          "value": 1
+        },
+        {
+          "name": "PlatformSupport",
+          "description": "Platform support can view and manage some staff.",
+          "value": 2
+        },
+        {
+          "name": "AppNewUser",
+          "description": "New user in application, can only create new app or be invited to an app.",
+          "value": 3
+        },
+        {
+          "name": "AppAdmin",
+          "description": "App admin can manage the application, but not the platform.",
+          "value": 4
+        },
+        {
+          "name": "AppSupport",
+          "description": "App support see the application info, but not the platform.",
+          "value": 5
+        },
+        {
+          "name": "AppApiKey",
+          "description": "The role is used for external users only.",
+          "value": 6
+        },
+        {
+          "name": "Platform",
+          "description": "The role is used for platform only.",
+          "value": 7
+        }
+      ]
+    }
+  },
+  {
+    "Enum": {
+      "name": "UserStatus",
+      "variants": [
+        {
+          "name": "enabled",
+          "description": "Active user.",
+          "value": 1
+        },
+        {
+          "name": "disabled",
+          "description": "Inactive user.",
+          "value": 2
+        },
+        {
+          "name": "banned",
+          "description": "Banned user.",
+          "value": 3
+        }
+      ]
+    }
+  },
+  {
+    "Enum": {
+      "name": "ErrorCode",
+      "variants": [
+        {
+          "name": "BadRequest",
+          "description": "Bad request",
+          "value": 100400
+        },
+        {
+          "name": "Unauthorized",
+          "description": "Authentication is required",
+          "value": 100401
+        },
+        {
+          "name": "PaymentRequired",
+          "description": "Payment is required",
+          "value": 100402
+        },
+        {
+          "name": "Forbidden",
+          "description": "Access is forbidden",
+          "value": 100403
+        },
+        {
+          "name": "NotFound",
+          "description": "Resource was not found",
+          "value": 100404
+        },
+        {
+          "name": "MethodNotAllowed",
+          "description": "Method is not allowed",
+          "value": 100405
+        },
+        {
+          "name": "NotAcceptable",
+          "description": "Response format is not acceptable",
+          "value": 100406
+        },
+        {
+          "name": "ProxyAuthenticationRequired",
+          "description": "Proxy authentication is required",
+          "value": 100407
+        },
+        {
+          "name": "RequestTimeout",
+          "description": "Request timed out",
+          "value": 100408
+        },
+        {
+          "name": "Conflict",
+          "description": "Request conflicts with current state",
+          "value": 100409
+        },
+        {
+          "name": "Gone",
+          "description": "Resource is gone",
+          "value": 100410
+        },
+        {
+          "name": "LengthRequired",
+          "description": "Content length is required",
+          "value": 100411
+        },
+        {
+          "name": "PreconditionFailed",
+          "description": "Precondition failed",
+          "value": 100412
+        },
+        {
+          "name": "PayloadTooLarge",
+          "description": "Payload is too large",
+          "value": 100413
+        },
+        {
+          "name": "UriTooLong",
+          "description": "URI is too long",
+          "value": 100414
+        },
+        {
+          "name": "UnsupportedMediaType",
+          "description": "Media type is unsupported",
+          "value": 100415
+        },
+        {
+          "name": "RangeNotSatisfiable",
+          "description": "Requested range cannot be satisfied",
+          "value": 100416
+        },
+        {
+          "name": "ExpectationFailed",
+          "description": "Expectation failed",
+          "value": 100417
+        },
+        {
+          "name": "ImATeapot",
+          "description": "I'm a teapot",
+          "value": 100418
+        },
+        {
+          "name": "MisdirectedRequest",
+          "description": "Request was misdirected",
+          "value": 100421
+        },
+        {
+          "name": "UnprocessableEntity",
+          "description": "Entity could not be processed",
+          "value": 100422
+        },
+        {
+          "name": "Locked",
+          "description": "Resource is locked",
+          "value": 100423
+        },
+        {
+          "name": "FailedDependency",
+          "description": "Dependency failed",
+          "value": 100424
+        },
+        {
+          "name": "UpgradeRequired",
+          "description": "Request must be upgraded",
+          "value": 100426
+        },
+        {
+          "name": "PreconditionRequired",
+          "description": "Precondition is required",
+          "value": 100428
+        },
+        {
+          "name": "TooManyRequests",
+          "description": "Too many requests",
+          "value": 100429
+        },
+        {
+          "name": "RequestHeaderFieldsTooLarge",
+          "description": "Request header fields are too large",
+          "value": 100431
+        },
+        {
+          "name": "UnavailableForLegalReasons",
+          "description": "Unavailable for legal reasons",
+          "value": 100451
+        },
+        {
+          "name": "InternalError",
+          "description": "Internal server error",
+          "value": 100500
+        },
+        {
+          "name": "NotImplemented",
+          "description": "Endpoint is not implemented",
+          "value": 100501
+        },
+        {
+          "name": "BadGateway",
+          "description": "Bad gateway",
+          "value": 100502
+        },
+        {
+          "name": "ServiceUnavailable",
+          "description": "Service is unavailable",
+          "value": 100503
+        },
+        {
+          "name": "GatewayTimeout",
+          "description": "Gateway timed out",
+          "value": 100504
+        },
+        {
+          "name": "HttpVersionNotSupported",
+          "description": "HTTP version is not supported",
+          "value": 100505
+        },
+        {
+          "name": "VariantAlsoNegotiates",
+          "description": "Content negotiation variant problem",
+          "value": 100506
+        },
+        {
+          "name": "InsufficientStorage",
+          "description": "Insufficient storage",
+          "value": 100507
+        },
+        {
+          "name": "LoopDetected",
+          "description": "Loop was detected",
+          "value": 100508
+        },
+        {
+          "name": "NotExtended",
+          "description": "Request must be extended",
+          "value": 100510
+        },
+        {
+          "name": "NetworkAuthenticationRequired",
+          "description": "Network authentication is required",
+          "value": 100511
+        }
+      ]
+    }
+  }
+]"#;
+
+/// Builds the type registry over all shared definitions, for use with
+/// `WebsocketServer::enable_mcp()`.
+pub fn type_registry() -> endpoint_libs::model::TypeRegistry {
+    let types: Vec<endpoint_libs::model::Type> =
+        serde_json::from_str(TYPE_DEFINITIONS).expect("Invalid embedded type definitions");
+    let mut registry = endpoint_libs::model::TypeRegistry::new();
+    registry.add_all(types.iter());
+    registry
 }
 
 #[derive(
@@ -318,8 +689,25 @@ pub struct CreateAppConfigResponse {
     pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub createdAt: i64,
     pub appApiKey: String,
+    pub callbackApiKey: String,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppKeyRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub label: String,
+    #[serde(default)]
+    pub expiresInSecs: Option<i64>,
+    pub createdBy: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateAppKeyResponse {
+    pub keyId: String,
+    pub key: String,
+    pub label: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -368,6 +756,46 @@ pub struct GetAppSecurityRulesResponse {
     pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub minPasswordLength: i32,
     pub requiredPasswordChars: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUserSecurityRequest {
+    pub userPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GetUserSecurityResponse {
+    pub totpEnabled: bool,
+    #[serde(default)]
+    pub telegramUsername: Option<String>,
+    pub telegramConfirmed: bool,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectAppCredentialRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub appKey: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct InspectAppCredentialResponse {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub keyId: String,
+    pub service: bool,
+    #[serde(default)]
+    pub expiresAt: Option<i64>,
+    #[serde(default)]
+    pub revokedAt: Option<i64>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ListAppKeysRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ListAppKeysResponse {
+    pub keys: Vec<AppKeyInfo>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -428,16 +856,41 @@ pub struct RegenerateAppApiKeyResponse {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct GetUserSecurityRequest {
-    pub userPublicId: Nanoid<16, Base62Alphabet>,
+pub struct RegenerateAppCallbackCredentialRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct GetUserSecurityResponse {
-    pub totpEnabled: bool,
+pub struct RegenerateAppCallbackCredentialResponse {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub callbackApiKey: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RevokeAppKeyRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub keyId: String,
+    pub graceSecs: i64,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RevokeAppKeyResponse {
+    pub keyId: String,
     #[serde(default)]
-    pub telegramUsername: Option<String>,
-    pub telegramConfirmed: bool,
+    pub expiresAt: Option<i64>,
+    #[serde(default)]
+    pub revokedAt: Option<i64>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SetAppServiceRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub service: bool,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SetAppServiceResponse {
+    pub service: bool,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -801,6 +1254,142 @@ impl From<GetUserSecurityError> for CustomError {
             GetUserSecurityError::UserNotFound => CustomError::new(EnumErrorCode::NotFound)
                 .with_message("User not found")
                 .with_kind("UserNotFound"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum CreateAppKeyError {
+    /// App not found
+    AppNotFound,
+    /// Invalid app key label or expiry
+    InvalidKeyRequest,
+    /// Failed to create app key
+    InternalError,
+}
+
+impl From<CreateAppKeyError> for CustomError {
+    fn from(err: CreateAppKeyError) -> Self {
+        match err {
+            CreateAppKeyError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            CreateAppKeyError::InvalidKeyRequest => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid app key label or expiry")
+                .with_kind("InvalidKeyRequest"),
+            CreateAppKeyError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to create app key")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum ListAppKeysError {
+    /// App not found
+    AppNotFound,
+}
+
+impl From<ListAppKeysError> for CustomError {
+    fn from(err: ListAppKeysError) -> Self {
+        match err {
+            ListAppKeysError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum RevokeAppKeyError {
+    /// App or app key not found
+    AppNotFound,
+    /// Grace period must be non-negative
+    InvalidGracePeriod,
+    /// Failed to revoke app key
+    InternalError,
+}
+
+impl From<RevokeAppKeyError> for CustomError {
+    fn from(err: RevokeAppKeyError) -> Self {
+        match err {
+            RevokeAppKeyError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App or app key not found")
+                .with_kind("AppNotFound"),
+            RevokeAppKeyError::InvalidGracePeriod => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Grace period must be non-negative")
+                .with_kind("InvalidGracePeriod"),
+            RevokeAppKeyError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to revoke app key")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum RegenerateAppCallbackCredentialError {
+    /// App not found
+    AppNotFound,
+    /// Failed to regenerate callback credential
+    InternalError,
+}
+
+impl From<RegenerateAppCallbackCredentialError> for CustomError {
+    fn from(err: RegenerateAppCallbackCredentialError) -> Self {
+        match err {
+            RegenerateAppCallbackCredentialError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            RegenerateAppCallbackCredentialError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to regenerate callback credential")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum InspectAppCredentialError {
+    /// Only service apps may inspect app credentials
+    AppNotService,
+    /// Invalid app credential
+    InvalidCredential,
+    /// Failed to inspect app credential
+    InternalError,
+}
+
+impl From<InspectAppCredentialError> for CustomError {
+    fn from(err: InspectAppCredentialError) -> Self {
+        match err {
+            InspectAppCredentialError::AppNotService => CustomError::new(EnumErrorCode::Forbidden)
+                .with_message("Only service apps may inspect app credentials")
+                .with_kind("AppNotService"),
+            InspectAppCredentialError::InvalidCredential => CustomError::new(EnumErrorCode::Unauthorized)
+                .with_message("Invalid app credential")
+                .with_kind("InvalidCredential"),
+            InspectAppCredentialError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to inspect app credential")
+                .with_kind("InternalError"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum SetAppServiceError {
+    /// App not found
+    AppNotFound,
+    /// Failed to update app service capability
+    InternalError,
+}
+
+impl From<SetAppServiceError> for CustomError {
+    fn from(err: SetAppServiceError) -> Self {
+        match err {
+            SetAppServiceError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+                .with_message("App not found")
+                .with_kind("AppNotFound"),
+            SetAppServiceError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+                .with_message("Failed to update app service capability")
+                .with_kind("InternalError"),
         }
     }
 }
@@ -1270,6 +1859,10 @@ impl WsRequest for CreateAppConfigRequest {
       "ty": "String"
     },
     {
+      "name": "callbackApiKey",
+      "ty": "String"
+    },
+    {
       "name": "minPasswordLength",
       "ty": "Int32"
     },
@@ -1279,7 +1872,7 @@ impl WsRequest for CreateAppConfigRequest {
     }
   ],
   "stream_response": null,
-  "description": "Platform can create new apps",
+  "description": "Platform creates an app and returns its app key and separate callback credential once",
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
@@ -1800,7 +2393,7 @@ impl WsRequest for RegenerateAppApiKeyRequest {
     }
   ],
   "stream_response": null,
-  "description": "Replace an application's callback API key and return the new key once",
+  "description": "Compatibility rotation: creates a new app key and immediately revokes every other app key",
   "json_schema": null,
   "roles": [
     "UserRole::Platform"
@@ -1899,6 +2492,496 @@ impl WsResponse for GetUserSecurityResponse {
     type Request = GetUserSecurityRequest;
 }
 
+impl WsRequest for CreateAppKeyRequest {
+    type Response = CreateAppKeyResponse;
+    const METHOD_ID: u32 = 121;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "CreateAppKey",
+  "code": 121,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "label",
+      "ty": "String"
+    },
+    {
+      "name": "expiresInSecs",
+      "ty": {
+        "Optional": "Int64"
+      }
+    },
+    {
+      "name": "createdBy",
+      "ty": "String"
+    }
+  ],
+  "returns": [
+    {
+      "name": "keyId",
+      "ty": "String"
+    },
+    {
+      "name": "key",
+      "ty": "String"
+    },
+    {
+      "name": "label",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Creates a hashed app key and returns its key string once",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "InvalidKeyRequest",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid app key label or expiry",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to create app key",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for CreateAppKeyResponse {
+    type Request = CreateAppKeyRequest;
+}
+
+impl WsRequest for ListAppKeysRequest {
+    type Response = ListAppKeysResponse;
+    const METHOD_ID: u32 = 122;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "ListAppKeys",
+  "code": 122,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "keys",
+      "ty": {
+        "StructTable": {
+          "struct_ref": "AppKeyInfo"
+        }
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "Lists app key metadata without secrets or hashes",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for ListAppKeysResponse {
+    type Request = ListAppKeysRequest;
+}
+
+impl WsRequest for RevokeAppKeyRequest {
+    type Response = RevokeAppKeyResponse;
+    const METHOD_ID: u32 = 123;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "RevokeAppKey",
+  "code": 123,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "keyId",
+      "ty": "String"
+    },
+    {
+      "name": "graceSecs",
+      "ty": "Int64"
+    }
+  ],
+  "returns": [
+    {
+      "name": "keyId",
+      "ty": "String"
+    },
+    {
+      "name": "expiresAt",
+      "ty": {
+        "Optional": "Int64"
+      }
+    },
+    {
+      "name": "revokedAt",
+      "ty": {
+        "Optional": "Int64"
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "Revokes an app key now or schedules its expiry after a grace period",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App or app key not found",
+      "fields": []
+    },
+    {
+      "name": "InvalidGracePeriod",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Grace period must be non-negative",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to revoke app key",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for RevokeAppKeyResponse {
+    type Request = RevokeAppKeyRequest;
+}
+
+impl WsRequest for RegenerateAppCallbackCredentialRequest {
+    type Response = RegenerateAppCallbackCredentialResponse;
+    const METHOD_ID: u32 = 124;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "RegenerateAppCallbackCredential",
+  "code": 124,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    }
+  ],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "callbackApiKey",
+      "ty": "String"
+    }
+  ],
+  "stream_response": null,
+  "description": "Creates and returns a separate callback credential once",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to regenerate callback credential",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for RegenerateAppCallbackCredentialResponse {
+    type Request = RegenerateAppCallbackCredentialRequest;
+}
+
+impl WsRequest for InspectAppCredentialRequest {
+    type Response = InspectAppCredentialResponse;
+    const METHOD_ID: u32 = 125;
+    const ROLES: &[u32] = &[6];
+    const SCHEMA: &'static str = r#"{
+  "name": "InspectAppCredential",
+  "code": 125,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "appKey",
+      "ty": "String"
+    }
+  ],
+  "returns": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "keyId",
+      "ty": "String"
+    },
+    {
+      "name": "service",
+      "ty": "Boolean"
+    },
+    {
+      "name": "expiresAt",
+      "ty": {
+        "Optional": "Int64"
+      }
+    },
+    {
+      "name": "revokedAt",
+      "ty": {
+        "Optional": "Int64"
+      }
+    }
+  ],
+  "stream_response": null,
+  "description": "Proves an app credential and returns its key status metadata to the trusted API backend",
+  "json_schema": null,
+  "roles": [
+    "UserRole::AppApiKey"
+  ],
+  "errors": [
+    {
+      "name": "AppNotService",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Forbidden"
+      },
+      "message": "Only service apps may inspect app credentials",
+      "fields": []
+    },
+    {
+      "name": "InvalidCredential",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Unauthorized"
+      },
+      "message": "Invalid app credential",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to inspect app credential",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for InspectAppCredentialResponse {
+    type Request = InspectAppCredentialRequest;
+}
+
+impl WsRequest for SetAppServiceRequest {
+    type Response = SetAppServiceResponse;
+    const METHOD_ID: u32 = 126;
+    const ROLES: &[u32] = &[7];
+    const SCHEMA: &'static str = r#"{
+  "name": "SetAppService",
+  "code": 126,
+  "parameters": [
+    {
+      "name": "appPublicId",
+      "ty": {
+        "NanoId": {
+          "len": 16
+        }
+      }
+    },
+    {
+      "name": "service",
+      "ty": "Boolean"
+    }
+  ],
+  "returns": [
+    {
+      "name": "service",
+      "ty": "Boolean"
+    }
+  ],
+  "stream_response": null,
+  "description": "Sets whether an app may act as a service verifier client",
+  "json_schema": null,
+  "roles": [
+    "UserRole::Platform"
+  ],
+  "errors": [
+    {
+      "name": "AppNotFound",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotFound"
+      },
+      "message": "App not found",
+      "fields": []
+    },
+    {
+      "name": "InternalError",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "InternalError"
+      },
+      "message": "Failed to update app service capability",
+      "fields": []
+    }
+  ]
+}"#;
+}
+impl WsResponse for SetAppServiceResponse {
+    type Request = SetAppServiceRequest;
+}
+
 impl WsRequest for ApiKeyConnectRequest {
     type Response = ApiKeyConnectResponse;
     const METHOD_ID: u32 = 200;
@@ -1914,7 +2997,7 @@ impl WsRequest for ApiKeyConnectRequest {
   ],
   "returns": [],
   "stream_response": null,
-  "description": "",
+  "description": "Authenticates Honey Auth callbacks using the app's separate callback credential",
   "json_schema": null,
   "roles": [
     "UserRole::Public"
@@ -1955,7 +3038,7 @@ impl WsRequest for AuthorizedConnectRequest {
   ],
   "returns": [],
   "stream_response": null,
-  "description": "",
+  "description": "A user connects to an app with the access token auth issued them.",
   "json_schema": null,
   "roles": [
     "UserRole::Public"

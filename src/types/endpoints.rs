@@ -43,6 +43,13 @@ pub mod auth_flow {
 }
 
 pub mod platform {
+    pub use crate::types::generated::{
+        AppKeyInfo, CreateAppKeyError, CreateAppKeyRequest, CreateAppKeyResponse, InspectAppCredentialError,
+        InspectAppCredentialRequest, InspectAppCredentialResponse, ListAppKeysError, ListAppKeysRequest,
+        ListAppKeysResponse, RegenerateAppCallbackCredentialError, RegenerateAppCallbackCredentialRequest,
+        RegenerateAppCallbackCredentialResponse, RevokeAppKeyError, RevokeAppKeyRequest, RevokeAppKeyResponse,
+        SetAppServiceError, SetAppServiceRequest, SetAppServiceResponse,
+    };
     pub use crate::types::generated::{BanUserError, BanUserRequest, BanUserResponse};
     pub use crate::types::generated::{CreateAppConfigError, CreateAppConfigRequest, CreateAppConfigResponse};
     pub use crate::types::generated::{DeleteAppConfigError, DeleteAppConfigRequest, DeleteAppConfigResponse};
@@ -62,13 +69,19 @@ pub mod platform {
     pub mod endpoint_codes {
         pub use crate::types::generated::EnumEndpoint::BanUser;
         pub use crate::types::generated::EnumEndpoint::CreateAppConfig;
+        pub use crate::types::generated::EnumEndpoint::CreateAppKey;
         pub use crate::types::generated::EnumEndpoint::DeleteAppConfig;
         pub use crate::types::generated::EnumEndpoint::DeleteUser;
         pub use crate::types::generated::EnumEndpoint::EditAppConfig;
         pub use crate::types::generated::EnumEndpoint::GetAppSecurityRules;
         pub use crate::types::generated::EnumEndpoint::GetUserSecurity;
+        pub use crate::types::generated::EnumEndpoint::InspectAppCredential;
+        pub use crate::types::generated::EnumEndpoint::ListAppKeys;
         pub use crate::types::generated::EnumEndpoint::PlatformConnect;
         pub use crate::types::generated::EnumEndpoint::RegenerateAppApiKey;
+        pub use crate::types::generated::EnumEndpoint::RegenerateAppCallbackCredential;
+        pub use crate::types::generated::EnumEndpoint::RevokeAppKey;
+        pub use crate::types::generated::EnumEndpoint::SetAppService;
         pub use crate::types::generated::EnumEndpoint::SetLogLevel;
         pub use crate::types::generated::EnumEndpoint::UnbanUser;
     }

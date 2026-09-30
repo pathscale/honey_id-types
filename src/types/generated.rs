@@ -6,7 +6,7 @@ use num_derive::FromPrimitive;
 use serde::*;
 use strum_macros::{Display, EnumString};
 
-use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
+use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use rkyv::Archive;
 use std::net::IpAddr;
 use worktable::prelude::*;

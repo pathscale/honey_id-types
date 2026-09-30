@@ -106,6 +106,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Resolve dependencies for audit
         run: cargo generate-lockfile
-      - uses: rustsec/audit-check@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # Report in the job log only; the job fails on a vulnerability.
+      - uses: taiki-e/install-action@cargo-audit
+      - name: Audit dependencies
+        run: cargo audit

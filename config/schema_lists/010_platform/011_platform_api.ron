@@ -318,7 +318,7 @@ Config(
             EndpointSchemaElement(
                 frontend_facing: false,
                 schema: (
-                    name: "RegenerateAppCallbackCredential",
+                    name: "RotateAppCallbackCredential",
                     code: 124,
                     parameters: [Field(name: "appPublicId", ty: NanoId(len: 16))],
                     returns: [

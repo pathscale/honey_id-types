@@ -46,8 +46,8 @@ pub mod platform {
     pub use crate::types::generated::{
         AppKeyInfo, CreateAppKeyError, CreateAppKeyRequest, CreateAppKeyResponse, InspectAppCredentialError,
         InspectAppCredentialRequest, InspectAppCredentialResponse, ListAppKeysError, ListAppKeysRequest,
-        ListAppKeysResponse, RegenerateAppCallbackCredentialError, RegenerateAppCallbackCredentialRequest,
-        RegenerateAppCallbackCredentialResponse, RevokeAppKeyError, RevokeAppKeyRequest, RevokeAppKeyResponse,
+        ListAppKeysResponse, RotateAppCallbackCredentialError, RotateAppCallbackCredentialRequest,
+        RotateAppCallbackCredentialResponse, RevokeAppKeyError, RevokeAppKeyRequest, RevokeAppKeyResponse,
         SetAppServiceError, SetAppServiceRequest, SetAppServiceResponse,
     };
     pub use crate::types::generated::{BanUserError, BanUserRequest, BanUserResponse};
@@ -79,7 +79,7 @@ pub mod platform {
         pub use crate::types::generated::EnumEndpoint::ListAppKeys;
         pub use crate::types::generated::EnumEndpoint::PlatformConnect;
         pub use crate::types::generated::EnumEndpoint::RegenerateAppApiKey;
-        pub use crate::types::generated::EnumEndpoint::RegenerateAppCallbackCredential;
+        pub use crate::types::generated::EnumEndpoint::RotateAppCallbackCredential;
         pub use crate::types::generated::EnumEndpoint::RevokeAppKey;
         pub use crate::types::generated::EnumEndpoint::SetAppService;
         pub use crate::types::generated::EnumEndpoint::SetLogLevel;

@@ -1471,7 +1471,7 @@
             }
           ],
           "json_schema": null,
-          "name": "RegenerateAppCallbackCredential",
+          "name": "RotateAppCallbackCredential",
           "parameters": [
             {
               "name": "appPublicId",

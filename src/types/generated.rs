@@ -6,7 +6,7 @@ use num_derive::FromPrimitive;
 use serde::*;
 use strum_macros::{Display, EnumString};
 
-use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
+use psc_nanoid::{alphabet::Base62Alphabet, Nanoid};
 use rkyv::Archive;
 use std::net::IpAddr;
 use worktable::prelude::*;
@@ -152,7 +152,7 @@ pub enum EnumEndpoint {
     CreateAppKey = 121,
     ListAppKeys = 122,
     RevokeAppKey = 123,
-    RegenerateAppCallbackCredential = 124,
+    RotateAppCallbackCredential = 124,
     InspectAppCredential = 125,
     SetAppService = 126,
     ApiKeyConnect = 200,
@@ -184,7 +184,7 @@ impl EnumEndpoint {
             Self::CreateAppKey => CreateAppKeyRequest::SCHEMA,
             Self::ListAppKeys => ListAppKeysRequest::SCHEMA,
             Self::RevokeAppKey => RevokeAppKeyRequest::SCHEMA,
-            Self::RegenerateAppCallbackCredential => RegenerateAppCallbackCredentialRequest::SCHEMA,
+            Self::RotateAppCallbackCredential => RotateAppCallbackCredentialRequest::SCHEMA,
             Self::InspectAppCredential => InspectAppCredentialRequest::SCHEMA,
             Self::SetAppService => SetAppServiceRequest::SCHEMA,
             Self::ApiKeyConnect => ApiKeyConnectRequest::SCHEMA,
@@ -856,17 +856,6 @@ pub struct RegenerateAppApiKeyResponse {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct RegenerateAppCallbackCredentialRequest {
-    pub appPublicId: Nanoid<16, Base62Alphabet>,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct RegenerateAppCallbackCredentialResponse {
-    pub appPublicId: Nanoid<16, Base62Alphabet>,
-    pub callbackApiKey: String,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct RevokeAppKeyRequest {
     pub appPublicId: Nanoid<16, Base62Alphabet>,
     pub keyId: String,
@@ -880,6 +869,17 @@ pub struct RevokeAppKeyResponse {
     pub expiresAt: Option<i64>,
     #[serde(default)]
     pub revokedAt: Option<i64>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RotateAppCallbackCredentialRequest {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RotateAppCallbackCredentialResponse {
+    pub appPublicId: Nanoid<16, Base62Alphabet>,
+    pub callbackApiKey: String,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -1327,20 +1327,20 @@ impl From<RevokeAppKeyError> for CustomError {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum RegenerateAppCallbackCredentialError {
+pub enum RotateAppCallbackCredentialError {
     /// App not found
     AppNotFound,
     /// Failed to regenerate callback credential
     InternalError,
 }
 
-impl From<RegenerateAppCallbackCredentialError> for CustomError {
-    fn from(err: RegenerateAppCallbackCredentialError) -> Self {
+impl From<RotateAppCallbackCredentialError> for CustomError {
+    fn from(err: RotateAppCallbackCredentialError) -> Self {
         match err {
-            RegenerateAppCallbackCredentialError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
+            RotateAppCallbackCredentialError::AppNotFound => CustomError::new(EnumErrorCode::NotFound)
                 .with_message("App not found")
                 .with_kind("AppNotFound"),
-            RegenerateAppCallbackCredentialError::InternalError => CustomError::new(EnumErrorCode::InternalError)
+            RotateAppCallbackCredentialError::InternalError => CustomError::new(EnumErrorCode::InternalError)
                 .with_message("Failed to regenerate callback credential")
                 .with_kind("InternalError"),
         }
@@ -2740,12 +2740,12 @@ impl WsResponse for RevokeAppKeyResponse {
     type Request = RevokeAppKeyRequest;
 }
 
-impl WsRequest for RegenerateAppCallbackCredentialRequest {
-    type Response = RegenerateAppCallbackCredentialResponse;
+impl WsRequest for RotateAppCallbackCredentialRequest {
+    type Response = RotateAppCallbackCredentialResponse;
     const METHOD_ID: u32 = 124;
     const ROLES: &[u32] = &[7];
     const SCHEMA: &'static str = r#"{
-  "name": "RegenerateAppCallbackCredential",
+  "name": "RotateAppCallbackCredential",
   "code": 124,
   "parameters": [
     {
@@ -2807,8 +2807,8 @@ impl WsRequest for RegenerateAppCallbackCredentialRequest {
   ]
 }"#;
 }
-impl WsResponse for RegenerateAppCallbackCredentialResponse {
-    type Request = RegenerateAppCallbackCredentialRequest;
+impl WsResponse for RotateAppCallbackCredentialResponse {
+    type Request = RotateAppCallbackCredentialRequest;
 }
 
 impl WsRequest for InspectAppCredentialRequest {

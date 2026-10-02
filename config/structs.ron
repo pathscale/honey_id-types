@@ -17,6 +17,38 @@ Config(
                     ],
                 ),
             ),
+            StructElement(
+                inner: Struct(
+                    name: "PasskeySummary",
+                    fields: [
+                        Field(name: "credentialId", ty: String, description: "Opaque owner-scoped credential management identifier"),
+                        Field(name: "label", ty: String, description: "User-visible credential label"),
+                        Field(name: "createdAt", ty: Int64, description: "Unix milliseconds; creation time"),
+                        Field(name: "lastUsedAt", ty: Optional(Int64), description: "Unix milliseconds; last successful use when present"),
+                    ],
+                ),
+            ),
+            StructElement(
+                inner: Struct(
+                    name: "TelegramBiometricDeviceSummary",
+                    fields: [
+                        Field(name: "deviceRecordId", ty: String, description: "Opaque owner-scoped device management identifier"),
+                        Field(name: "label", ty: String, description: "User-visible device label"),
+                        Field(name: "createdAt", ty: Int64, description: "Unix milliseconds; creation time"),
+                        Field(name: "lastUsedAt", ty: Optional(Int64), description: "Unix milliseconds; last successful use when present"),
+                    ],
+                ),
+            ),
+            StructElement(
+                inner: Struct(
+                    name: "TelegramBotSummary",
+                    fields: [
+                        Field(name: "botId", ty: String, description: "Registered Telegram bot identifier"),
+                        Field(name: "label", ty: String, description: "AppAdmin-visible bot label"),
+                        Field(name: "createdAt", ty: Int64, description: "Unix milliseconds; registration time"),
+                    ],
+                ),
+            ),
         ],
     ),
 )

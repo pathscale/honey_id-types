@@ -51,6 +51,11 @@ Config(
                             value: 7,
                             description: "The role is used for platform only.",
                         ),
+                        EnumVariant(
+                            name: "App",
+                            value: 8,
+                            description: "Authenticated app backend accessing its own auth-service settings; product AppAdmin authorization is checked by the trusted console backend.",
+                        ),
                     ],
                 ),
             ),
@@ -114,6 +119,23 @@ Config(
                             name: "detail",
                             value: 6,
                             description: "Detailed trace logging (no crate filtering).",
+                        ),
+                    ],
+                ),
+            ),
+            EnumElement(
+                inner: Enum(
+                    name: "LoginNextStep",
+                    variants: [
+                        EnumVariant(
+                            name: "complete",
+                            value: 1,
+                            description: "Login completed.",
+                        ),
+                        EnumVariant(
+                            name: "totp",
+                            value: 2,
+                            description: "TOTP code is required.",
                         ),
                     ],
                 ),

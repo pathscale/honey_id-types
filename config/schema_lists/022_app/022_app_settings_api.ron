@@ -1,0 +1,148 @@
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+
+Config(
+    definition: EndpointSchemaList(
+        service_name: "appSettingsApi",
+        service_id: 22,
+        endpoints: [
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ListOwnBrowserRedirectUris",
+                    code: 22001,
+                    parameters: [],
+                    returns: [
+                        Field(name: "redirectUris", ty: Vec(String), description: "Exact browser return URIs registered on the authenticated app"),
+                    ],
+                    stream_response: None,
+                    description: "List this authenticated app's browser return URI settings. The trusted app backend must authorize the Honey console caller as this app's AppAdmin; these settings are separate from callBackUrl.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "AddOwnBrowserRedirectUri",
+                    code: 22002,
+                    parameters: [
+                        Field(name: "redirectUri", ty: String, description: "Exact HTTPS URI with origin and path; no wildcards, credentials or fragment; HTTP localhost only for development apps"),
+                        Field(name: "actorPublicId", ty: NanoId(len: 16), description: "Honey user public id of the AppAdmin verified by the trusted backend; audit attribution only, never proof of authorization"),
+                    ],
+                    returns: [
+                        Field(name: "redirectUris", ty: Vec(String), description: "Persisted set of exact browser return URIs for this app"),
+                    ],
+                    stream_response: None,
+                    description: "Add and audit an exact browser return URI on the authenticated app after its trusted backend verifies the caller's AppAdmin role. Require HTTPS, reject wildcards, user information and fragments; allow HTTP localhost only for development apps. Do not change callBackUrl.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                        EndpointErrorSchema(name: "InvalidRedirectUri", code: "ErrorCode::BadRequest", message: "Invalid exact browser return URI", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "RemoveOwnBrowserRedirectUri",
+                    code: 22003,
+                    parameters: [
+                        Field(name: "redirectUri", ty: String, description: "Exact HTTPS URI with origin and path; no wildcards, credentials or fragment; HTTP localhost only for development apps"),
+                        Field(name: "actorPublicId", ty: NanoId(len: 16), description: "Honey user public id of the AppAdmin verified by the trusted backend; audit attribution only, never proof of authorization"),
+                    ],
+                    returns: [
+                        Field(name: "redirectUris", ty: Vec(String), description: "Persisted set after idempotent removal"),
+                    ],
+                    stream_response: None,
+                    description: "Remove and audit a browser return URI on the authenticated app after its trusted backend verifies AppAdmin ownership. Persist the app record before success; do not change callBackUrl.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "ListOwnTelegramBots",
+                    code: 22004,
+                    parameters: [],
+                    returns: [
+                        Field(name: "bots", ty: Vec(StructRef("TelegramBotSummary")), description: "Registered bot summaries for this app; never return bot tokens"),
+                    ],
+                    stream_response: None,
+                    description: "List this authenticated app's Telegram bot associations after its trusted backend verifies the caller's AppAdmin role. Never return signing secrets.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "AddOwnTelegramBot",
+                    code: 22005,
+                    parameters: [
+                        Field(name: "botId", ty: String, description: "Telegram bot identifier validated against the bot token"),
+                        Field(name: "botToken", ty: String, description: "Secret Telegram bot token used only for server-side initData validation"),
+                        Field(name: "label", ty: String, description: "AppAdmin-visible label"),
+                        Field(name: "actorPublicId", ty: NanoId(len: 16), description: "Honey user public id of the AppAdmin verified by the trusted backend; audit attribution only, never proof of authorization"),
+                    ],
+                    returns: [
+                        Field(name: "bot", ty: StructRef("TelegramBotSummary"), description: "Persisted association without its bot token"),
+                    ],
+                    stream_response: None,
+                    description: "Register and audit a Telegram bot on this authenticated app after its trusted backend verifies AppAdmin ownership and bot-token identity. Keep the signing secret server-side; a client-provided bot id does not establish trust.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                        EndpointErrorSchema(name: "InvalidTelegramBot", code: "ErrorCode::BadRequest", message: "Bot token does not identify the requested Telegram bot", fields: []),
+                        EndpointErrorSchema(name: "TelegramBotAlreadyRegistered", code: "ErrorCode::Conflict", message: "Telegram bot is already registered", fields: []),
+                    ],
+                ),
+            ),
+            EndpointSchemaElement(
+                frontend_facing: false,
+                schema: (
+                    name: "RemoveOwnTelegramBot",
+                    code: 22006,
+                    parameters: [
+                        Field(name: "botId", ty: String, description: "Registered Telegram bot identifier"),
+                        Field(name: "actorPublicId", ty: NanoId(len: 16), description: "Honey user public id of the AppAdmin verified by the trusted backend; audit attribution only, never proof of authorization"),
+                    ],
+                    returns: [
+                        Field(name: "removed", ty: Boolean, description: "True after persisted owner-scoped removal"),
+                    ],
+                    stream_response: None,
+                    description: "Remove and audit a Telegram bot association on this authenticated app after its trusted backend verifies AppAdmin ownership. Bound device authentication must fail after removal.",
+                    json_schema: (),
+                    roles: ["UserRole::App"],
+                    errors: [
+                        EndpointErrorSchema(name: "AppNotFound", code: "ErrorCode::NotFound", message: "App not found", fields: []),
+                        EndpointErrorSchema(name: "AppAdminRequired", code: "ErrorCode::Forbidden", message: "The caller must be an AppAdmin of this app", fields: []),
+                        EndpointErrorSchema(name: "PersistenceFailed", code: "ErrorCode::InternalError", message: "The required credential write could not be persisted", fields: []),
+                    ],
+                ),
+            ),
+        ],
+    ),
+)

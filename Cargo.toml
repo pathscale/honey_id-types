@@ -37,5 +37,5 @@ strum_macros = "^0.28"
 url = { version = "^2.5.8", features = ["serde"] }
 psc-nanoid = { version = "^3", features = ["serde", "packed", "rkyv"] }
 tracing = "^0.1.44"
-worktable = "^1.10.0-beta1"
+worktable = "^1.11.0"
 rkyv = "^0.8.9"

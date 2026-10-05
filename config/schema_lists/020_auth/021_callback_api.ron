@@ -15,16 +15,23 @@ Config(
                         Field(name: "token", ty: String),
                         Field(name: "username", ty: String),
                         Field(name: "userPubId", ty: NanoId(len: 16)),
+                        Field(name: "completionId", ty: Optional(String)),
                     ],
-                    returns: [],
+                    returns: [
+                        Field(name: "completionId", ty: Optional(String)),
+                    ],
                     stream_response: None,
-                    description: "Backend receives auth tokens, happens after login",
+                    description: "Backend receives auth tokens after login. completionId opts into a revocation-aware completion adapter; legacy handlers reject it. Retries of pending work resume safely, completed duplicates do not reapply effects, and deleted users cannot be restored by callback replay. Requests without completionId retain legacy behavior.",
                     json_schema: (),
                     roles: [
                         "UserRole::AppApiKey",
                     ],
                     errors: [
                         EndpointErrorSchema(name: "InvalidToken", code: "ErrorCode::BadRequest", message: "Invalid token", fields: []),
+                        EndpointErrorSchema(name: "CompletionNotSupported", code: "ErrorCode::NotImplemented", message: "completionId requires a revocation-aware receiver", fields: []),
+                        EndpointErrorSchema(name: "InvalidCompletionId", code: "ErrorCode::BadRequest", message: "Invalid completionId", fields: []),
+                        EndpointErrorSchema(name: "CompletionConflict", code: "ErrorCode::Conflict", message: "completionId was already used with a different payload", fields: []),
+                        EndpointErrorSchema(name: "CompletionRevoked", code: "ErrorCode::Conflict", message: "user was deleted for this app before this completion could be applied", fields: []),
                     ],
                 )
                 

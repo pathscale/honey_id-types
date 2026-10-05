@@ -15,9 +15,13 @@ use crate::endpoints::callback::{
     HoneyReceiveUserInfoResponse, HoneyValidateTokenError, HoneyValidateTokenRequest, HoneyValidateTokenResponse,
 };
 use crate::endpoints::connect::{HoneyApiKeyConnectError, HoneyApiKeyConnectRequest, HoneyApiKeyConnectResponse};
+use crate::handlers::convenience_utils::completion_receipt::{
+    CompletionId, CompletionReceiptError, ReceiveTokenCompletionKey, ReceiveTokenCompletionPayload,
+    ReceiveTokenCompletionStorage,
+};
 use crate::handlers::convenience_utils::token_management::TokenStorage;
 use crate::handlers::convenience_utils::user_management::{CreateUserInfo, DeleteUserInfo, UserStorage};
-use crate::id_entities::AuthToken;
+use crate::id_entities::{AppPublicId, AuthToken};
 use crate::types::id_entities::UserPublicId;
 
 pub struct MethodApiKeyConnect {
@@ -70,6 +74,10 @@ impl RequestHandler for MethodReceiveToken {
     type Error = HoneyReceiveTokenError;
 
     async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
+        if req.completionId.is_some() {
+            return Err(HandlerError::Public(HoneyReceiveTokenError::CompletionNotSupported));
+        }
+
         let token = req
             .token
             .parse::<AuthToken>()
@@ -90,7 +98,85 @@ impl RequestHandler for MethodReceiveToken {
             .await
             .map_err(HandlerError::internal)?;
 
-        Ok(HoneyReceiveTokenResponse {})
+        Ok(HoneyReceiveTokenResponse { completionId: None })
+    }
+}
+
+/// Completion-aware ReceiveToken handler. Requests without a completion ID
+/// retain the legacy callback behavior. Requests with an ID require a
+/// revocation-aware adapter and receive an echoed ID only after the adapter
+/// completes or recognizes a completed receipt. Register
+/// `MethodReceiveUserDeletedWithCompletion` with this same adapter before
+/// enabling this handler, and route every deletion/revocation path for these
+/// users through that adapter instead of the legacy token/user delete handler.
+pub struct MethodReceiveTokenWithCompletion {
+    /// Use the same configured client Arc as `MethodApiKeyConnect`. Its
+    /// configuration binds the accepted callback API key and receiver app ID.
+    /// A receiver instance serves one app; a multi-app receiver must carry the
+    /// authenticated app identity through its auth context instead.
+    pub honey_id_client: Arc<HoneyIdClient>,
+    pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
+    pub user_storage: Arc<dyn UserStorage + Send + Sync>,
+    pub completion_storage: Arc<dyn ReceiveTokenCompletionStorage>,
+}
+
+#[async_trait(?Send)]
+impl RequestHandler for MethodReceiveTokenWithCompletion {
+    type Request = HoneyReceiveTokenRequest;
+    type Error = HoneyReceiveTokenError;
+
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
+        let token = req
+            .token
+            .parse::<AuthToken>()
+            .map_err(|_| HandlerError::Public(HoneyReceiveTokenError::InvalidToken))?;
+        let completion_id = req
+            .completionId
+            .as_deref()
+            .map(CompletionId::parse)
+            .transpose()
+            .map_err(|_| HandlerError::Public(HoneyReceiveTokenError::InvalidCompletionId))?;
+        let user_pub_id = UserPublicId::from(req.userPubId);
+        let payload = ReceiveTokenCompletionPayload {
+            token,
+            username: req.username,
+            user_pub_id,
+        };
+
+        if let Some(completion_id) = completion_id.as_ref() {
+            let fingerprint_material = payload.fingerprint_material();
+            self.completion_storage
+                .apply_receive_token(
+                    ReceiveTokenCompletionKey {
+                        app_pub_id: AppPublicId::from(self.honey_id_client.get_app_pub_id()),
+                        completion_id: completion_id.clone(),
+                    },
+                    &fingerprint_material,
+                    &payload,
+                )
+                .await
+                .map_err(map_completion_error)?;
+
+            return Ok(HoneyReceiveTokenResponse {
+                completionId: Some(completion_id.as_str().to_owned()),
+            });
+        }
+
+        self.user_storage
+            .create_or_update_user(CreateUserInfo {
+                username: payload.username.clone(),
+                user_pub_id: req.userPubId,
+                app_pub_id: None,
+            })
+            .await
+            .map_err(HandlerError::internal)?;
+
+        self.token_storage
+            .store_token(payload.user_pub_id, payload.token)
+            .await
+            .map_err(HandlerError::internal)?;
+
+        Ok(HoneyReceiveTokenResponse { completionId: None })
     }
 }
 pub struct MethodReceiveUserInfo {
@@ -134,6 +220,47 @@ impl RequestHandler for MethodReceiveUserInfo {
 pub struct MethodReceiveUserDeleted {
     pub token_storage: Arc<dyn TokenStorage + Sync + Send>,
     pub user_storage: Arc<dyn UserStorage + Send + Sync>,
+}
+
+/// Revocation-aware delete route paired with `MethodReceiveTokenWithCompletion`.
+/// Both handlers must share the same adapter instance so deletion installs the
+/// tombstone checked by pending/completed receipt processing. Do not also
+/// register the legacy delete route for these users.
+pub struct MethodReceiveUserDeletedWithCompletion {
+    /// Use the same configured client Arc as `MethodApiKeyConnect` and
+    /// `MethodReceiveTokenWithCompletion` so the request scope is tied to the
+    /// app whose API key authenticated this receiver.
+    pub honey_id_client: Arc<HoneyIdClient>,
+    pub completion_storage: Arc<dyn ReceiveTokenCompletionStorage>,
+}
+
+#[async_trait(?Send)]
+impl RequestHandler for MethodReceiveUserDeletedWithCompletion {
+    type Request = HoneyReceiveUserDeletedRequest;
+    type Error = CustomError;
+
+    async fn handle(&self, _ctx: RequestContext, req: Self::Request) -> Response<Self::Request, Self::Error> {
+        let configured_app_pub_id = AppPublicId::from(self.honey_id_client.get_app_pub_id());
+        let app_pub_id = match req.appPubId {
+            Some(request_app_pub_id) => {
+                let request_app_pub_id = AppPublicId::from(request_app_pub_id);
+                if request_app_pub_id != configured_app_pub_id {
+                    return Err(HandlerError::internal(eyre::eyre!(
+                        "ReceiveUserDeleted appPubId does not match the API key bound to this receiver"
+                    )));
+                }
+                Some(request_app_pub_id)
+            }
+            None => None,
+        };
+
+        self.completion_storage
+            .revoke_user(app_pub_id, UserPublicId::from(req.userPubId))
+            .await
+            .map_err(HandlerError::internal)?;
+
+        Ok(HoneyReceiveUserDeletedResponse {})
+    }
 }
 
 #[async_trait(?Send)]
@@ -185,6 +312,16 @@ impl RequestHandler for MethodValidateToken {
                 valid: false,
                 userPubId: None,
             }),
+        }
+    }
+}
+
+fn map_completion_error(error: CompletionReceiptError) -> HandlerError<HoneyReceiveTokenError> {
+    match error {
+        CompletionReceiptError::Conflict => HandlerError::Public(HoneyReceiveTokenError::CompletionConflict),
+        CompletionReceiptError::Revoked => HandlerError::Public(HoneyReceiveTokenError::CompletionRevoked),
+        unsupported @ (CompletionReceiptError::Unsupported | CompletionReceiptError::Storage(_)) => {
+            HandlerError::internal(unsupported)
         }
     }
 }

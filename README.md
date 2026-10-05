@@ -107,3 +107,25 @@ To preview what `cargo-release` would do without making changes:
 ```sh
 cargo release patch  # omit --execute for a dry run
 ```
+
+### Completion-aware callbacks (3.0)
+
+`ReceiveToken` accepts an optional `completionId` and echoes it only through the
+completion-aware handler. The legacy handler refuses an ID before changing user
+or token state. Requests without an ID keep the legacy behavior; the response
+now includes `completionId: null`.
+
+Register `MethodReceiveTokenWithCompletion` and
+`MethodReceiveUserDeletedWithCompletion` with the same configured Honey client
+and durable `ReceiveTokenCompletionStorage` adapter. The adapter must persist
+pending/completed receipt digests, serialize application and revocation, and
+retain revocation tombstones. Completed retries acknowledge without recreating
+users or tokens. Token lifetime remains the receiver's existing policy; durable
+receipts do not authorize persistent login tokens. The default adapter refuses
+completion-aware work.
+
+Keep producers' IDs disabled until every target receiver has passed actual
+callback, restart, replay, and revocation acceptance. A filesystem lock fences
+only writers sharing that directory; deployment must fence separate volumes and
+machines before enabling a single-writer adapter. This API does not enable S3
+migration or provide a fleet-wide writer fence.

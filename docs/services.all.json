@@ -1732,7 +1732,7 @@
       "endpoints": [
         {
           "code": 210,
-          "description": "Backend receives auth tokens, happens after login",
+          "description": "Backend receives auth tokens after login. completionId opts into a revocation-aware completion adapter; legacy handlers reject it. Retries of pending work resume safely, completed duplicates do not reapply effects, and deleted users cannot be restored by callback replay. Requests without completionId retain legacy behavior.",
           "errors": [
             {
               "code": {
@@ -1746,6 +1746,58 @@
               "fields": [],
               "message": "Invalid token",
               "name": "InvalidToken"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "NotImplemented"
+              },
+              "fields": [],
+              "message": "completionId requires a revocation-aware receiver",
+              "name": "CompletionNotSupported"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "BadRequest"
+              },
+              "fields": [],
+              "message": "Invalid completionId",
+              "name": "InvalidCompletionId"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Conflict"
+              },
+              "fields": [],
+              "message": "completionId was already used with a different payload",
+              "name": "CompletionConflict"
+            },
+            {
+              "code": {
+                "ty": {
+                  "EnumRef": {
+                    "name": "ErrorCode"
+                  }
+                },
+                "variant": "Conflict"
+              },
+              "fields": [],
+              "message": "user was deleted for this app before this completion could be applied",
+              "name": "CompletionRevoked"
             }
           ],
           "json_schema": null,
@@ -1766,9 +1818,22 @@
                   "len": 16
                 }
               }
+            },
+            {
+              "name": "completionId",
+              "ty": {
+                "Optional": "String"
+              }
             }
           ],
-          "returns": [],
+          "returns": [
+            {
+              "name": "completionId",
+              "ty": {
+                "Optional": "String"
+              }
+            }
+          ],
           "roles": [
             "UserRole::AppApiKey"
           ],

@@ -817,10 +817,15 @@ pub struct ReceiveTokenRequest {
     pub token: String,
     pub username: String,
     pub userPubId: Nanoid<16, Base62Alphabet>,
+    #[serde(default)]
+    pub completionId: Option<String>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct ReceiveTokenResponse {}
+pub struct ReceiveTokenResponse {
+    #[serde(default)]
+    pub completionId: Option<String>,
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ReceiveUserDeletedRequest {
@@ -1430,6 +1435,14 @@ impl From<AuthorizedConnectError> for CustomError {
 pub enum ReceiveTokenError {
     /// Invalid token
     InvalidToken,
+    /// completionId requires a revocation-aware receiver
+    CompletionNotSupported,
+    /// Invalid completionId
+    InvalidCompletionId,
+    /// completionId was already used with a different payload
+    CompletionConflict,
+    /// user was deleted for this app before this completion could be applied
+    CompletionRevoked,
 }
 
 impl From<ReceiveTokenError> for CustomError {
@@ -1438,6 +1451,18 @@ impl From<ReceiveTokenError> for CustomError {
             ReceiveTokenError::InvalidToken => CustomError::new(EnumErrorCode::BadRequest)
                 .with_message("Invalid token")
                 .with_kind("InvalidToken"),
+            ReceiveTokenError::CompletionNotSupported => CustomError::new(EnumErrorCode::NotImplemented)
+                .with_message("completionId requires a revocation-aware receiver")
+                .with_kind("CompletionNotSupported"),
+            ReceiveTokenError::InvalidCompletionId => CustomError::new(EnumErrorCode::BadRequest)
+                .with_message("Invalid completionId")
+                .with_kind("InvalidCompletionId"),
+            ReceiveTokenError::CompletionConflict => CustomError::new(EnumErrorCode::Conflict)
+                .with_message("completionId was already used with a different payload")
+                .with_kind("CompletionConflict"),
+            ReceiveTokenError::CompletionRevoked => CustomError::new(EnumErrorCode::Conflict)
+                .with_message("user was deleted for this app before this completion could be applied")
+                .with_kind("CompletionRevoked"),
         }
     }
 }
@@ -3087,11 +3112,24 @@ impl WsRequest for ReceiveTokenRequest {
           "len": 16
         }
       }
+    },
+    {
+      "name": "completionId",
+      "ty": {
+        "Optional": "String"
+      }
     }
   ],
-  "returns": [],
+  "returns": [
+    {
+      "name": "completionId",
+      "ty": {
+        "Optional": "String"
+      }
+    }
+  ],
   "stream_response": null,
-  "description": "Backend receives auth tokens, happens after login",
+  "description": "Backend receives auth tokens after login. completionId opts into a revocation-aware completion adapter; legacy handlers reject it. Retries of pending work resume safely, completed duplicates do not reapply effects, and deleted users cannot be restored by callback replay. Requests without completionId retain legacy behavior.",
   "json_schema": null,
   "roles": [
     "UserRole::AppApiKey"
@@ -3108,6 +3146,58 @@ impl WsRequest for ReceiveTokenRequest {
         "variant": "BadRequest"
       },
       "message": "Invalid token",
+      "fields": []
+    },
+    {
+      "name": "CompletionNotSupported",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "NotImplemented"
+      },
+      "message": "completionId requires a revocation-aware receiver",
+      "fields": []
+    },
+    {
+      "name": "InvalidCompletionId",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "BadRequest"
+      },
+      "message": "Invalid completionId",
+      "fields": []
+    },
+    {
+      "name": "CompletionConflict",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Conflict"
+      },
+      "message": "completionId was already used with a different payload",
+      "fields": []
+    },
+    {
+      "name": "CompletionRevoked",
+      "code": {
+        "ty": {
+          "EnumRef": {
+            "name": "ErrorCode"
+          }
+        },
+        "variant": "Conflict"
+      },
+      "message": "user was deleted for this app before this completion could be applied",
       "fields": []
     }
   ]

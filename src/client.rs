@@ -1,6 +1,7 @@
 use nagoya::reactor::Handle;
 use psc_nanoid::{Nanoid, alphabet::Base62Alphabet};
 use secrecy::ExposeSecret;
+use subtle::ConstantTimeEq;
 use url::Url;
 
 use crate::{
@@ -41,7 +42,7 @@ impl HoneyIdClient {
     }
 
     pub fn validate_auth_api_key(&self, key: &str) -> Result<(), ApiKeyError> {
-        if self.config.auth_api_key.expose_secret() == key {
+        if self.config.auth_api_key.expose_secret().as_bytes().ct_eq(key.as_bytes()).into() {
             Ok(())
         } else {
             Err(ApiKeyError::IncorrectKey)

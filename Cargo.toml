@@ -21,6 +21,7 @@ derive_more = { version = "^2.1.1", features = [
 ] }
 # endpoint-libs = { path = "../endpoint-libs", features = ["ws", "ws-client"] }
 endpoint-libs = { version = "^3.2", features = ["ws", "ws-client"] }
+subtle = "^2"
 nagoya = { version = "^0.1", features = ["reactor"] }
 
 eyre = "^0.6.12"

@@ -9,11 +9,6 @@ name: Publish
 # `=2.0.2` and could not resolve it, which reads as their own build being
 # broken rather than as a release that never happened.
 on:
-  push:
-    branches: [master]
-    paths:
-      - Cargo.toml
-      - src/**
   workflow_dispatch:
     inputs:
       dry_run:

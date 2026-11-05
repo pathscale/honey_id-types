@@ -3,6 +3,8 @@ mod config;
 pub mod handlers;
 mod types;
 
+pub mod publication;
+
 pub use client::HoneyIdClient;
 pub use client::honeyid_ws_conn::HoneyIdConnection;
 pub use config::HoneyIdConfig;

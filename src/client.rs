@@ -42,7 +42,14 @@ impl HoneyIdClient {
     }
 
     pub fn validate_auth_api_key(&self, key: &str) -> Result<(), ApiKeyError> {
-        if self.config.auth_api_key.expose_secret().as_bytes().ct_eq(key.as_bytes()).into() {
+        if self
+            .config
+            .auth_api_key
+            .expose_secret()
+            .as_bytes()
+            .ct_eq(key.as_bytes())
+            .into()
+        {
             Ok(())
         } else {
             Err(ApiKeyError::IncorrectKey)

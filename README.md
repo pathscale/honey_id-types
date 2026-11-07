@@ -75,38 +75,18 @@ Endpoint types are generated from `.ron` schema files using `endpoint-gen`. To a
 
 `honey_id-types` re-exports `endpoint-libs` request and response traits. Use the
 `endpoint-libs` version declared by the selected `honey_id-types` release and ensure
-the application resolves only one copy. `honey_id-types 2.1.x` accepts the
-compatible endpoint-libs 2.x release line.
+the application resolves only one copy. `honey_id-types 3.0.2` requires
+endpoint-libs `^3.4.4`.
 
 `endpoint-gen` is needed only when regenerating the checked-in endpoint model from
 the RON schemas. Consumers of this crate do not need it.
 
 ## Releasing
 
-Releases are managed with [`cargo-release`](https://github.com/crate-ci/cargo-release) and [`git-cliff`](https://github.com/orhun/git-cliff). Both must be installed:
-
-```sh
-cargo install cargo-release git-cliff
-```
-
-To cut a release:
-
-```sh
-./scripts/release.sh [--skip-bump] <patch|minor|major>
-```
-
-The script will:
-1. Run `cargo release --execute <level>` — bumps the version in `Cargo.toml`, regenerates `CHANGELOG.md`, and commits everything as `chore(release): vX.Y.Z`.
-2. Open your `$EDITOR` with the auto-generated tag notes (from `git-cliff`) for review.
-3. Create an annotated tag using the edited notes as the tag body (shown as GitHub Release notes).
-4. Push the commit and tag.
-5. Prompt whether to publish to crates.io.
-
-To preview what `cargo-release` would do without making changes:
-
-```sh
-cargo release patch  # omit --execute for a dry run
-```
+Bump the package version in `Cargo.toml` in the reviewed change. Verify locally,
+rebase-merge the change, then explicitly dispatch `publish.yml` from `master`.
+The manual workflow runs `cargo publish --registry crates-io`; Cargo reads the
+manifest version. Publication creates no tags and does not run remote CI.
 
 ### Completion-aware callbacks (3.0)
 

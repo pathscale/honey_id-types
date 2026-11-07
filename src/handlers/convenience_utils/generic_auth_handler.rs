@@ -22,6 +22,10 @@ use super::user_management::UserStorage;
 use crate::id_entities::UserPublicId;
 
 /// Context passed to the `on_connect` callback for authorized connections.
+///
+/// The callback sees the connection's pre-authentication roles. The candidate
+/// roles for this connection are available in `user_api_roles`.
+/// Callbacks using this handler should leave role publication to the handler.
 /// Extensible: add fields here to give apps more info without changing their closure signature.
 pub struct AuthorizedConnectContext {
     pub user_pub_id: UserPublicId,
@@ -30,6 +34,12 @@ pub struct AuthorizedConnectContext {
 }
 
 /// Context passed to the `on_connect` callback for public connections.
+///
+/// The callback sees the connection's pre-authentication roles. It can read
+/// configured public role candidates from its `UserStorage` if needed; the
+/// context shape remains unchanged. The built-in handler publishes the roles
+/// after the callback succeeds.
+/// Callbacks using this handler should leave role publication to the handler.
 pub struct PublicConnectContext {
     pub conn: Arc<WsConnection>,
 }
@@ -115,7 +125,8 @@ where
 
 /// Generic handler for authorized WebSocket connections with custom request/response types.
 ///
-/// This handler validates access tokens, assigns roles, and delegates to a custom callback.
+/// This handler validates access tokens, delegates to a custom callback, and
+/// assigns roles only after the callback succeeds.
 ///
 /// # Example
 ///
@@ -217,14 +228,15 @@ where
                 .user_storage
                 .get_api_roles_by_pub_id(user_pub_id)
                 .map_err(HandlerError::internal)?;
-            conn.set_roles(Arc::new(roles.clone()));
+            let candidate_roles = Arc::new(roles.clone());
 
             let ctx = AuthorizedConnectContext {
                 user_pub_id,
                 user_api_roles: roles,
-                conn,
+                conn: conn.clone(),
             };
             let res = (self.on_connect)(req, ctx).await.map_err(HandlerError::internal)?;
+            conn.set_roles(candidate_roles);
 
             Ok(res)
         }
@@ -234,7 +246,8 @@ where
 
 /// Generic handler for public WebSocket connections with custom request/response types.
 ///
-/// This handler assigns the public role and delegates to a custom callback.
+/// This handler delegates to a custom callback and assigns public roles only
+/// after the callback succeeds.
 ///
 /// # Example
 ///
@@ -307,10 +320,11 @@ where
     ) -> LocalBoxFuture<'static, Response<Self::Request, Self::Error>> {
         async move {
             let roles = self.user_storage.get_public_roles();
-            conn.set_roles(Arc::new(Vec::from(roles)));
+            let candidate_roles = Arc::new(Vec::from(roles));
 
-            let ctx = PublicConnectContext { conn };
+            let ctx = PublicConnectContext { conn: conn.clone() };
             let res = (self.on_connect)(req, ctx).await.map_err(HandlerError::internal)?;
+            conn.set_roles(candidate_roles);
 
             Ok(res)
         }
